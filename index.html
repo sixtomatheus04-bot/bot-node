@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream V11 - Ultimate</title>
+    <title>CineStream V12 - Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -13,266 +13,226 @@
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; text-decoration: none; font-family: 'Outfit', sans-serif; }
         body { background: var(--black); color: white; overflow-x: hidden; }
 
-        /* UTILITÁRIOS */
+        /* GERAL */
         .screen { display: none; width: 100%; min-height: 100vh; }
-        .active-screen { display: flex; } 
-        .app-active { display: block; }
+        .active-screen { display: flex; } /* Para Login e Admin */
+        .app-active { display: block; } /* Para o App */
         
-        .btn { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-red { background: var(--red); color: white; }
-        .btn-green { background: var(--green); color: black; }
-        .btn:hover { opacity: 0.8; transform: scale(1.05); }
+        .btn-red:hover { background: #b20710; }
+        .btn-gray { background: #333; color: white; border: 1px solid #555; }
 
-        /* 1. LOGIN SCREEN */
+        /* 1. LOGIN */
         #auth-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 3000;
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
             background-size: cover; align-items: center; justify-content: center; flex-direction: column;
         }
-        .auth-box { background: rgba(0,0,0,0.85); padding: 50px; border-radius: 12px; width: 400px; text-align: center; border: 1px solid #333; backdrop-filter: blur(10px); }
-        .auth-input { width: 100%; padding: 15px; background: #333; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; }
+        .auth-box { background: rgba(0,0,0,0.85); padding: 40px; border-radius: 10px; width: 350px; text-align: center; border: 1px solid #333; backdrop-filter: blur(10px); }
+        .auth-input { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; }
 
-        /* 2. ADMIN SCREEN */
-        #admin-screen { background: #111; padding: 0; }
-        .admin-sidebar { width: 250px; background: #000; border-right: 1px solid #333; height: 100vh; position: fixed; padding: 20px; }
-        .admin-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
-        .admin-menu-item { padding: 15px; cursor: pointer; color: #aaa; font-weight: bold; margin-bottom: 5px; display: flex; gap: 10px; align-items: center; }
-        .admin-menu-item:hover, .admin-menu-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
+        /* 2. ADMIN */
+        #admin-screen { background: #111; flex-direction: row; }
+        .admin-sidebar { width: 250px; background: #050505; border-right: 1px solid #333; height: 100vh; padding: 20px; position: fixed; }
+        .admin-content { margin-left: 250px; padding: 40px; width: 100%; }
+        .adm-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; display: flex; gap: 10px; align-items: center; border-radius: 5px; margin-bottom: 5px; }
+        .adm-item:hover, .adm-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
         
-        table { width: 100%; border-collapse: collapse; background: #1a1a1a; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; }
+        table { width: 100%; border-collapse: collapse; background: #1a1a1a; margin-top: 20px; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
         th { background: #222; color: var(--green); }
 
-        /* Chat Layout (Admin & User) */
-        .chat-layout { display: flex; height: 60vh; background: #1a1a1a; border-radius: 10px; border: 1px solid #333; overflow: hidden; }
-        .chat-sidebar { width: 30%; border-right: 1px solid #333; overflow-y: auto; background: #111; }
-        .chat-main { width: 70%; display: flex; flex-direction: column; background: #0d0d0d; }
-        .chat-feed { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .chat-input { padding: 15px; background: #1a1a1a; display: flex; gap: 10px; }
-        
-        .msg { padding: 8px 15px; border-radius: 10px; max-width: 70%; font-size: 14px; }
+        /* CHAT */
+        .chat-layout { display: flex; height: 60vh; background: #151515; border: 1px solid #333; border-radius: 8px; overflow: hidden; margin-top: 20px; }
+        .chat-list { width: 30%; border-right: 1px solid #333; overflow-y: auto; background: #111; }
+        .chat-feed { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0a0a0a; }
+        .chat-input-area { padding: 15px; background: #1a1a1a; display: flex; gap: 10px; }
+        .msg { padding: 8px 12px; border-radius: 8px; font-size: 14px; max-width: 75%; }
         .msg.me { background: var(--green); color: black; align-self: flex-end; }
         .msg.other { background: #333; color: white; align-self: flex-start; }
 
-        /* 3. APP SCREEN */
+        /* 3. APP UI */
         #app-screen { display: none; }
+        .nav { position: fixed; top: 0; width: 100%; height: 60px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, black, transparent); z-index: 100; transition: 0.3s; }
+        .nav.black { background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         
-        /* Navbar & Search */
-        .nav { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, black, transparent); z-index: 100; transition: 0.3s; }
-        .nav.black { background: #000; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-        .search-container { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 5px 15px; display: flex; align-items: center; width: 300px; backdrop-filter: blur(5px); }
-        .search-container input { background: transparent; border: none; color: white; width: 100%; margin-left: 10px; }
-
-        /* Sidebar User */
-        .sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: #000; border-right: 1px solid #333; z-index: 200; transform: translateX(-100%); transition: 0.4s; padding-top: 80px; }
+        .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: #000; border-right: 1px solid #333; z-index: 200; transform: translateX(-100%); transition: 0.3s; padding-top: 70px; }
         .sidebar.open { transform: translateX(0); }
-        .menu-item { padding: 15px 30px; display: flex; align-items: center; gap: 15px; color: #ccc; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        .menu-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; color: #aaa; cursor: pointer; font-size: 16px; }
         .menu-item:hover { color: white; background: #1a1a1a; border-left: 4px solid var(--red); }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
 
-        /* Content Sections */
-        .page-section { display: none; padding-top: 80px; padding-bottom: 50px; min-height: 100vh; animation: fadeIn 0.5s; }
-        .page-section.active { display: block; }
-        
+        /* CONTENT */
+        .page { display: none; padding-top: 70px; min-height: 100vh; padding-bottom: 50px; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Hero & Posters */
-        .hero { height: 85vh; background-size: cover; background-position: center; position: relative; margin-top: -80px; }
-        .hero-content { position: absolute; bottom: 20%; left: 4%; max-width: 700px; text-shadow: 2px 2px 10px black; }
-        .row { margin-bottom: 40px; padding-left: 4%; }
-        .posters { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .poster { width: 160px; height: 240px; border-radius: 8px; cursor: pointer; transition: 0.3s; object-fit: cover; }
-        .poster:hover { transform: scale(1.1); z-index: 10; }
+        .hero { height: 80vh; background-size: cover; background-position: center; margin-top: -70px; position: relative; }
+        .hero-content { position: absolute; bottom: 20%; left: 4%; max-width: 600px; text-shadow: 2px 2px 10px black; }
+        
+        .row { margin-bottom: 30px; padding-left: 4%; }
+        .posters { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+        .poster { width: 150px; height: 225px; border-radius: 6px; cursor: pointer; transition: 0.2s; object-fit: cover; }
+        .poster:hover { transform: scale(1.05); z-index: 5; }
 
-        /* TV Player */
-        #tv-player-box { width: 90%; max-width: 900px; margin: 20px auto; background: black; aspect-ratio: 16/9; border: 1px solid #333; }
+        /* TV & MODAIS */
+        #tv-box { width: 90%; max-width: 800px; margin: 0 auto; background: black; aspect-ratio: 16/9; }
         video { width: 100%; height: 100%; }
-        .channel-grid { display: flex; gap: 10px; overflow-x: auto; padding: 20px 4%; }
-        .channel-btn { min-width: 120px; padding: 15px; background: #222; text-align: center; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
-        .channel-btn:hover { border-color: var(--red); background: #333; }
+        .channels { display: flex; gap: 10px; overflow-x: auto; padding: 20px 4%; }
+        .ch-btn { min-width: 120px; padding: 10px; background: #222; text-align: center; border-radius: 5px; cursor: pointer; border: 1px solid #444; }
+        .ch-btn:hover { border-color: var(--red); background: #333; }
 
-        /* Modais */
         #video-modal, #paywall-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; align-items: center; justify-content: center; }
         iframe { width: 100%; height: 100%; border: none; }
-        .close-btn { position: absolute; top: 20px; right: 30px; font-size: 40px; cursor: pointer; z-index: 6000; }
-        
-        .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; padding: 20px 4%; }
-
+        .close-btn { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; z-index: 6000; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen" class="active-screen">
         <div class="auth-box">
-            <h1 style="color:var(--red); font-size:45px; margin-bottom:10px; font-weight:800;">CINESTREAM</h1>
-            <p style="color:#aaa; margin-bottom:30px;">V11 MASTER</p>
-            <p id="msg-error" style="color:#ff5555; display:none; margin-bottom:10px;"></p>
+            <h1 style="color:var(--red); font-size:40px; font-weight:800; margin-bottom:10px;">CINESTREAM</h1>
+            <p style="color:#888; margin-bottom:20px;">V12 FIXED</p>
+            <p id="error-txt" style="color:#ff5555; display:none; margin-bottom:10px;"></p>
             
             <input type="text" id="login-email" class="auth-input" placeholder="Email ou 'admin'">
             <input type="password" id="login-pass" class="auth-input" placeholder="Senha">
-            
-            <button class="btn btn-red" style="width:100%" onclick="loginSystem()">ENTRAR</button>
-            <p style="margin-top:20px; color:#ccc; font-size:14px; cursor:pointer;" onclick="criarContaUI()">Novo aqui? <u>Criar conta</u></p>
+            <button class="btn btn-red" style="width:100%" onclick="doLogin()">ENTRAR</button>
+            <p style="margin-top:15px; font-size:13px; cursor:pointer; color:#ccc;" onclick="doRegisterUI()">Criar conta</p>
         </div>
     </div>
 
     <div id="admin-screen" class="screen">
         <div class="admin-sidebar">
-            <h2 style="color:var(--green); margin-bottom:40px;">ADMIN PAINEL</h2>
-            <div class="admin-menu-item active" onclick="tabAdmin('users')"><i class="fas fa-users"></i> Usuários</div>
-            <div class="admin-menu-item" onclick="tabAdmin('chat')"><i class="fas fa-comments"></i> Chat Suporte</div>
-            <div class="admin-menu-item" onclick="logout()" style="color:#ff5555; margin-top:50px;"><i class="fas fa-power-off"></i> Sair</div>
+            <h2 style="color:var(--green); margin-bottom:30px;">PAINEL ADMIN</h2>
+            <div class="adm-item active" onclick="tabAdmin('users')"><i class="fas fa-users"></i> Usuários</div>
+            <div class="adm-item" onclick="tabAdmin('chat')"><i class="fas fa-comments"></i> Chat</div>
+            <div class="adm-item" onclick="logout()" style="color:#ff5555; margin-top:auto;"><i class="fas fa-sign-out-alt"></i> Sair</div>
         </div>
-
         <div class="admin-content">
             <div id="adm-users">
-                <h2 style="margin-bottom:20px;">Gerenciar Assinaturas</h2>
-                <table style="width:100%;">
-                    <thead><tr><th>Email</th><th>Senha</th><th>Plano Atual</th><th>Ações</th></tr></thead>
-                    <tbody id="user-table"></tbody>
-                </table>
+                <h2>Gerenciar Contas</h2>
+                <table id="user-table"></table>
             </div>
             <div id="adm-chat" style="display:none;">
-                <h2 style="margin-bottom:20px;">Atendimento ao Cliente</h2>
+                <h2>Suporte</h2>
                 <div class="chat-layout">
-                    <div class="chat-sidebar" id="admin-chat-list"></div>
-                    <div class="chat-main">
-                        <div class="chat-feed" id="admin-chat-feed"><p style="color:#555; text-align:center; margin-top:20px;">Selecione um usuário.</p></div>
-                        <div class="chat-input" id="admin-chat-input" style="display:none;">
-                            <input type="text" id="adm-msg" class="auth-input" style="margin:0;" placeholder="Responder...">
-                            <button class="btn btn-green" onclick="sendAdminMsg()">Enviar</button>
-                        </div>
-                    </div>
+                    <div class="chat-list" id="adm-chat-list"></div>
+                    <div class="chat-feed" id="adm-chat-feed"></div>
+                </div>
+                <div class="chat-input-area" id="adm-chat-input" style="display:none;">
+                    <input type="text" id="adm-msg" class="auth-input" style="margin:0;" placeholder="Responder...">
+                    <button class="btn btn-green" onclick="sendAdmin()">Enviar</button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="app-screen" class="screen">
-        
         <nav class="nav" id="navbar">
-            <div style="display:flex; align-items:center; gap:20px;">
-                <i class="fas fa-bars" style="font-size:24px; cursor:pointer;" onclick="toggleSidebar()"></i>
-                <div style="font-size:24px; font-weight:bold; color:var(--red);">CINESTREAM</div>
-            </div>
-            <div class="search-container">
-                <i class="fas fa-search" style="color:#aaa;"></i>
-                <input type="text" id="search-bar" placeholder="Buscar filmes..." onkeyup="doSearch()">
-            </div>
             <div style="display:flex; align-items:center; gap:15px;">
-                <div id="badge-plan" style="background:#333; padding:5px 10px; border-radius:4px; font-size:12px;">FREE</div>
-                <i class="fas fa-user-circle" style="font-size:28px; cursor:pointer;" onclick="nav('profile')"></i>
+                <i class="fas fa-bars" style="font-size:22px; cursor:pointer;" onclick="toggleSidebar()"></i>
+                <div style="font-weight:bold; font-size:22px; color:var(--red);">CINESTREAM</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span id="badge" style="font-size:12px; padding:4px 8px; background:#333; border-radius:4px;">FREE</span>
+                <i class="fas fa-user-circle" style="font-size:26px;"></i>
             </div>
         </nav>
 
         <div class="overlay" onclick="toggleSidebar()"></div>
         <div class="sidebar" id="sidebar">
-            <div class="menu-item" onclick="nav('home')"><i class="fas fa-home"></i> Início</div>
-            <div class="menu-item" onclick="nav('movies')"><i class="fas fa-film"></i> Filmes</div>
-            <div class="menu-item" onclick="nav('series')"><i class="fas fa-tv"></i> Séries</div>
-            <div class="menu-item" onclick="nav('trending')"><i class="fas fa-fire"></i> Em Alta</div>
-            <div class="menu-item" onclick="nav('tv')"><i class="fas fa-broadcast-tower"></i> TV Ao Vivo</div>
+            <div class="menu-item" onclick="navTo('home')"><i class="fas fa-home"></i> Início</div>
+            <div class="menu-item" onclick="navTo('movies')"><i class="fas fa-film"></i> Filmes</div>
+            <div class="menu-item" onclick="navTo('series')"><i class="fas fa-tv"></i> Séries</div>
+            <div class="menu-item" onclick="navTo('tv')"><i class="fas fa-broadcast-tower"></i> TV Ao Vivo</div>
+            <div class="menu-item" onclick="navTo('support')"><i class="fas fa-headset"></i> Suporte</div>
             <hr style="border-color:#333;">
-            <div class="menu-item" onclick="nav('profile')"><i class="fas fa-user"></i> Perfil</div>
-            <div class="menu-item" onclick="nav('config')"><i class="fas fa-cog"></i> Configurações</div>
-            <div class="menu-item" onclick="nav('support')"><i class="fas fa-headset"></i> Suporte</div>
             <div class="menu-item" onclick="logout()" style="color:#ff5555;"><i class="fas fa-sign-out-alt"></i> Sair</div>
         </div>
 
-        <div id="page-home" class="page-section active" style="padding:0;">
+        <div id="page-home" class="page active" style="padding:0;">
             <div class="hero" id="hero">
                 <div class="hero-content">
-                    <h1 id="hero-title" style="font-size:50px; font-weight:800;">Carregando...</h1>
+                    <h1 id="hero-title" style="font-size:40px; margin-bottom:10px;">Carregando...</h1>
                     <p id="hero-desc">...</p>
                     <button class="btn btn-red" onclick="playHero()">▶ ASSISTIR</button>
                 </div>
             </div>
-            <div style="margin-top:-100px; position:relative; z-index:10; padding:0 4%;">
-                <div id="dynamic-rows"></div> </div>
-        </div>
-
-        <div id="page-search" class="page-section result-grid"></div>
-
-        <div id="page-grid" class="page-section result-grid"></div>
-
-        <div id="page-tv" class="page-section" style="padding:100px 4%;">
-            <h2 style="margin-bottom:20px; color:var(--red);">📺 TV Ao Vivo (Grátis)</h2>
-            <div id="tv-player-box"><video id="tv-video" controls></video></div>
-            <div class="channel-grid">
-                <div class="channel-btn" onclick="playChannel('https://stmv1.srvif.com/recordnews/recordnews/playlist.m3u8')">Record News</div>
-                <div class="channel-btn" onclick="playChannel('https://cdn.jmvstream.com/w/CA-1361/index.m3u8')">Rede Brasil</div>
-                <div class="channel-btn" onclick="playChannel('https://59f1cbe63db89.streamlock.net:1443/tvcatiafonseca/tvcatiafonseca/playlist.m3u8')">TV Gazeta</div>
-                <div class="channel-btn" onclick="playChannel('https://nasa-i.akamaihd.net/hls/live/253565/NASA-NTV1-Public/master.m3u8')">NASA TV</div>
-                <div class="channel-btn" onclick="playChannel('https://rbmn-live.akamaized.net/hls/live/590964/Bootsy/master.m3u8')">Red Bull TV</div>
+            <div style="margin-top:-80px; position:relative; z-index:10; padding-bottom:50px;">
+                <div id="dynamic-rows"></div>
             </div>
         </div>
 
-        <div id="page-support" class="page-section" style="padding:100px 4%;">
+        <div id="page-tv" class="page" style="padding:100px 4%;">
+            <h2 style="color:var(--red); margin-bottom:20px;">TV Ao Vivo</h2>
+            <div id="tv-box"><video id="tv-video" controls></video></div>
+            <div class="channels">
+                <div class="ch-btn" onclick="playCh('https://stmv1.srvif.com/recordnews/recordnews/playlist.m3u8')">Record News</div>
+                <div class="ch-btn" onclick="playCh('https://cdn.jmvstream.com/w/CA-1361/index.m3u8')">Rede Brasil</div>
+                <div class="ch-btn" onclick="playCh('https://59f1cbe63db89.streamlock.net:1443/tvcatiafonseca/tvcatiafonseca/playlist.m3u8')">TV Gazeta</div>
+                <div class="ch-btn" onclick="playCh('https://nasa-i.akamaihd.net/hls/live/253565/NASA-NTV1-Public/master.m3u8')">NASA TV</div>
+            </div>
+        </div>
+
+        <div id="page-movies" class="page" style="padding:100px 4%;"><h2>Filmes</h2><div class="posters" id="grid-movies" style="flex-wrap:wrap;"></div></div>
+        <div id="page-series" class="page" style="padding:100px 4%;"><h2>Séries</h2><div class="posters" id="grid-series" style="flex-wrap:wrap;"></div></div>
+
+        <div id="page-support" class="page" style="padding:100px 4%;">
             <div style="max-width:800px; margin:0 auto;">
-                <h2>💬 Fale com o Suporte</h2>
-                <div class="chat-layout" style="margin-top:20px;">
-                    <div class="chat-main" style="width:100%;">
-                        <div class="chat-feed" id="user-chat-feed"></div>
-                        <div class="chat-input">
-                            <input type="text" id="user-msg" class="auth-input" style="margin:0;" placeholder="Digite...">
-                            <button class="btn btn-red" onclick="sendUserMsg()">Enviar</button>
-                        </div>
-                    </div>
+                <h2>Suporte Chat</h2>
+                <div class="chat-layout">
+                    <div class="chat-feed" id="user-chat-feed"></div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="user-msg" class="auth-input" style="margin:0;" placeholder="Digite...">
+                    <button class="btn btn-red" onclick="sendUser()">Enviar</button>
                 </div>
             </div>
-        </div>
-
-        <div id="page-profile" class="page-section" style="padding:100px 4%;">
-            <h2>👤 Meu Perfil</h2>
-            <div class="auth-box" style="margin-top:20px; text-align:left;">
-                <p>Email: <strong id="prof-email"></strong></p>
-                <p>Plano: <strong id="prof-plan" style="color:var(--gold);"></strong></p>
-                <p style="margin-top:20px; color:#aaa;">ID: <span id="prof-id"></span></p>
-            </div>
-        </div>
-        
-        <div id="page-config" class="page-section" style="padding:100px 4%;">
-            <h2>⚙️ Configurações</h2>
-            <p>Opções de qualidade e conta (em breve).</p>
         </div>
 
     </div>
 
     <div id="video-modal">
         <div class="close-btn" onclick="closePlayer()">×</div>
-        <div style="position:absolute; top:20px; left:20px; z-index:6001; display:flex; gap:10px;">
-            <button class="btn" style="background:rgba(0,0,0,0.5); color:white; border:1px solid #555;" onclick="setSource(1)">🇧🇷 Player 1</button>
-            <button class="btn" style="background:rgba(0,0,0,0.5); color:white; border:1px solid #555;" onclick="setSource(2)">🇺🇸 Player 2</button>
+        <div style="position:absolute; top:20px; left:20px; z-index:6001;">
+            <button class="btn btn-gray" onclick="setPlayer(1)">🇧🇷 Opção 1</button>
+            <button class="btn btn-gray" onclick="setPlayer(2)">🇧🇷 Opção 2</button>
+            <button class="btn btn-gray" onclick="setPlayer(3)">🇺🇸 Opção 3</button>
         </div>
         <iframe id="video-frame" allowfullscreen></iframe>
     </div>
 
     <div id="paywall-modal">
         <div class="auth-box" style="border-color:var(--gold);">
-            <h1 style="font-size:50px;">🔒</h1>
-            <h2>Premium</h2>
-            <p>Peça ao Admin para liberar sua conta.</p>
-            <button class="btn btn-red" onclick="document.getElementById('paywall-modal').style.display='none'">Fechar</button>
+            <h1 style="font-size:40px;">🔒</h1>
+            <h2 style="color:var(--gold);">PREMIUM</h2>
+            <p>Conteúdo bloqueado.</p>
+            <button class="btn btn-gray" onclick="document.getElementById('paywall-modal').style.display='none'">Fechar</button>
         </div>
     </div>
 
     <script>
-        // === BANCO DE DADOS ===
-        const DB_USERS = 'cine_v11_users';
-        const DB_CHATS = 'cine_v11_chats';
+        // CONFIG
+        const DB_KEY = 'cine_v12_users';
+        const CHAT_KEY = 'cine_v12_chats';
         const API = 'c3162eed0616407fa43134e07880c7d5';
         const BASE = 'https://api.themoviedb.org/3';
         
-        let currentUser = null, activeChat = null, heroId = 0, currentPlayerId = 0;
+        let currentUser = null, activeChat = null, heroId = 0, currentMid = 0;
+        
+        // HELPERS
         const getDB = k => JSON.parse(localStorage.getItem(k)) || [];
         const saveDB = (k,v) => localStorage.setItem(k, JSON.stringify(v));
 
+        // INIT
         window.onload = () => {
-            const sess = JSON.parse(localStorage.getItem('cineSession'));
-            if(sess) {
-                if(sess.role === 'admin') initAdmin();
+            const s = JSON.parse(localStorage.getItem('cineSession'));
+            if(s) {
+                if(s.role === 'admin') initAdmin();
                 else {
-                    const u = getDB(DB_USERS).find(x => x.email === sess.email);
+                    const u = getDB(DB_KEY).find(x => x.email === s.email);
                     if(u) { currentUser = u; initApp(); } 
                     else logout();
                 }
@@ -281,114 +241,127 @@
             }
         };
 
-        // === AUTH ===
-        function loginSystem() {
+        // --- AUTH ---
+        function doLogin() {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
             if(e === 'admin' && p === 'admin') {
                 localStorage.setItem('cineSession', JSON.stringify({role:'admin'}));
                 location.reload(); return;
             }
-            const u = getDB(DB_USERS).find(x => x.email === e && x.pass === p);
+            const u = getDB(DB_KEY).find(x => x.email === e && x.pass === p);
             if(u) {
                 localStorage.setItem('cineSession', JSON.stringify(u));
                 location.reload();
             } else {
-                document.getElementById('msg-error').innerText = "Erro no login.";
-                document.getElementById('msg-error').style.display = 'block';
+                document.getElementById('error-txt').innerText = "Erro no login.";
+                document.getElementById('error-txt').style.display = 'block';
             }
         }
 
-        function criarContaUI() {
+        function doRegisterUI() {
             const e = prompt("Email:"); if(!e) return;
             const p = prompt("Senha:"); if(!p) return;
-            const db = getDB(DB_USERS);
+            const db = getDB(DB_KEY);
             if(db.find(x => x.email === e)) return alert("Email já existe!");
             db.push({ email: e, pass: p, plan: 'free' });
-            saveDB(DB_USERS, db);
-            alert("Conta criada! Entre agora.");
+            saveDB(DB_KEY, db);
+            alert("Conta criada!");
         }
 
         function logout() { localStorage.removeItem('cineSession'); location.reload(); }
 
-        // === ADMIN ===
+        // --- ADMIN ---
         function initAdmin() {
             document.getElementById('auth-screen').style.display='none';
             document.getElementById('admin-screen').style.display='flex';
             renderUsers();
-            setInterval(() => { if(activeChat) loadAdminChat(activeChat); }, 2000);
+            setInterval(() => { if(activeChat) renderAdminChat(activeChat); }, 2000);
         }
 
         function tabAdmin(t) {
-            document.getElementById('adm-users').style.display = t === 'users'?'block':'none';
-            document.getElementById('adm-chat').style.display = t === 'chat'?'block':'none';
-            if(t === 'users') renderUsers();
-            if(t === 'chat') renderChatList();
+            document.getElementById('adm-users').style.display = t==='users'?'block':'none';
+            document.getElementById('adm-chat').style.display = t==='chat'?'block':'none';
+            if(t==='users') renderUsers();
+            if(t==='chat') renderChatList();
         }
 
         function renderUsers() {
-            const tbody = document.getElementById('user-table'); tbody.innerHTML='';
-            getDB(DB_USERS).forEach((u, i) => {
-                const btnTxt = u.plan === 'free' ? '👑 VIRAR PREMIUM' : '⬇️ VIRAR FREE';
-                const color = u.plan === 'free' ? 'var(--gold)' : '#ccc';
-                tbody.innerHTML += `<tr><td>${u.email}</td><td>${u.pass}</td><td>${u.plan.toUpperCase()}</td><td><button onclick="togglePlan(${i})" style="padding:5px; background:${color}; border:none; cursor:pointer; font-weight:bold; border-radius:4px;">${btnTxt}</button> <button onclick="delUser(${i})" style="color:red; background:none; border:none; cursor:pointer; margin-left:10px;">X</button></td></tr>`;
+            const tb = document.getElementById('user-table'); tb.innerHTML = '';
+            getDB(DB_KEY).forEach((u, i) => {
+                const color = u.plan === 'premium' ? 'var(--gold)' : '#555';
+                tb.innerHTML += `<tr><td>${u.email}</td><td>${u.pass}</td><td style="color:${color};font-weight:bold;">${u.plan.toUpperCase()}</td><td><button onclick="changePlan(${i})" class="btn btn-gray">Trocar Plano</button> <button onclick="delUser(${i})" style="color:red;border:none;background:none;cursor:pointer;">X</button></td></tr>`;
             });
         }
 
-        function togglePlan(i) {
-            const db = getDB(DB_USERS);
+        function changePlan(i) {
+            const db = getDB(DB_KEY);
             db[i].plan = db[i].plan === 'free' ? 'premium' : 'free';
-            saveDB(DB_USERS, db); renderUsers();
+            saveDB(DB_KEY, db); renderUsers();
         }
 
         function delUser(i) {
-            if(confirm("Excluir?")) {
-                const db = getDB(DB_USERS); db.splice(i, 1);
-                saveDB(DB_USERS, db); renderUsers();
+            if(confirm("Deletar?")) {
+                const db = getDB(DB_KEY); db.splice(i, 1);
+                saveDB(DB_KEY, db); renderUsers();
             }
         }
 
-        // === ADMIN CHAT ===
+        // --- CHAT ---
         function renderChatList() {
-            const list = document.getElementById('admin-chat-list'); list.innerHTML='';
-            getDB(DB_CHATS).forEach(c => {
-                list.innerHTML += `<div style="padding:15px; border-bottom:1px solid #333; cursor:pointer;" onclick="openChat('${c.email}')"><strong>${c.email}</strong></div>`;
+            const l = document.getElementById('adm-chat-list'); l.innerHTML = '';
+            getDB(CHAT_KEY).forEach(c => {
+                l.innerHTML += `<div style="padding:15px; border-bottom:1px solid #333; cursor:pointer;" onclick="openChat('${c.email}')">${c.email}</div>`;
             });
         }
-        function openChat(email) {
-            activeChat = email;
-            document.getElementById('admin-chat-input').style.display='flex';
-            loadAdminChat(email);
+        function openChat(e) { activeChat = e; document.getElementById('adm-chat-input').style.display='flex'; renderAdminChat(e); }
+        
+        function renderAdminChat(e) {
+            const c = getDB(CHAT_KEY).find(x => x.email === e);
+            const f = document.getElementById('adm-chat-feed'); f.innerHTML='';
+            if(c) c.msgs.forEach(m => f.innerHTML += `<div class="msg ${m.sender==='admin'?'me':'other'}">${m.text}</div>`);
         }
-        function loadAdminChat(email) {
-            const chat = getDB(DB_CHATS).find(c => c.email === email);
-            const feed = document.getElementById('admin-chat-feed'); feed.innerHTML='';
-            if(chat) chat.msgs.forEach(m => feed.innerHTML += `<div class="msg ${m.sender==='admin'?'me':'other'}">${m.text}</div>`);
-        }
-        function sendAdminMsg() {
-            const txt = document.getElementById('adm-msg').value; if(!txt) return;
-            const db = getDB(DB_CHATS); const c = db.find(x => x.email === activeChat);
-            c.msgs.push({sender:'admin', text:txt}); saveDB(DB_CHATS, db);
-            document.getElementById('adm-msg').value=''; loadAdminChat(activeChat);
+        function sendAdmin() {
+            const t = document.getElementById('adm-msg').value; if(!t) return;
+            const db = getDB(CHAT_KEY); const c = db.find(x => x.email === activeChat);
+            c.msgs.push({sender:'admin', text:t}); saveDB(CHAT_KEY, db);
+            document.getElementById('adm-msg').value=''; renderAdminChat(activeChat);
         }
 
-        // === APP USUÁRIO ===
+        // USER CHAT
+        function renderUserChat() {
+            const db = getDB(CHAT_KEY); let c = db.find(x => x.email === currentUser.email);
+            const f = document.getElementById('user-chat-feed'); f.innerHTML='';
+            if(c) c.msgs.forEach(m => f.innerHTML += `<div class="msg ${m.sender==='user'?'me':'other'}">${m.text}</div>`);
+        }
+        function sendUser() {
+            const t = document.getElementById('user-msg').value; if(!t) return;
+            const db = getDB(CHAT_KEY); let c = db.find(x => x.email === currentUser.email);
+            if(!c) { c = {email:currentUser.email, msgs:[]}; db.push(c); }
+            c.msgs.push({sender:'user', text:t}); saveDB(CHAT_KEY, db);
+            document.getElementById('user-msg').value=''; renderUserChat();
+        }
+
+        // --- APP ---
         async function initApp() {
             document.getElementById('auth-screen').style.display='none';
-            document.getElementById('app-screen').style.display='flex';
+            document.getElementById('app-screen').style.display='block';
             
-            // Setup Profile
-            document.getElementById('prof-email').innerText = currentUser.email;
-            document.getElementById('prof-plan').innerText = currentUser.plan.toUpperCase();
-            document.getElementById('prof-id').innerText = Date.now(); // fake id
-            
-            // Badge UI
-            const b = document.getElementById('badge-plan');
-            b.innerText = currentUser.plan === 'premium' ? 'PREMIUM 👑' : 'FREE';
-            b.style.background = currentUser.plan === 'premium' ? 'var(--gold)' : '#333';
-            b.style.color = currentUser.plan === 'premium' ? 'black' : 'white';
+            const badge = document.getElementById('badge');
+            badge.innerText = currentUser.plan.toUpperCase();
+            badge.style.color = currentUser.plan === 'premium' ? 'var(--gold)' : 'white';
 
-            // Load Content
+            // Security Check Loop
+            setInterval(() => {
+                const u = getDB(DB_KEY).find(x => x.email === currentUser.email);
+                if(!u) { alert('Conta excluída.'); logout(); }
+                else if(u.plan !== currentUser.plan) { currentUser.plan = u.plan; localStorage.setItem('cineSession', JSON.stringify(currentUser)); location.reload(); }
+            }, 3000);
+
+            // Chat Polling
+            setInterval(() => { if(document.getElementById('page-support').style.display==='block') renderUserChat(); }, 2000);
+
+            // Content
             const hRes = await fetch(`${BASE}/trending/movie/week?api_key=${API}&language=pt-BR`);
             const hData = await hRes.json();
             const h = hData.results[0];
@@ -397,138 +370,87 @@
             document.getElementById('hero-title').innerText = h.title;
             document.getElementById('hero-desc').innerText = h.overview;
 
-            // Infinite Rows
-            const container = document.getElementById('dynamic-rows');
-            container.innerHTML = '';
-            
-            // 1. Trending (Com Trava)
-            container.innerHTML += `<div class="row"><h2>🔥 Em Alta</h2><div class="posters" id="row-trend"></div></div>`;
-            fillPoster(hData.results, 'row-trend', true);
-
-            // 2. Generos (Loop Infinito)
-            const genres = [{id:28,n:'Ação'},{id:16,n:'Animação'},{id:35,n:'Comédia'},{id:27,n:'Terror'},{id:878,n:'Sci-Fi'},{id:10749,n:'Romance'}];
+            // Rows
+            fillRow(hData.results, 'dynamic-rows', '🔥 Em Alta', true);
+            const genres = [{id:28,n:'Ação'}, {id:35,n:'Comédia'}, {id:27,n:'Terror'}];
             for(let g of genres) {
-                const rid = `r-${g.id}`;
-                container.innerHTML += `<div class="row"><h2>🎬 ${g.n}</h2><div class="posters" id="${rid}">Loading...</div></div>`;
-                fetchAndFill(g.id, rid);
+                const r = await fetch(`${BASE}/discover/movie?api_key=${API}&with_genres=${g.id}&language=pt-BR`);
+                const d = await r.json();
+                fillRow(d.results, 'dynamic-rows', `🎬 ${g.n}`, false);
             }
-
-            // Security Check
-            setInterval(() => {
-                const u = getDB(DB_USERS).find(x => x.email === currentUser.email);
-                if(!u) { alert('Conta removida.'); logout(); }
-                else if(u.plan !== currentUser.plan) { currentUser.plan = u.plan; localStorage.setItem('cineSession', JSON.stringify(currentUser)); location.reload(); }
-            }, 3000);
-
-            // Chat Polling
-            setInterval(() => { if(document.getElementById('page-support').style.display === 'block') loadUserChat(); }, 2000);
         }
 
-        async function fetchAndFill(gid, elId) {
-            const r = await fetch(`${BASE}/discover/movie?api_key=${API}&with_genres=${gid}&language=pt-BR`);
-            const d = await r.json();
-            fillPoster(d.results, elId, false);
-        }
-
-        function fillPoster(list, elId, isLocked) {
-            const el = document.getElementById(elId); el.innerHTML='';
+        function fillRow(list, containerId, title, locked) {
+            const c = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'row';
+            let html = `<h2>${title}</h2><div class="posters">`;
             list.forEach(f => {
                 if(f.poster_path) {
-                    const lock = isLocked && currentUser.plan !== 'premium';
-                    el.innerHTML += `<div class="poster-wrapper" onclick="tryPlay(${f.id}, ${lock})">
-                        <img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster">
-                        ${lock ? '<div class="lock-overlay"><i class="fas fa-lock"></i></div>' : ''}
-                    </div>`;
+                    html += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="tryPlay(${f.id}, ${locked})">`;
                 }
             });
+            html += `</div>`;
+            div.innerHTML = html;
+            c.appendChild(div);
         }
 
-        // --- NAVIGATION ---
-        function nav(page) {
-            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-'+page).style.display = 'none'; // reset all
-            
-            // Hide all first
-            const sections = ['home', 'search', 'grid', 'tv', 'support', 'profile', 'config'];
-            sections.forEach(s => document.getElementById('page-'+s).classList.remove('active'));
-
-            const target = document.getElementById('page-'+page);
-            if(target) target.classList.add('active');
-            
-            if(page === 'trending') loadGrid(`${BASE}/trending/all/week?api_key=${API}&language=pt-BR`);
-            if(page === 'movies') loadGrid(`${BASE}/discover/movie?api_key=${API}&language=pt-BR`);
-            if(page === 'series') loadGrid(`${BASE}/discover/tv?api_key=${API}&language=pt-BR`);
-            if(page === 'support') loadUserChat();
-
+        function navTo(p) {
+            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+            document.getElementById('page-'+p).classList.add('active');
             toggleSidebar();
+            
+            if(p==='movies') loadGrid(`${BASE}/discover/movie?api_key=${API}&language=pt-BR`, 'grid-movies');
+            if(p==='series') loadGrid(`${BASE}/discover/tv?api_key=${API}&language=pt-BR`, 'grid-series');
+            if(p==='support') renderUserChat();
         }
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open')?'block':'none';
-        }
-
-        async function doSearch() {
-            const q = document.getElementById('search-bar').value;
-            if(q.length < 3) return;
-            nav('search');
-            const r = await fetch(`${BASE}/search/multi?api_key=${API}&language=pt-BR&query=${q}`);
-            const d = await r.json();
-            const el = document.getElementById('page-search'); el.innerHTML='';
-            d.results.forEach(f => {
-                if(f.poster_path) el.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="tryPlay(${f.id}, false)">`;
-            });
-        }
-
-        async function loadGrid(url) {
-            const el = document.getElementById('page-grid'); el.innerHTML='Carregando...';
+        async function loadGrid(url, elId) {
+            const el = document.getElementById(elId); el.innerHTML='Carregando...';
             const r = await fetch(url); const d = await r.json(); el.innerHTML='';
             d.results.forEach(f => {
                 if(f.poster_path) el.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="tryPlay(${f.id}, false)">`;
             });
-            document.getElementById('page-grid').classList.add('active');
         }
 
-        // --- PLAYER ---
-        function tryPlay(id, locked) {
-            if(locked) document.getElementById('paywall-modal').style.display='flex';
-            else { currentPlayerId = id; document.getElementById('video-modal').style.display='flex'; setSource(1); }
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
         }
+
+        // PLAYER
         function playHero() { tryPlay(heroId, false); }
-        function setSource(n) {
+        function tryPlay(id, lock) {
+            if(lock && currentUser.plan !== 'premium') {
+                document.getElementById('paywall-modal').style.display='flex';
+            } else {
+                currentMid = id;
+                document.getElementById('video-modal').style.display='flex';
+                setPlayer(1);
+            }
+        }
+        function setPlayer(n) {
             const f = document.getElementById('video-frame');
-            if(n===1) f.src=`https://embed.warezcdn.link/filme/${currentPlayerId}`;
-            if(n===2) f.src=`https://vidsrc.me/embed/movie?tmdb=${currentPlayerId}`;
+            if(n===1) f.src=`https://embed.warezcdn.link/filme/${currentMid}`;
+            if(n===2) f.src=`https://superflixapi.top/filme/${currentMid}`;
+            if(n===3) f.src=`https://vidsrc.me/embed/movie?tmdb=${currentMid}`;
         }
         function closePlayer() { document.getElementById('video-modal').style.display='none'; document.getElementById('video-frame').src=''; }
 
-        // --- TV PLAYER ---
-        function playChannel(url) {
-            const video = document.getElementById('tv-video');
+        // TV
+        function playCh(url) {
+            const v = document.getElementById('tv-video');
             if(Hls.isSupported()) {
-                const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url; video.addEventListener('loadedmetadata',()=>video.play());
+                const hls = new Hls(); hls.loadSource(url); hls.attachMedia(v); hls.on(Hls.Events.MANIFEST_PARSED,()=>v.play());
+            } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
+                v.src=url; v.play();
             }
         }
 
-        // --- USER CHAT ---
-        function loadUserChat() {
-            const db = getDB(DB_CHATS);
-            let c = db.find(x => x.email === currentUser.email);
-            const feed = document.getElementById('user-chat-feed'); feed.innerHTML='';
-            if(c) c.msgs.forEach(m => feed.innerHTML += `<div class="msg ${m.sender==='user'?'me':'other'}">${m.text}</div>`);
+        window.onscroll = () => {
+            const nav = document.querySelector('.nav');
+            if(window.scrollY > 50) nav.classList.add('black'); else nav.classList.remove('black');
         }
-        function sendUserMsg() {
-            const t = document.getElementById('user-msg').value; if(!t) return;
-            const db = getDB(DB_CHATS);
-            let c = db.find(x => x.email === currentUser.email);
-            if(!c) { c = {email:currentUser.email, msgs:[]}; db.push(c); }
-            c.msgs.push({sender:'user', text:t}); saveDB(DB_CHATS, db);
-            document.getElementById('user-msg').value=''; loadUserChat();
-        }
-
-        window.onscroll = () => { const n = document.getElementById('navbar'); window.scrollY>50?n.classList.add('black'):n.classList.remove('black'); }
     </script>
 </body>
 </html>
