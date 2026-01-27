@@ -2,185 +2,119 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NuClone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { background: #820AD1; color: white; font-family: 'Outfit', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .phone { background: #fff; color: black; width: 350px; height: 700px; border-radius: 30px; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .phone { background: #fff; color: black; width: 350px; height: 650px; border-radius: 30px; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
         
-        .header { background: #820AD1; padding: 30px 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
-        .balance-card { padding: 20px; border-bottom: 1px solid #eee; }
-        .balance-val { font-size: 24px; font-weight: bold; }
-        
-        /* TELAS */
         .view { display: none; height: 100%; flex-direction: column; }
-        .active { display: flex; }
-
-        /* INPUTS */
-        .nubank-input { width: 100%; padding: 15px; border: none; border-bottom: 1px solid #ccc; outline: none; margin-bottom: 20px; font-size: 16px; }
-        .btn-nu { background: #820AD1; color: white; border: none; padding: 15px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; }
+        .view.active { display: flex; }
         
-        /* RECIBO */
-        .receipt { background: #f9f9f9; padding: 20px; flex: 1; font-size: 14px; color: #555; }
-        .receipt-header { text-align: center; border-bottom: 1px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px; }
-        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .inp { width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; font-size: 16px; }
+        .btn-nu { background: #820AD1; color: white; border: none; padding: 15px; border-radius: 30px; font-weight: bold; width: 100%; cursor: pointer; }
+        
+        h2 { color: #820AD1; margin-bottom: 5px; }
+        .bal { font-size: 28px; font-weight: bold; margin: 20px 0; }
     </style>
 </head>
 <body>
 
     <div class="phone">
         
-        <div id="view-auth" class="view active" style="padding:40px; justify-content:center;">
-            <h2 style="color:#820AD1;">Olá, NuClone</h2>
-            <p style="color:#666;">Complete seu cadastro para acessar.</p>
-            
-            <input id="reg-name" class="nubank-input" placeholder="Nome Completo">
-            <input id="reg-cpf" class="nubank-input" placeholder="CPF (000.000.000-00)">
-            <input id="reg-pin" class="nubank-input" type="password" placeholder="Senha de 4 dígitos" maxlength="4">
-            
-            <button class="btn-nu" onclick="completeRegister()">ACESSAR CONTA</button>
+        <div id="v-login" class="view active" style="justify-content:center;">
+            <h2>Olá, NuClone</h2>
+            <p style="color:#666; margin-bottom:20px;">Complete seu cadastro bancário.</p>
+            <input id="reg-name" class="inp" placeholder="Nome Completo">
+            <input id="reg-cpf" class="inp" placeholder="CPF">
+            <input id="reg-pin" class="inp" type="password" placeholder="Senha (4 números)" maxlength="4">
+            <button class="btn-nu" onclick="createBank()">ACESSAR CONTA</button>
         </div>
 
-        <div id="view-home" class="view">
-            <div class="header">
-                <span id="user-display">Olá</span>
-                <i class="fas fa-eye-slash"></i>
+        <div id="v-home" class="view">
+            <div style="background:#820AD1; color:white; padding:20px; margin:-20px -20px 20px -20px;">
+                <span id="user-name">Olá</span>
             </div>
-            <div class="balance-card">
-                <div style="font-size:14px; color:#666;">Conta</div>
-                <div class="balance-val">R$ <span id="balance">0,00</span></div>
-            </div>
-            <div style="padding:20px; display:flex; gap:15px; overflow-x:auto;">
-                <div style="text-align:center; cursor:pointer;" onclick="goto('pix')">
-                    <div style="background:#eee; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto;"><i class="fas fa-brands fa-pix"></i></div>
-                    <span style="font-size:12px;">Área Pix</span>
-                </div>
+            <p style="color:#666;">Saldo disponível</p>
+            <div class="bal">R$ <span id="balance">0.00</span></div>
+            <div style="display:flex; gap:10px; overflow-x:auto; padding:10px 0;">
+                <div style="background:#f0f0f0; width:80px; height:80px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="goto('pix')">Pix</div>
             </div>
         </div>
 
-        <div id="view-pix" class="view" style="padding:20px;">
-            <h3 style="color:#820AD1;">Área Pix</h3>
-            <p>Insira a chave ou código:</p>
-            <input id="pix-key" class="nubank-input" placeholder="Cola aqui o código...">
-            <button class="btn-nu" onclick="confirmPix()">CONTINUAR</button>
-            <p style="text-align:center; margin-top:20px; cursor:pointer;" onclick="goto('home')">Voltar</p>
-        </div>
-
-        <div id="view-pass" class="view" style="padding:20px; justify-content:center;">
-            <h3 style="text-align:center;">Digite sua senha de 4 dígitos</h3>
-            <input id="confirm-pin" class="nubank-input" type="password" style="text-align:center; letter-spacing:10px; font-size:24px;" maxlength="4">
-            <button class="btn-nu" onclick="processPayment()">CONFIRMAR PAGAMENTO</button>
-        </div>
-
-        <div id="view-receipt" class="view">
-            <div class="receipt">
-                <div class="receipt-header">
-                    <h2 style="color:#820AD1; margin:0;">Comprovante</h2>
-                    <p>Envio realizado com sucesso</p>
-                </div>
-                <div class="receipt-row"><span>Valor</span><strong>R$ <span id="rec-val"></span></strong></div>
-                <div class="receipt-row"><span>Data</span><span id="rec-date"></span></div>
-                <div class="receipt-row"><span>Origem</span><span id="rec-orig"></span></div>
-                <div class="receipt-row"><span>Destino</span><strong>CineStream LTDA</strong></div>
-                <div class="receipt-row"><span>Autenticação</span><span style="font-family:monospace; font-size:10px;" id="rec-id"></span></div>
-            </div>
-            <button class="btn-nu" style="margin:20px; width:auto;" onclick="goto('home')">Fechar</button>
+        <div id="v-pix" class="view">
+            <h2>Área Pix</h2>
+            <p>Pagar Código:</p>
+            <input id="pix-key" class="inp" placeholder="Cola aqui...">
+            <button class="btn-nu" onclick="pay()">PAGAR</button>
+            <p style="text-align:center; color:#820AD1; margin-top:20px; cursor:pointer;" onclick="goto('home')">Voltar</p>
         </div>
 
     </div>
 
     <script>
-        const DB = 'cine_ecosystem_v18';
+        const DB_KEY = 'cine_v19_ecosystem';
         let currentUser = null;
-        let pendingPayment = null;
 
-        function getDB() { return JSON.parse(localStorage.getItem(DB)) || []; }
-        function saveDB(d) { localStorage.setItem(DB, JSON.stringify(d)); }
+        function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
+        function saveDB(d) { localStorage.setItem(DB_KEY, JSON.stringify(d)); }
 
         window.onload = () => {
-            // Verifica sessão do site
             const s = JSON.parse(localStorage.getItem('cineSession'));
-            if(!s) { alert("Entre no CineStream primeiro."); return; }
+            if(!s) { alert("Entre no CineStream primeiro!"); return; }
             
             const db = getDB();
             currentUser = db.find(u => u.email === s.email);
             
-            // Se já tem cadastro bancário (nome), vai pra home
             if(currentUser.name && currentUser.name !== 'Usuário') {
-                updateUI();
-                goto('home');
+                updateUI(); goto('home');
             }
         };
 
-        function goto(v) {
-            document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-            document.getElementById('view-'+v).classList.add('active');
-        }
-
-        function completeRegister() {
-            const name = document.getElementById('reg-name').value;
-            const cpf = document.getElementById('reg-cpf').value;
-            const pin = document.getElementById('reg-pin').value;
+        function createBank() {
+            const n = document.getElementById('reg-name').value;
+            const c = document.getElementById('reg-cpf').value;
+            const p = document.getElementById('reg-pin').value;
             
-            if(name && cpf && pin.length===4) {
+            if(n && c && p.length===4) {
                 const db = getDB();
-                const idx = db.findIndex(u => u.email === currentUser.email);
-                
-                db[idx].name = name;
-                db[idx].cpf = cpf;
-                db[idx].pin = pin; // Guarda senha 4 digitos
-                
-                saveDB(db);
-                currentUser = db[idx];
-                updateUI();
-                goto('home');
-            } else alert("Preencha tudo corretamente.");
+                const i = db.findIndex(u => u.email === currentUser.email);
+                db[i].name = n; db[i].cpf = c; db[i].pin = p;
+                saveDB(db); currentUser = db[i];
+                updateUI(); goto('home');
+            } else alert("Preencha tudo");
         }
 
         function updateUI() {
-            document.getElementById('user-display').innerText = "Olá, " + currentUser.name.split(' ')[0];
+            document.getElementById('user-name').innerText = "Olá, " + currentUser.name;
             document.getElementById('balance').innerText = currentUser.balance.toFixed(2);
         }
 
-        function confirmPix() {
-            const code = document.getElementById('pix-key').value;
-            if(!code.startsWith("CINESTREAM_")) return alert("Código inválido.");
-            
-            // Parse Code: CINESTREAM_GOLD_19.90
-            const parts = code.split('_');
-            const plan = parts[1];
-            const val = parseFloat(parts[2]);
-            
-            if(currentUser.balance < val) return alert("Saldo insuficiente.");
-            
-            pendingPayment = { plan, val };
-            goto('pass');
+        function goto(v) {
+            document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+            document.getElementById('v-'+v).classList.add('active');
         }
 
-        function processPayment() {
-            const pin = document.getElementById('confirm-pin').value;
-            if(pin !== currentUser.pin) return alert("Senha incorreta.");
+        function pay() {
+            const k = document.getElementById('pix-key').value;
+            if(!k.includes('CINESTREAM')) return alert("Código Inválido");
             
-            // Processa
-            const db = getDB();
-            const idx = db.findIndex(u => u.email === currentUser.email);
-            
-            db[idx].balance -= pendingPayment.val;
-            db[idx].plan = pendingPayment.plan.toLowerCase(); // ATIVA PLANO
-            
-            saveDB(db);
-            currentUser = db[idx];
-            
-            // Gera Comprovante
-            document.getElementById('rec-val').innerText = pendingPayment.val.toFixed(2);
-            document.getElementById('rec-date').innerText = new Date().toLocaleString();
-            document.getElementById('rec-orig').innerText = currentUser.name + " (CPF ***)";
-            document.getElementById('rec-id').innerText = Math.random().toString(36).substr(2, 9).toUpperCase();
-            
-            updateUI();
-            goto('receipt');
+            // CINESTREAM_PREMIUM_29.90
+            const val = parseFloat(k.split('_')[2]);
+            const plan = k.split('_')[1].toLowerCase();
+
+            if(currentUser.balance >= val) {
+                const db = getDB();
+                const i = db.findIndex(u => u.email === currentUser.email);
+                
+                db[i].balance -= val;
+                db[i].plan = plan; // ATIVA NO SITE
+                
+                saveDB(db); currentUser = db[i];
+                alert("PAGAMENTO REALIZADO! Plano Ativado.");
+                updateUI(); goto('home');
+            } else alert("Saldo insuficiente. Peça ao Admin.");
         }
     </script>
 </body>
