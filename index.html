@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream V19 - Fixed</title>
+    <title>CineStream V20 - Fixed Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -11,72 +11,83 @@
     <style>
         :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; --gold: #FFD700; --green: #2ecc71; --purple: #820AD1; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Outfit', sans-serif; text-decoration: none; }
-        body { background: var(--black); color: white; overflow-x: hidden; }
+        body { background: var(--black); color: white; overflow-x: hidden; margin: 0; }
 
+        /* TELAS */
         .screen { display: none; width: 100%; min-height: 100vh; }
-        .active-flex { display: flex; }
-        .active-block { display: block; }
-        .btn { padding: 12px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-red { background: var(--red); color: white; }
-        .btn-purple { background: var(--purple); color: white; }
-        .btn-gold { background: var(--gold); color: black; }
+        .active-flex { display: flex !important; }
+        .active-block { display: block !important; }
 
-        /* 1. AUTH */
+        .btn { padding: 12px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .btn-red { background: var(--red); color: white; } .btn-red:hover { background: #b20710; }
+        .btn-green { background: var(--green); color: black; }
+        .btn-gold { background: var(--gold); color: black; }
+        .btn-purple { background: var(--purple); color: white; }
+
+        /* 1. LOGIN */
         #auth-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 3000;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://w.wallhaven.cc/full/lm/wallhaven-lmwmwl.jpg');
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
             background-size: cover; align-items: center; justify-content: center; flex-direction: column;
         }
         .auth-box { background: rgba(0,0,0,0.9); padding: 40px; border-radius: 12px; width: 380px; text-align: center; border: 1px solid #333; }
-        .auth-input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; }
+        .auth-input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; font-size: 16px; }
 
         /* 2. ADMIN */
         #admin-screen { background: #111; padding: 0; }
         .admin-sidebar { width: 250px; background: #050505; border-right: 1px solid #333; height: 100vh; padding: 20px; position: fixed; }
         .admin-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
-        .adm-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; display: flex; gap: 10px; align-items: center; }
-        .adm-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
-        table { width: 100%; border-collapse: collapse; background: #1a1a1a; margin-top: 20px; border-radius: 8px; }
+        .adm-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; display: flex; gap: 10px; align-items: center; margin-bottom: 5px; border-radius: 5px; }
+        .adm-item:hover, .adm-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
+        table { width: 100%; border-collapse: collapse; background: #1a1a1a; margin-top: 20px; border-radius: 8px; overflow: hidden; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
         th { background: #222; color: var(--green); }
 
         /* 3. APP */
         #app-screen { display: none; }
         .nav { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: black; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        
         .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: #000; border-right: 1px solid #333; z-index: 200; transform: translateX(-100%); transition: 0.3s; padding-top: 80px; }
         .sidebar.open { transform: translateX(0); }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
-        .menu-item { padding: 15px 30px; display: flex; align-items: center; gap: 15px; color: #aaa; cursor: pointer; }
+        .menu-item { padding: 15px 30px; display: flex; align-items: center; gap: 15px; color: #aaa; cursor: pointer; transition: 0.2s; font-size: 16px; }
         .menu-item:hover { color: white; background: #1a1a1a; border-left: 4px solid var(--red); }
 
-        .page { display: none; padding-top: 80px; padding-bottom: 50px; min-height: 100vh; }
+        /* PAGES */
+        .page { display: none; padding-top: 80px; padding-bottom: 50px; min-height: 100vh; animation: fadeIn 0.4s; }
         .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         .hero { height: 80vh; background-size: cover; background-position: center; margin-top: -80px; position: relative; }
         .hero-content { position: absolute; bottom: 20%; left: 4%; max-width: 600px; text-shadow: 2px 2px 10px black; }
         .row { margin-bottom: 40px; padding-left: 4%; }
         .posters { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .poster { width: 160px; height: 240px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .poster { width: 160px; height: 240px; border-radius: 8px; cursor: pointer; transition: 0.3s; object-fit: cover; }
         .poster:hover { transform: scale(1.1); z-index: 10; }
 
         /* PLANOS */
         .plans-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
         .plan-card { background: #1a1a1a; padding: 30px; border-radius: 15px; width: 280px; border: 2px solid #333; text-align: center; }
-        .plan-card.premium { border-color: var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+        .plan-card.premium { border-color: var(--gold); transform: scale(1.05); z-index: 2; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+        .check { color: var(--green); margin-right: 10px; }
 
-        /* MODAIS */
-        #checkout-modal, #video-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; align-items: center; justify-content: center; }
+        /* CHECKOUT */
+        #checkout-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; align-items: center; justify-content: center; }
         .checkout-box { background: white; color: black; padding: 30px; border-radius: 10px; width: 400px; text-align: center; }
         .pix-code { background: #eee; padding: 10px; font-family: monospace; font-size: 12px; margin: 20px 0; border: 1px dashed #000; word-break: break-all; }
+
+        /* PLAYER */
+        #video-modal, #paywall-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; align-items: center; justify-content: center; }
         iframe { width: 100%; height: 100%; border: none; }
         .close-btn { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; z-index: 6000; color: white; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen">
+    <div id="auth-screen" class="screen">
         <div class="auth-box">
             <h1 style="color:var(--red); font-size:40px; margin-bottom:10px;">CINESTREAM</h1>
-            <p id="error-msg" style="color:#ff5555; display:none;"></p>
+            <p id="error-msg" style="color:#ff5555; display:none; margin-bottom:15px;"></p>
             
             <div id="form-login">
                 <input type="text" id="log-email" class="auth-input" placeholder="Email ou 'admin'">
@@ -86,41 +97,41 @@
             </div>
 
             <div id="form-register" style="display:none;">
-                <input type="text" id="reg-email" class="auth-input" placeholder="Novo Email">
-                <input type="password" id="reg-pass" class="auth-input" placeholder="Nova Senha">
-                <button class="btn btn-purple" style="width:100%" onclick="doRegister()">CRIAR CONTA</button>
+                <input type="text" id="reg-email" class="auth-input" placeholder="Seu Email">
+                <input type="password" id="reg-pass" class="auth-input" placeholder="Crie uma Senha">
+                <button class="btn btn-purple" style="width:100%" onclick="doRegister()">CRIAR AGORA</button>
                 <p style="margin-top:15px; color:#ccc; cursor:pointer;" onclick="toggleForm('login')">Voltar</p>
             </div>
         </div>
     </div>
 
-    <div id="admin-screen">
+    <div id="admin-screen" class="screen">
         <div class="admin-sidebar">
             <h2 style="color:var(--green); margin-bottom:30px;">ADMIN</h2>
-            <div class="adm-item active" onclick="renderAdmin()"><i class="fas fa-users"></i> Usuários</div>
-            <div class="adm-item" onclick="openBank()"><i class="fas fa-university"></i> Banco</div>
+            <div class="adm-item active" onclick="tab('users')"><i class="fas fa-users"></i> Usuários</div>
+            <div class="adm-item" onclick="tab('bank')"><i class="fas fa-university"></i> Banco</div>
             <div class="adm-item" onclick="logout()" style="color:#ff5555; margin-top:50px;">Sair</div>
         </div>
         <div class="admin-content">
-            <div id="adm-users">
-                <h2>Contas</h2>
+            <div id="tab-users">
+                <h2>Usuários</h2>
                 <table style="width:100%; margin-top:20px;">
                     <thead><tr><th>Email</th><th>Plano</th><th>Saldo</th><th>Ação</th></tr></thead>
                     <tbody id="user-table"></tbody>
                 </table>
             </div>
-            <div id="adm-bank" style="display:none;">
-                <h2>🏦 Enviar Pix (Admin)</h2>
+            <div id="tab-bank" style="display:none;">
+                <h2>Injetar Saldo</h2>
                 <div style="background:#1a1a1a; padding:20px; border-radius:10px; max-width:500px; margin-top:20px;">
-                    <input type="text" id="bank-email" class="auth-input" placeholder="Email do Usuário">
-                    <input type="number" id="bank-val" class="auth-input" placeholder="Valor R$">
-                    <button class="btn btn-purple" style="width:100%" onclick="sendMoney()">ENVIAR SALDO</button>
+                    <input type="text" id="bank-user-email" class="auth-input" placeholder="Email do Cliente">
+                    <input type="number" id="bank-amount" class="auth-input" placeholder="Valor (R$)">
+                    <button class="btn btn-purple" style="width:100%" onclick="addBalance()">ENVIAR PIX</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="app-screen">
+    <div id="app-screen" class="screen">
         <nav class="nav">
             <div style="display:flex; align-items:center; gap:15px;">
                 <i class="fas fa-bars" style="font-size:24px; cursor:pointer;" onclick="toggleSidebar()"></i>
@@ -139,7 +150,7 @@
             <div class="menu-item" onclick="logout()" style="color:#ff5555;">Sair</div>
         </div>
 
-        <div id="page-home" class="page active" style="padding:0;">
+        <div id="page-home" class="page active">
             <div class="hero" id="hero">
                 <div class="hero-content">
                     <h1 id="hero-title">Carregando...</h1>
@@ -156,11 +167,11 @@
             <h2 style="text-align:center;">Assinatura</h2>
             <div class="plans-container">
                 <div class="plan-card">
-                    <h3>FREE</h3><div class="plan-price">R$ 0,00</div>
+                    <h3>FREE</h3><div style="font-size:30px; font-weight:bold; margin:10px 0;">R$ 0,00</div>
                     <button class="btn btn-green" style="width:100%" onclick="setPlan('free')">USAR</button>
                 </div>
                 <div class="plan-card premium">
-                    <h3 style="color:var(--gold);">PREMIUM</h3><div class="plan-price">R$ 29,90</div>
+                    <h3 style="color:var(--gold);">PREMIUM</h3><div style="font-size:30px; font-weight:bold; margin:10px 0;">R$ 29,90</div>
                     <button class="btn btn-gold" style="width:100%" onclick="checkout()">ASSINAR</button>
                 </div>
             </div>
@@ -170,10 +181,10 @@
     <div id="checkout-modal">
         <div class="checkout-box">
             <h2 style="color:#820AD1;">Pagamento</h2>
-            <p>Copie o código e pague no Banco.</p>
+            <p>Copie o código e pague no Banco NuClone.</p>
             <div class="pix-code" id="pix-code">CINESTREAM_PREMIUM_29.90</div>
             <button class="btn btn-purple" style="width:100%" onclick="copyPix()">COPIAR</button>
-            <p style="margin-top:10px; font-size:12px; cursor:pointer; color:red;" onclick="document.getElementById('checkout-modal').style.display='none'">Fechar</p>
+            <p style="margin-top:10px; cursor:pointer; color:red;" onclick="document.getElementById('checkout-modal').style.display='none'">Fechar</p>
         </div>
     </div>
 
@@ -182,56 +193,58 @@
         <iframe id="video-frame" allowfullscreen></iframe>
     </div>
 
+    <div id="paywall-modal">
+        <div class="auth-box" style="border-color:var(--gold);">
+            <h1>🔒</h1><h2 style="color:var(--gold);">PREMIUM</h2>
+            <button class="btn btn-gold" style="width:100%" onclick="navTo('plans'); document.getElementById('paywall-modal').style.display='none';">ASSINAR</button>
+            <p style="margin-top:15px; cursor:pointer;" onclick="document.getElementById('paywall-modal').style.display='none'">Voltar</p>
+        </div>
+    </div>
+
     <script>
-        // CONFIG
-        const DB_KEY = 'cine_v19_ecosystem';
+        // --- CORE SYSTEM V20 ---
+        const DB_KEY = 'cine_v20_system';
         const API = 'c3162eed0616407fa43134e07880c7d5';
-        
-        let currentUser = null;
-        let heroId = 0;
+        let currentUser = null, heroId = 0;
 
         function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
         function saveDB(d) { localStorage.setItem(DB_KEY, JSON.stringify(d)); }
 
-        // --- CORREÇÃO AUTOMÁTICA DE ERROS (A MÁGICA) ---
-        window.onload = () => {
+        // --- SISTEMA DE TELAS (FIXED) ---
+        window.onload = () => { checkSession(); };
+
+        function checkSession() {
             const s = JSON.parse(localStorage.getItem('cineSession'));
+            
+            // 1. Oculta tudo primeiro
+            document.querySelectorAll('.screen').forEach(el => {
+                el.style.display = 'none';
+                el.classList.remove('active-flex', 'active-block');
+            });
+
             if(s) {
                 if(s.role === 'admin') {
-                    showScreen('admin-screen');
+                    // ADMIN MODE
+                    document.getElementById('admin-screen').style.display = 'flex';
                     renderAdmin();
                 } else {
+                    // USER MODE
                     const db = getDB();
                     const user = db.find(u => u.email === s.email);
                     
-                    // SE O USUÁRIO NÃO EXISTIR NO BANCO, LIMPA TUDO E MANDA PRO LOGIN
-                    if(!user) {
-                        console.log("Usuário fantasma detectado. Limpando...");
-                        localStorage.removeItem('cineSession');
-                        showScreen('auth-screen');
-                    } else {
-                        // SE EXISTE, CARREGA O APP
+                    if(user) {
                         currentUser = user;
+                        document.getElementById('app-screen').style.display = 'block';
                         initApp();
+                    } else {
+                        // Usuário não existe mais (Bug Fix)
+                        localStorage.removeItem('cineSession');
+                        document.getElementById('auth-screen').style.display = 'flex';
                     }
                 }
             } else {
-                showScreen('auth-screen');
-            }
-        };
-
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => {
-                s.style.display = 'none';
-                s.classList.remove('active-flex', 'active-block');
-            });
-            const el = document.getElementById(id);
-            if(id === 'app-screen') {
-                el.style.display = 'block'; 
-                el.classList.add('active-block');
-            } else {
-                el.style.display = 'flex';
-                el.classList.add('active-flex');
+                // NO SESSION
+                document.getElementById('auth-screen').style.display = 'flex';
             }
         }
 
@@ -246,49 +259,47 @@
             const p = document.getElementById('log-pass').value;
             if(e==='admin' && p==='admin') {
                 localStorage.setItem('cineSession', JSON.stringify({role:'admin'}));
-                location.reload(); return;
+                checkSession(); return;
             }
             const user = getDB().find(u => u.email === e && u.pass === p);
             if(user) {
                 localStorage.setItem('cineSession', JSON.stringify(user));
-                location.reload();
-            } else alert("Dados inválidos");
+                checkSession();
+            } else alert("Dados inválidos.");
         }
 
         function doRegister() {
             const e = document.getElementById('reg-email').value;
             const p = document.getElementById('reg-pass').value;
             const db = getDB();
-            if(db.find(u => u.email === e)) return alert("Email já existe");
+            if(db.find(u => u.email === e)) return alert("Email já existe.");
             
-            // CRIA COM DADOS COMPLETOS PARA EVITAR ERRO 'UNDEFINED'
-            const newUser = { email:e, pass:p, plan:'free', balance:0, name:'Usuário' };
+            const newUser = { email:e, pass:p, plan:'free', balance:0, name:'Cliente' };
             db.push(newUser);
             saveDB(db);
             
-            // Loga direto
+            // Loga automaticamente
             localStorage.setItem('cineSession', JSON.stringify(newUser));
-            alert("Conta criada! Bem-vindo.");
-            location.reload();
+            alert("Conta criada!");
+            checkSession();
         }
 
-        function logout() { localStorage.removeItem('cineSession'); location.reload(); }
+        function logout() { localStorage.removeItem('cineSession'); checkSession(); }
 
-        // --- APP ---
+        // --- APP LOGIC ---
         async function initApp() {
-            showScreen('app-screen');
             document.getElementById('user-badge').innerText = currentUser.plan.toUpperCase();
-
-            // Sincronia de Pagamento
+            
+            // Monitoramento de Pagamento
             setInterval(() => {
                 const fresh = getDB().find(u => u.email === currentUser.email);
                 if(fresh && fresh.plan !== currentUser.plan) {
-                    alert("Plano Atualizado: " + fresh.plan.toUpperCase());
+                    alert("Plano Atualizado para: " + fresh.plan.toUpperCase());
                     location.reload();
                 }
             }, 3000);
 
-            // API
+            // API Filmes
             try {
                 const r = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API}&language=pt-BR`);
                 const d = await r.json();
@@ -301,31 +312,34 @@
                 d.results.forEach(f => {
                     rw.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="play(${f.id})">`;
                 });
-            } catch(e) { console.log("Erro API"); }
+            } catch(e) { console.log('Erro API'); }
         }
 
         function play(id) {
-            if(currentUser.plan !== 'premium') {
-                if(confirm("Filme Premium. Assinar?")) navTo('plans');
-            } else {
+            if(currentUser.plan !== 'premium') document.getElementById('paywall-modal').style.display='flex';
+            else {
                 document.getElementById('video-modal').style.display='flex';
                 document.getElementById('video-frame').src=`https://embed.warezcdn.link/filme/${id}`;
             }
         }
         function playHero() { play(heroId); }
 
+        // --- NAVEGAÇÃO APP ---
         function navTo(p) {
             document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
             document.getElementById('page-'+p).classList.add('active');
             toggleSidebar();
         }
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open')?'block':'none'; }
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open')?'block':'none';
+        }
 
-        // --- CHECKOUT ---
+        // --- PAGAMENTO ---
         function checkout() { document.getElementById('checkout-modal').style.display='flex'; }
         function copyPix() {
             navigator.clipboard.writeText(document.getElementById('pix-code').innerText);
-            alert("Copiado! Pague no Banco.");
+            alert("Código copiado! Pague no Banco.");
         }
         function setPlan(p) {
             const db = getDB();
@@ -334,19 +348,24 @@
         }
 
         // --- ADMIN ---
-        function openBank() { document.getElementById('adm-users').style.display='none'; document.getElementById('adm-bank').style.display='block'; }
+        function tab(t) {
+            document.getElementById('tab-users').style.display = t==='users'?'block':'none';
+            document.getElementById('tab-bank').style.display = t==='bank'?'block':'none';
+            if(t==='users') renderAdmin();
+        }
         function renderAdmin() {
-            document.getElementById('adm-users').style.display='block'; document.getElementById('adm-bank').style.display='none';
             const tb = document.getElementById('user-table'); tb.innerHTML='';
             getDB().forEach((u,i) => {
                 tb.innerHTML += `<tr><td>${u.email}</td><td>${u.plan}</td><td>R$ ${u.balance.toFixed(2)}</td><td><button style="color:red;border:none;background:none;cursor:pointer" onclick="delUser(${i})">X</button></td></tr>`;
             });
         }
-        function sendMoney() {
-            const e = document.getElementById('bank-email').value;
-            const v = parseFloat(document.getElementById('bank-val').value);
-            const db = getDB(); const u = db.find(x => x.email === e);
-            if(u) { u.balance += v; saveDB(db); alert('Enviado!'); renderAdmin(); } else alert('Erro');
+        function addBalance() {
+            const e = document.getElementById('bank-user-email').value;
+            const v = parseFloat(document.getElementById('bank-amount').value);
+            const db = getDB();
+            const u = db.find(x => x.email === e);
+            if(u) { u.balance += v; saveDB(db); alert('Saldo enviado!'); renderAdmin(); } 
+            else alert('Usuário não encontrado');
         }
         function delUser(i) {
             if(confirm('Excluir?')) { const db=getDB(); db.splice(i,1); saveDB(db); renderAdmin(); }
