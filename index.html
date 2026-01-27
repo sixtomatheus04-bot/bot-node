@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream V20 - Fixed Login</title>
+    <title>CineStream V21 - Ecosystem</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -11,133 +11,128 @@
     <style>
         :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; --gold: #FFD700; --green: #2ecc71; --purple: #820AD1; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Outfit', sans-serif; text-decoration: none; }
-        body { background: var(--black); color: white; overflow-x: hidden; margin: 0; }
+        body { background: var(--black); color: white; overflow-x: hidden; }
 
-        /* TELAS */
         .screen { display: none; width: 100%; min-height: 100vh; }
-        .active-flex { display: flex !important; }
-        .active-block { display: block !important; }
-
-        .btn { padding: 12px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; }
-        .btn-red { background: var(--red); color: white; } .btn-red:hover { background: #b20710; }
-        .btn-green { background: var(--green); color: black; }
-        .btn-gold { background: var(--gold); color: black; }
+        .active-flex { display: flex; } .active-block { display: block; }
+        .btn { padding: 10px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-red { background: var(--red); color: white; }
         .btn-purple { background: var(--purple); color: white; }
+        .btn-green { background: var(--green); color: black; }
 
-        /* 1. LOGIN */
+        /* AUTH */
         #auth-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 3000;
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
-            background-size: cover; align-items: center; justify-content: center; flex-direction: column;
+            background-size: cover; display: flex; align-items: center; justify-content: center; flex-direction: column;
         }
         .auth-box { background: rgba(0,0,0,0.9); padding: 40px; border-radius: 12px; width: 380px; text-align: center; border: 1px solid #333; }
-        .auth-input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; font-size: 16px; }
+        .auth-input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; }
 
-        /* 2. ADMIN */
+        /* ADMIN */
         #admin-screen { background: #111; padding: 0; }
         .admin-sidebar { width: 250px; background: #050505; border-right: 1px solid #333; height: 100vh; padding: 20px; position: fixed; }
         .admin-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
         .adm-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; display: flex; gap: 10px; align-items: center; margin-bottom: 5px; border-radius: 5px; }
-        .adm-item:hover, .adm-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
+        .adm-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
+        
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .st-paid { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
+        .st-pending { background: rgba(241, 196, 15, 0.2); color: #f1c40f; border: 1px solid #f1c40f; }
+
         table { width: 100%; border-collapse: collapse; background: #1a1a1a; margin-top: 20px; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; font-size: 14px; }
         th { background: #222; color: var(--green); }
 
-        /* 3. APP */
+        /* APP */
         #app-screen { display: none; }
         .nav { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: black; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        
+        .search-bar { background: #222; border: 1px solid #444; border-radius: 20px; padding: 5px 15px; display: flex; align-items: center; width: 300px; }
+        .search-bar input { background: transparent; border: none; color: white; width: 100%; margin-left: 10px; }
+
         .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: #000; border-right: 1px solid #333; z-index: 200; transform: translateX(-100%); transition: 0.3s; padding-top: 80px; }
         .sidebar.open { transform: translateX(0); }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
-        .menu-item { padding: 15px 30px; display: flex; align-items: center; gap: 15px; color: #aaa; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        .menu-item { padding: 15px 30px; display: flex; align-items: center; gap: 15px; color: #aaa; cursor: pointer; transition: 0.2s; }
         .menu-item:hover { color: white; background: #1a1a1a; border-left: 4px solid var(--red); }
-
-        /* PAGES */
-        .page { display: none; padding-top: 80px; padding-bottom: 50px; min-height: 100vh; animation: fadeIn 0.4s; }
+        
+        .page { display: none; padding-top: 80px; padding-bottom: 50px; min-height: 100vh; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
+        
         .hero { height: 80vh; background-size: cover; background-position: center; margin-top: -80px; position: relative; }
-        .hero-content { position: absolute; bottom: 20%; left: 4%; max-width: 600px; text-shadow: 2px 2px 10px black; }
         .row { margin-bottom: 40px; padding-left: 4%; }
         .posters { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .poster { width: 160px; height: 240px; border-radius: 8px; cursor: pointer; transition: 0.3s; object-fit: cover; }
+        .poster { width: 160px; height: 240px; border-radius: 8px; cursor: pointer; transition: 0.3s; }
         .poster:hover { transform: scale(1.1); z-index: 10; }
 
-        /* PLANOS */
-        .plans-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 30px; }
-        .plan-card { background: #1a1a1a; padding: 30px; border-radius: 15px; width: 280px; border: 2px solid #333; text-align: center; }
-        .plan-card.premium { border-color: var(--gold); transform: scale(1.05); z-index: 2; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
-        .check { color: var(--green); margin-right: 10px; }
-
-        /* CHECKOUT */
-        #checkout-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; align-items: center; justify-content: center; }
+        /* CHECKOUT & MODALS */
+        #checkout-modal, #video-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; align-items: center; justify-content: center; }
         .checkout-box { background: white; color: black; padding: 30px; border-radius: 10px; width: 400px; text-align: center; }
-        .pix-code { background: #eee; padding: 10px; font-family: monospace; font-size: 12px; margin: 20px 0; border: 1px dashed #000; word-break: break-all; }
-
-        /* PLAYER */
-        #video-modal, #paywall-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; align-items: center; justify-content: center; }
         iframe { width: 100%; height: 100%; border: none; }
         .close-btn { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; z-index: 6000; color: white; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" class="screen">
+    <div id="auth-screen">
         <div class="auth-box">
-            <h1 style="color:var(--red); font-size:40px; margin-bottom:10px;">CINESTREAM</h1>
-            <p id="error-msg" style="color:#ff5555; display:none; margin-bottom:15px;"></p>
-            
-            <div id="form-login">
-                <input type="text" id="log-email" class="auth-input" placeholder="Email ou 'admin'">
-                <input type="password" id="log-pass" class="auth-input" placeholder="Senha">
-                <button class="btn btn-red" style="width:100%" onclick="doLogin()">ENTRAR</button>
-                <p style="margin-top:15px; color:#ccc; cursor:pointer;" onclick="toggleForm('register')">Criar conta</p>
-            </div>
-
-            <div id="form-register" style="display:none;">
-                <input type="text" id="reg-email" class="auth-input" placeholder="Seu Email">
-                <input type="password" id="reg-pass" class="auth-input" placeholder="Crie uma Senha">
-                <button class="btn btn-purple" style="width:100%" onclick="doRegister()">CRIAR AGORA</button>
-                <p style="margin-top:15px; color:#ccc; cursor:pointer;" onclick="toggleForm('login')">Voltar</p>
-            </div>
+            <h1 style="color:var(--red); font-size:40px;">CINESTREAM</h1>
+            <p style="color:#aaa; margin-bottom:20px;">V21 ENTERPRISE</p>
+            <input type="text" id="log-email" class="auth-input" placeholder="Email ou 'admin'">
+            <input type="password" id="log-pass" class="auth-input" placeholder="Senha">
+            <button class="btn btn-red" style="width:100%" onclick="doLogin()">ENTRAR</button>
+            <p style="margin-top:15px; color:#ccc; cursor:pointer;" onclick="createAcc()">Criar conta</p>
         </div>
     </div>
 
-    <div id="admin-screen" class="screen">
+    <div id="admin-screen">
         <div class="admin-sidebar">
             <h2 style="color:var(--green); margin-bottom:30px;">ADMIN</h2>
             <div class="adm-item active" onclick="tab('users')"><i class="fas fa-users"></i> Usuários</div>
-            <div class="adm-item" onclick="tab('bank')"><i class="fas fa-university"></i> Banco</div>
+            <div class="adm-item" onclick="tab('financial')"><i class="fas fa-chart-line"></i> Transações</div>
+            <div class="adm-item" onclick="tab('loans')"><i class="fas fa-hand-holding-usd"></i> Empréstimos</div>
             <div class="adm-item" onclick="logout()" style="color:#ff5555; margin-top:50px;">Sair</div>
         </div>
         <div class="admin-content">
-            <div id="tab-users">
-                <h2>Usuários</h2>
-                <table style="width:100%; margin-top:20px;">
-                    <thead><tr><th>Email</th><th>Plano</th><th>Saldo</th><th>Ação</th></tr></thead>
+            <div id="adm-users">
+                <div style="display:flex; justify-content:space-between;">
+                    <h2>Base de Usuários</h2>
+                    <input type="text" id="adm-search" placeholder="Buscar email..." class="auth-input" style="width:300px; padding:8px;" onkeyup="renderUsers()">
+                </div>
+                <table style="width:100%;">
+                    <thead><tr><th>Email</th><th>CPF</th><th>Plano</th><th>Saldo</th><th>Ação</th></tr></thead>
                     <tbody id="user-table"></tbody>
                 </table>
             </div>
-            <div id="tab-bank" style="display:none;">
-                <h2>Injetar Saldo</h2>
+            <div id="adm-financial" style="display:none;">
+                <h2>Fluxo de Caixa (Pix Aleatórios)</h2>
+                <table style="width:100%;">
+                    <thead><tr><th>De (Usuário)</th><th>Para (Destino)</th><th>Valor</th><th>Data</th><th>Status</th></tr></thead>
+                    <tbody id="finance-table"></tbody>
+                </table>
+            </div>
+            <div id="adm-loans" style="display:none;">
+                <h2>Gestão de Empréstimos</h2>
+                <p>Defina o limite aprovado para o cliente sacar no app.</p>
                 <div style="background:#1a1a1a; padding:20px; border-radius:10px; max-width:500px; margin-top:20px;">
-                    <input type="text" id="bank-user-email" class="auth-input" placeholder="Email do Cliente">
-                    <input type="number" id="bank-amount" class="auth-input" placeholder="Valor (R$)">
-                    <button class="btn btn-purple" style="width:100%" onclick="addBalance()">ENVIAR PIX</button>
+                    <input type="text" id="loan-email" class="auth-input" placeholder="Email do Cliente">
+                    <input type="number" id="loan-val" class="auth-input" placeholder="Limite Aprovado (R$)">
+                    <button class="btn btn-purple" style="width:100%" onclick="approveLoan()">APROVAR LIMITE</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="app-screen" class="screen">
+    <div id="app-screen">
         <nav class="nav">
             <div style="display:flex; align-items:center; gap:15px;">
                 <i class="fas fa-bars" style="font-size:24px; cursor:pointer;" onclick="toggleSidebar()"></i>
-                <div style="font-size:24px; font-weight:bold; color:var(--red);">CINESTREAM</div>
+                <div style="font-weight:bold; font-size:22px; color:var(--red);">CINESTREAM</div>
             </div>
-            <div style="display:flex; align-items:center; gap:15px;">
+            <div class="search-bar">
+                <i class="fas fa-search" style="color:#aaa;"></i>
+                <input type="text" placeholder="Pesquisar..." onkeyup="alert('Buscando...')">
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
                 <span id="user-badge" style="font-size:12px; padding:5px; background:#333; border-radius:4px;">FREE</span>
                 <button class="btn btn-purple" onclick="window.open('banco.html', '_blank')">🏦 BANCO</button>
             </div>
@@ -146,7 +141,8 @@
         <div class="overlay" onclick="toggleSidebar()"></div>
         <div class="sidebar" id="sidebar">
             <div class="menu-item" onclick="navTo('home')"><i class="fas fa-home"></i> Início</div>
-            <div class="menu-item" onclick="navTo('plans')"><i class="fas fa-crown"></i> Planos</div>
+            <div class="menu-item" onclick="navTo('plans')"><i class="fas fa-crown"></i> Assinatura</div>
+            <div class="menu-item" onclick="navTo('support')"><i class="fas fa-headset"></i> Suporte</div>
             <div class="menu-item" onclick="logout()" style="color:#ff5555;">Sair</div>
         </div>
 
@@ -157,22 +153,21 @@
                     <button class="btn btn-red" onclick="playHero()">▶ ASSISTIR</button>
                 </div>
             </div>
-            <div class="row" style="margin-top:-80px; position:relative; z-index:10;">
-                <h2>🔥 Em Alta</h2>
-                <div class="posters" id="row-trend"></div>
+            <div style="margin-top:-80px; position:relative; z-index:10; padding-bottom:50px;">
+                <div id="infinite-rows"></div>
             </div>
         </div>
 
         <div id="page-plans" class="page" style="padding:100px 4%;">
-            <h2 style="text-align:center;">Assinatura</h2>
-            <div class="plans-container">
-                <div class="plan-card">
-                    <h3>FREE</h3><div style="font-size:30px; font-weight:bold; margin:10px 0;">R$ 0,00</div>
-                    <button class="btn btn-green" style="width:100%" onclick="setPlan('free')">USAR</button>
+            <h2 style="text-align:center;">Escolha seu Plano</h2>
+            <div style="display:flex; gap:20px; justify-content:center; margin-top:30px;">
+                <div style="background:#1a1a1a; padding:30px; border-radius:10px; width:300px; text-align:center;">
+                    <h3>GOLD</h3><div style="font-size:30px; margin:10px 0;">R$ 19,90</div>
+                    <button class="btn btn-purple" onclick="checkout('gold', 19.90)">ASSINAR</button>
                 </div>
-                <div class="plan-card premium">
-                    <h3 style="color:var(--gold);">PREMIUM</h3><div style="font-size:30px; font-weight:bold; margin:10px 0;">R$ 29,90</div>
-                    <button class="btn btn-gold" style="width:100%" onclick="checkout()">ASSINAR</button>
+                <div style="background:#1a1a1a; padding:30px; border-radius:10px; width:300px; text-align:center; border:2px solid var(--gold);">
+                    <h3 style="color:var(--gold);">PLATINUM</h3><div style="font-size:30px; margin:10px 0;">R$ 29,90</div>
+                    <button class="btn btn-gold" onclick="checkout('platinum', 29.90)">ASSINAR</button>
                 </div>
             </div>
         </div>
@@ -180,195 +175,175 @@
 
     <div id="checkout-modal">
         <div class="checkout-box">
-            <h2 style="color:#820AD1;">Pagamento</h2>
-            <p>Copie o código e pague no Banco NuClone.</p>
-            <div class="pix-code" id="pix-code">CINESTREAM_PREMIUM_29.90</div>
-            <button class="btn btn-purple" style="width:100%" onclick="copyPix()">COPIAR</button>
-            <p style="margin-top:10px; cursor:pointer; color:red;" onclick="document.getElementById('checkout-modal').style.display='none'">Fechar</p>
-        </div>
-    </div>
-
-    <div id="video-modal">
-        <div class="close-btn" onclick="document.getElementById('video-modal').style.display='none'; document.getElementById('video-frame').src='';">×</div>
-        <iframe id="video-frame" allowfullscreen></iframe>
-    </div>
-
-    <div id="paywall-modal">
-        <div class="auth-box" style="border-color:var(--gold);">
-            <h1>🔒</h1><h2 style="color:var(--gold);">PREMIUM</h2>
-            <button class="btn btn-gold" style="width:100%" onclick="navTo('plans'); document.getElementById('paywall-modal').style.display='none';">ASSINAR</button>
-            <p style="margin-top:15px; cursor:pointer;" onclick="document.getElementById('paywall-modal').style.display='none'">Voltar</p>
+            <h2 style="color:#820AD1;">Pagar com NuClone</h2>
+            <p id="chk-desc">...</p>
+            <div style="background:#eee; padding:10px; font-family:monospace; margin:20px 0; word-break:break-all;" id="chk-code"></div>
+            <button class="btn btn-purple" style="width:100%" onclick="copyPix()">COPIAR PIX</button>
+            <p style="margin-top:10px; font-size:12px; color:red; cursor:pointer;" onclick="document.getElementById('checkout-modal').style.display='none'">Fechar</p>
         </div>
     </div>
 
     <script>
-        // --- CORE SYSTEM V20 ---
-        const DB_KEY = 'cine_v20_system';
+        const DB_KEY = 'cine_v21_system';
         const API = 'c3162eed0616407fa43134e07880c7d5';
-        let currentUser = null, heroId = 0;
+        let currentUser = null;
 
-        function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
+        function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || { users: [], transactions: [] }; }
         function saveDB(d) { localStorage.setItem(DB_KEY, JSON.stringify(d)); }
 
-        // --- SISTEMA DE TELAS (FIXED) ---
-        window.onload = () => { checkSession(); };
-
-        function checkSession() {
+        // INIT & AUTH
+        window.onload = () => {
             const s = JSON.parse(localStorage.getItem('cineSession'));
-            
-            // 1. Oculta tudo primeiro
-            document.querySelectorAll('.screen').forEach(el => {
-                el.style.display = 'none';
-                el.classList.remove('active-flex', 'active-block');
-            });
-
             if(s) {
-                if(s.role === 'admin') {
-                    // ADMIN MODE
-                    document.getElementById('admin-screen').style.display = 'flex';
+                if(s.role === 'admin') { 
+                    document.getElementById('auth-screen').style.display='none'; 
+                    document.getElementById('admin-screen').style.display='block'; 
                     renderAdmin();
                 } else {
-                    // USER MODE
                     const db = getDB();
-                    const user = db.find(u => u.email === s.email);
-                    
-                    if(user) {
-                        currentUser = user;
-                        document.getElementById('app-screen').style.display = 'block';
-                        initApp();
-                    } else {
-                        // Usuário não existe mais (Bug Fix)
-                        localStorage.removeItem('cineSession');
-                        document.getElementById('auth-screen').style.display = 'flex';
-                    }
+                    const u = db.users.find(x => x.email === s.email);
+                    if(u) { currentUser = u; initApp(); } 
+                    else { localStorage.removeItem('cineSession'); document.getElementById('auth-screen').style.display='flex'; }
                 }
             } else {
-                // NO SESSION
-                document.getElementById('auth-screen').style.display = 'flex';
+                document.getElementById('auth-screen').style.display='flex';
             }
-        }
-
-        // --- AUTH ---
-        function toggleForm(f) {
-            document.getElementById('form-login').style.display = f==='login'?'block':'none';
-            document.getElementById('form-register').style.display = f==='register'?'block':'none';
-        }
+        };
 
         function doLogin() {
             const e = document.getElementById('log-email').value;
             const p = document.getElementById('log-pass').value;
             if(e==='admin' && p==='admin') {
                 localStorage.setItem('cineSession', JSON.stringify({role:'admin'}));
-                checkSession(); return;
+                location.reload(); return;
             }
-            const user = getDB().find(u => u.email === e && u.pass === p);
-            if(user) {
-                localStorage.setItem('cineSession', JSON.stringify(user));
-                checkSession();
-            } else alert("Dados inválidos.");
-        }
-
-        function doRegister() {
-            const e = document.getElementById('reg-email').value;
-            const p = document.getElementById('reg-pass').value;
             const db = getDB();
-            if(db.find(u => u.email === e)) return alert("Email já existe.");
-            
-            const newUser = { email:e, pass:p, plan:'free', balance:0, name:'Cliente' };
-            db.push(newUser);
+            const u = db.users.find(x => x.email === e && x.pass === p);
+            if(u) {
+                localStorage.setItem('cineSession', JSON.stringify(u));
+                location.reload();
+            } else alert('Erro.');
+        }
+
+        function createAcc() {
+            const e = prompt('Email:'); const p = prompt('Senha:');
+            const db = getDB();
+            if(db.users.find(x => x.email === e)) return alert('Existe');
+            // User Data Structure
+            const newUser = { 
+                email: e, pass: p, plan: 'free', balance: 0, cpf: '', name: 'Usuário', 
+                loan_limit: 0, loan_taken: 0 
+            };
+            db.users.push(newUser);
             saveDB(db);
-            
-            // Loga automaticamente
-            localStorage.setItem('cineSession', JSON.stringify(newUser));
-            alert("Conta criada!");
-            checkSession();
+            alert('Criado!');
         }
 
-        function logout() { localStorage.removeItem('cineSession'); checkSession(); }
+        function logout() { localStorage.removeItem('cineSession'); location.reload(); }
 
-        // --- APP LOGIC ---
-        async function initApp() {
-            document.getElementById('user-badge').innerText = currentUser.plan.toUpperCase();
-            
-            // Monitoramento de Pagamento
-            setInterval(() => {
-                const fresh = getDB().find(u => u.email === currentUser.email);
-                if(fresh && fresh.plan !== currentUser.plan) {
-                    alert("Plano Atualizado para: " + fresh.plan.toUpperCase());
-                    location.reload();
+        // ADMIN FUNCTIONS
+        function tab(t) {
+            document.getElementById('adm-users').style.display = t==='users'?'block':'none';
+            document.getElementById('adm-financial').style.display = t==='financial'?'block':'none';
+            document.getElementById('adm-loans').style.display = t==='loans'?'block':'none';
+            if(t==='users') renderUsers();
+            if(t==='financial') renderFinance();
+        }
+
+        function renderUsers() {
+            const filter = document.getElementById('adm-search').value.toLowerCase();
+            const tb = document.getElementById('user-table'); tb.innerHTML='';
+            getDB().users.forEach((u,i) => {
+                if(u.email.toLowerCase().includes(filter)) {
+                    tb.innerHTML += `<tr><td>${u.email}</td><td>${u.cpf || '---'}</td><td>${u.plan.toUpperCase()}</td><td>R$ ${u.balance.toFixed(2)}</td><td><button style="color:red;border:none;background:none;cursor:pointer" onclick="delUser(${i})">X</button></td></tr>`;
                 }
+            });
+        }
+
+        function renderFinance() {
+            const tb = document.getElementById('finance-table'); tb.innerHTML='';
+            getDB().transactions.reverse().forEach(t => {
+                const status = t.status === 'paid' ? '<span class="status-badge st-paid">PAGO</span>' : '<span class="status-badge st-pending">PENDENTE</span>';
+                tb.innerHTML += `<tr><td>${t.from}</td><td>${t.to}</td><td>R$ ${t.val.toFixed(2)}</td><td>${t.date}</td><td>${status}</td></tr>`;
+            });
+        }
+
+        function approveLoan() {
+            const e = document.getElementById('loan-email').value;
+            const v = parseFloat(document.getElementById('loan-val').value);
+            const db = getDB();
+            const u = db.users.find(x => x.email === e);
+            if(u) {
+                u.loan_limit = v;
+                saveDB(db);
+                alert(`Limite de R$ ${v} aprovado para ${e}. Ele pode sacar no banco agora.`);
+            } else alert('Usuário não encontrado');
+        }
+
+        function delUser(i) {
+            if(confirm("Excluir?")) { const db=getDB(); db.users.splice(i,1); saveDB(db); renderUsers(); }
+        }
+
+        // APP LOGIC
+        async function initApp() {
+            document.getElementById('auth-screen').style.display='none';
+            document.getElementById('app-screen').style.display='block';
+            document.getElementById('user-badge').innerText = currentUser.plan.toUpperCase();
+
+            // Infinite Rows & API
+            const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API}&language=pt-BR`);
+            const d = await res.json();
+            const h = d.results[0];
+            document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, #000, transparent), url(https://image.tmdb.org/t/p/original${h.backdrop_path})`;
+            
+            const cont = document.getElementById('infinite-rows');
+            cont.innerHTML = '';
+            
+            // Loop to simulate infinite scroll categories
+            const cats = ['🔥 Em Alta', '🎬 Ação', '😂 Comédia', '👻 Terror', '👽 Sci-Fi', '❤️ Romance', '🤠 Faroeste'];
+            let idx = 0;
+            
+            // Render rows
+            addPosterRow(d.results, '🔥 Em Alta', cont);
+            // Simulação de mais categorias (reusando dados pra demo)
+            for(let i=1; i<cats.length; i++) addPosterRow(d.results.reverse(), cats[i], cont);
+
+            // Sync Loop
+            setInterval(() => {
+                const fresh = getDB().users.find(u => u.email === currentUser.email);
+                if(fresh.plan !== currentUser.plan) location.reload();
             }, 3000);
-
-            // API Filmes
-            try {
-                const r = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API}&language=pt-BR`);
-                const d = await r.json();
-                const h = d.results[0];
-                heroId = h.id;
-                document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, #000, transparent), url(https://image.tmdb.org/t/p/original${h.backdrop_path})`;
-                document.getElementById('hero-title').innerText = h.title;
-                
-                const rw = document.getElementById('row-trend'); rw.innerHTML='';
-                d.results.forEach(f => {
-                    rw.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="play(${f.id})">`;
-                });
-            } catch(e) { console.log('Erro API'); }
         }
 
-        function play(id) {
-            if(currentUser.plan !== 'premium') document.getElementById('paywall-modal').style.display='flex';
-            else {
-                document.getElementById('video-modal').style.display='flex';
-                document.getElementById('video-frame').src=`https://embed.warezcdn.link/filme/${id}`;
-            }
+        function addPosterRow(list, title, container) {
+            let html = `<div class="row"><h2>${title}</h2><div class="posters">`;
+            list.forEach(f => {
+                html += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="alert('Play ID ${f.id}')">`;
+            });
+            html += `</div></div>`;
+            container.innerHTML += html;
         }
-        function playHero() { play(heroId); }
 
-        // --- NAVEGAÇÃO APP ---
+        function checkout(plan, price) {
+            document.getElementById('chk-desc').innerText = `Plano ${plan.toUpperCase()} - R$ ${price.toFixed(2)}`;
+            document.getElementById('chk-code').innerText = `CINESTREAM_${plan.toUpperCase()}_${price}`;
+            document.getElementById('checkout-modal').style.display='flex';
+        }
+
+        function copyPix() {
+            navigator.clipboard.writeText(document.getElementById('chk-code').innerText);
+            alert("Copiado! Pague no NuClone.");
+        }
+
         function navTo(p) {
             document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
             document.getElementById('page-'+p).classList.add('active');
-            toggleSidebar();
+            document.getElementById('sidebar').classList.remove('open');
+            document.querySelector('.overlay').style.display='none';
         }
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open')?'block':'none';
-        }
-
-        // --- PAGAMENTO ---
-        function checkout() { document.getElementById('checkout-modal').style.display='flex'; }
-        function copyPix() {
-            navigator.clipboard.writeText(document.getElementById('pix-code').innerText);
-            alert("Código copiado! Pague no Banco.");
-        }
-        function setPlan(p) {
-            const db = getDB();
-            const i = db.findIndex(u => u.email === currentUser.email);
-            db[i].plan = p; saveDB(db); location.reload();
-        }
-
-        // --- ADMIN ---
-        function tab(t) {
-            document.getElementById('tab-users').style.display = t==='users'?'block':'none';
-            document.getElementById('tab-bank').style.display = t==='bank'?'block':'none';
-            if(t==='users') renderAdmin();
-        }
-        function renderAdmin() {
-            const tb = document.getElementById('user-table'); tb.innerHTML='';
-            getDB().forEach((u,i) => {
-                tb.innerHTML += `<tr><td>${u.email}</td><td>${u.plan}</td><td>R$ ${u.balance.toFixed(2)}</td><td><button style="color:red;border:none;background:none;cursor:pointer" onclick="delUser(${i})">X</button></td></tr>`;
-            });
-        }
-        function addBalance() {
-            const e = document.getElementById('bank-user-email').value;
-            const v = parseFloat(document.getElementById('bank-amount').value);
-            const db = getDB();
-            const u = db.find(x => x.email === e);
-            if(u) { u.balance += v; saveDB(db); alert('Saldo enviado!'); renderAdmin(); } 
-            else alert('Usuário não encontrado');
-        }
-        function delUser(i) {
-            if(confirm('Excluir?')) { const db=getDB(); db.splice(i,1); saveDB(db); renderAdmin(); }
         }
     </script>
 </body>
