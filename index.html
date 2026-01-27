@@ -3,127 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream V12 - Fixed</title>
+    <title>CineStream V13 - AI Support</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
 
     <style>
-        :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; --gold: #FFD700; --green: #2ecc71; }
+        :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; --gold: #FFD700; --green: #2ecc71; --blue: #3498db; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; text-decoration: none; font-family: 'Outfit', sans-serif; }
         body { background: var(--black); color: white; overflow-x: hidden; }
 
-        /* GERAL */
+        /* UTILITÁRIOS */
         .screen { display: none; width: 100%; min-height: 100vh; }
-        .active-screen { display: flex; } /* Para Login e Admin */
-        .app-active { display: block; } /* Para o App */
-        
-        .btn { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .active-flex { display: flex; }
+        .active-block { display: block; }
+        .btn { padding: 12px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; }
         .btn-red { background: var(--red); color: white; }
         .btn-red:hover { background: #b20710; }
-        .btn-gray { background: #333; color: white; border: 1px solid #555; }
-
-        /* 1. LOGIN */
+        .btn-green { background: var(--green); color: black; }
+        
+        /* 1. AUTH (LOGIN & REGISTER) */
         #auth-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 3000;
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
             background-size: cover; align-items: center; justify-content: center; flex-direction: column;
         }
-        .auth-box { background: rgba(0,0,0,0.85); padding: 40px; border-radius: 10px; width: 350px; text-align: center; border: 1px solid #333; backdrop-filter: blur(10px); }
-        .auth-input { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; }
+        .auth-box { background: rgba(0,0,0,0.85); padding: 50px; border-radius: 12px; width: 400px; text-align: center; border: 1px solid #333; backdrop-filter: blur(10px); }
+        .auth-input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; font-size: 16px; }
+        .auth-input:focus { border-color: var(--red); }
+        .toggle-link { margin-top: 20px; color: #aaa; cursor: pointer; font-size: 14px; }
+        .toggle-link u { color: white; }
 
-        /* 2. ADMIN */
-        #admin-screen { background: #111; flex-direction: row; }
+        /* 2. ADMIN PANEL */
+        #admin-screen { background: #111; padding: 0; }
         .admin-sidebar { width: 250px; background: #050505; border-right: 1px solid #333; height: 100vh; padding: 20px; position: fixed; }
-        .admin-content { margin-left: 250px; padding: 40px; width: 100%; }
+        .admin-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
         .adm-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; display: flex; gap: 10px; align-items: center; border-radius: 5px; margin-bottom: 5px; }
-        .adm-item:hover, .adm-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
+        .adm-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
         
         table { width: 100%; border-collapse: collapse; background: #1a1a1a; margin-top: 20px; border-radius: 8px; overflow: hidden; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
         th { background: #222; color: var(--green); }
 
-        /* CHAT */
-        .chat-layout { display: flex; height: 60vh; background: #151515; border: 1px solid #333; border-radius: 8px; overflow: hidden; margin-top: 20px; }
-        .chat-list { width: 30%; border-right: 1px solid #333; overflow-y: auto; background: #111; }
-        .chat-feed { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #0a0a0a; }
-        .chat-input-area { padding: 15px; background: #1a1a1a; display: flex; gap: 10px; }
-        .msg { padding: 8px 12px; border-radius: 8px; font-size: 14px; max-width: 75%; }
-        .msg.me { background: var(--green); color: black; align-self: flex-end; }
-        .msg.other { background: #333; color: white; align-self: flex-start; }
-
         /* 3. APP UI */
         #app-screen { display: none; }
-        .nav { position: fixed; top: 0; width: 100%; height: 60px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, black, transparent); z-index: 100; transition: 0.3s; }
+        .nav { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, black, transparent); z-index: 100; transition: 0.3s; }
         .nav.black { background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         
-        .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: #000; border-right: 1px solid #333; z-index: 200; transform: translateX(-100%); transition: 0.3s; padding-top: 70px; }
+        /* Sidebar User */
+        .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: #000; border-right: 1px solid #333; z-index: 200; transform: translateX(-100%); transition: 0.3s; padding-top: 80px; }
         .sidebar.open { transform: translateX(0); }
-        .menu-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; color: #aaa; cursor: pointer; font-size: 16px; }
+        .menu-item { padding: 15px 30px; display: flex; align-items: center; gap: 15px; color: #aaa; cursor: pointer; transition: 0.2s; font-size: 16px; }
         .menu-item:hover { color: white; background: #1a1a1a; border-left: 4px solid var(--red); }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
 
         /* CONTENT */
-        .page { display: none; padding-top: 70px; min-height: 100vh; padding-bottom: 50px; animation: fadeIn 0.3s; }
+        .page { display: none; padding-top: 80px; min-height: 100vh; padding-bottom: 50px; animation: fadeIn 0.4s; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .hero { height: 80vh; background-size: cover; background-position: center; margin-top: -70px; position: relative; }
+        .hero { height: 80vh; background-size: cover; background-position: center; margin-top: -80px; position: relative; }
         .hero-content { position: absolute; bottom: 20%; left: 4%; max-width: 600px; text-shadow: 2px 2px 10px black; }
-        
-        .row { margin-bottom: 30px; padding-left: 4%; }
-        .posters { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
-        .poster { width: 150px; height: 225px; border-radius: 6px; cursor: pointer; transition: 0.2s; object-fit: cover; }
-        .poster:hover { transform: scale(1.05); z-index: 5; }
+        .row { margin-bottom: 40px; padding-left: 4%; }
+        .posters { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+        .poster { width: 160px; height: 240px; border-radius: 8px; cursor: pointer; transition: 0.3s; object-fit: cover; }
+        .poster:hover { transform: scale(1.1); z-index: 10; }
 
-        /* TV & MODAIS */
-        #tv-box { width: 90%; max-width: 800px; margin: 0 auto; background: black; aspect-ratio: 16/9; }
+        /* CHAT IA & SUPORTE */
+        .chat-box { background: #1a1a1a; border-radius: 10px; border: 1px solid #333; max-width: 800px; margin: 0 auto; overflow: hidden; height: 600px; display: flex; flex-direction: column; }
+        .chat-feed { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-input-area { padding: 15px; background: #111; display: flex; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 10px; max-width: 80%; font-size: 14px; line-height: 1.4; position: relative; }
+        .msg.bot { background: #333; color: #fff; align-self: flex-start; border-bottom-left-radius: 0; border: 1px solid var(--blue); }
+        .msg.bot::before { content: '🤖 IA'; position: absolute; top: -18px; left: 0; font-size: 10px; color: var(--blue); }
+        .msg.admin { background: #222; color: var(--gold); align-self: flex-start; border-bottom-left-radius: 0; border: 1px solid var(--gold); }
+        .msg.admin::before { content: '👑 ADMIN'; position: absolute; top: -18px; left: 0; font-size: 10px; color: var(--gold); }
+        .msg.user { background: var(--green); color: black; align-self: flex-end; border-bottom-right-radius: 0; }
+
+        /* TV PLAYER */
+        #tv-container { width: 90%; max-width: 900px; margin: 0 auto; background: black; aspect-ratio: 16/9; border: 1px solid #333; }
         video { width: 100%; height: 100%; }
-        .channels { display: flex; gap: 10px; overflow-x: auto; padding: 20px 4%; }
-        .ch-btn { min-width: 120px; padding: 10px; background: #222; text-align: center; border-radius: 5px; cursor: pointer; border: 1px solid #444; }
-        .ch-btn:hover { border-color: var(--red); background: #333; }
+        .channel-list { display: flex; gap: 10px; overflow-x: auto; padding: 20px 4%; }
+        .ch-card { min-width: 140px; padding: 15px; background: #222; text-align: center; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .ch-card:hover { border-color: var(--red); background: #333; }
 
+        /* MODAIS */
         #video-modal, #paywall-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; align-items: center; justify-content: center; }
         iframe { width: 100%; height: 100%; border: none; }
         .close-btn { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; z-index: 6000; }
+        .player-controls { position: absolute; top: 20px; left: 20px; z-index: 6001; display: flex; gap: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" class="active-screen">
+    <div id="auth-screen" class="active-flex screen">
         <div class="auth-box">
             <h1 style="color:var(--red); font-size:40px; font-weight:800; margin-bottom:10px;">CINESTREAM</h1>
-            <p style="color:#888; margin-bottom:20px;">V12 FIXED</p>
-            <p id="error-txt" style="color:#ff5555; display:none; margin-bottom:10px;"></p>
+            <p style="color:#888; margin-bottom:20px;">V13 AI EDITION</p>
+            <p id="error-msg" style="color:#ff5555; display:none; margin-bottom:15px;"></p>
             
-            <input type="text" id="login-email" class="auth-input" placeholder="Email ou 'admin'">
-            <input type="password" id="login-pass" class="auth-input" placeholder="Senha">
-            <button class="btn btn-red" style="width:100%" onclick="doLogin()">ENTRAR</button>
-            <p style="margin-top:15px; font-size:13px; cursor:pointer; color:#ccc;" onclick="doRegisterUI()">Criar conta</p>
+            <div id="form-login">
+                <input type="text" id="log-email" class="auth-input" placeholder="Email ou 'admin'">
+                <input type="password" id="log-pass" class="auth-input" placeholder="Senha">
+                <button class="btn btn-red" style="width:100%" onclick="doLogin()">ENTRAR</button>
+                <div class="toggle-link" onclick="toggleForm('register')">Novo por aqui? <u>Criar Conta</u></div>
+            </div>
+
+            <div id="form-register" style="display:none;">
+                <input type="email" id="reg-email" class="auth-input" placeholder="Seu melhor Email">
+                <input type="password" id="reg-pass" class="auth-input" placeholder="Crie uma Senha">
+                <button class="btn btn-green" style="width:100%" onclick="doRegister()">CADASTRAR</button>
+                <div class="toggle-link" onclick="toggleForm('login')">Já tem conta? <u>Fazer Login</u></div>
+            </div>
         </div>
     </div>
 
     <div id="admin-screen" class="screen">
         <div class="admin-sidebar">
             <h2 style="color:var(--green); margin-bottom:30px;">PAINEL ADMIN</h2>
-            <div class="adm-item active" onclick="tabAdmin('users')"><i class="fas fa-users"></i> Usuários</div>
-            <div class="adm-item" onclick="tabAdmin('chat')"><i class="fas fa-comments"></i> Chat</div>
-            <div class="adm-item" onclick="logout()" style="color:#ff5555; margin-top:auto;"><i class="fas fa-sign-out-alt"></i> Sair</div>
+            <div class="adm-item active" onclick="navAdmin('users')"><i class="fas fa-users"></i> Usuários</div>
+            <div class="adm-item" onclick="navAdmin('chat')"><i class="fas fa-headset"></i> Atendimento</div>
+            <div class="adm-item" onclick="logout()" style="color:#ff5555; margin-top:50px;"><i class="fas fa-sign-out-alt"></i> Sair</div>
         </div>
         <div class="admin-content">
-            <div id="adm-users">
-                <h2>Gerenciar Contas</h2>
+            <div id="adm-tab-users">
+                <h2>Gestão de Contas</h2>
                 <table id="user-table"></table>
             </div>
-            <div id="adm-chat" style="display:none;">
-                <h2>Suporte</h2>
-                <div class="chat-layout">
-                    <div class="chat-list" id="adm-chat-list"></div>
-                    <div class="chat-feed" id="adm-chat-feed"></div>
-                </div>
-                <div class="chat-input-area" id="adm-chat-input" style="display:none;">
-                    <input type="text" id="adm-msg" class="auth-input" style="margin:0;" placeholder="Responder...">
-                    <button class="btn btn-green" onclick="sendAdmin()">Enviar</button>
+            <div id="adm-tab-chat" style="display:none;">
+                <h2>Suporte ao Vivo</h2>
+                <div style="display:flex; height:600px; border:1px solid #333; margin-top:20px;">
+                    <div id="adm-chat-list" style="width:30%; border-right:1px solid #333; background:#111; padding:10px;"></div>
+                    <div style="width:70%; display:flex; flex-direction:column; background:#000;">
+                        <div id="adm-chat-feed" style="flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;"></div>
+                        <div style="padding:15px; display:flex; gap:10px;">
+                            <input id="adm-chat-input" class="auth-input" style="margin:0;" placeholder="Responder...">
+                            <button class="btn btn-green" onclick="sendAdminMsg()">Enviar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,7 +154,7 @@
             </div>
             <div style="display:flex; align-items:center; gap:10px;">
                 <span id="badge" style="font-size:12px; padding:4px 8px; background:#333; border-radius:4px;">FREE</span>
-                <i class="fas fa-user-circle" style="font-size:26px;"></i>
+                <i class="fas fa-user-circle" style="font-size:26px;" onclick="navTo('profile')"></i>
             </div>
         </nav>
 
@@ -146,16 +163,18 @@
             <div class="menu-item" onclick="navTo('home')"><i class="fas fa-home"></i> Início</div>
             <div class="menu-item" onclick="navTo('movies')"><i class="fas fa-film"></i> Filmes</div>
             <div class="menu-item" onclick="navTo('series')"><i class="fas fa-tv"></i> Séries</div>
+            <div class="menu-item" onclick="navTo('trending')"><i class="fas fa-fire"></i> Em Alta</div>
             <div class="menu-item" onclick="navTo('tv')"><i class="fas fa-broadcast-tower"></i> TV Ao Vivo</div>
-            <div class="menu-item" onclick="navTo('support')"><i class="fas fa-headset"></i> Suporte</div>
             <hr style="border-color:#333;">
+            <div class="menu-item" onclick="navTo('profile')"><i class="fas fa-user"></i> Perfil</div>
+            <div class="menu-item" onclick="navTo('support')"><i class="fas fa-robot"></i> Suporte IA</div>
             <div class="menu-item" onclick="logout()" style="color:#ff5555;"><i class="fas fa-sign-out-alt"></i> Sair</div>
         </div>
 
         <div id="page-home" class="page active" style="padding:0;">
             <div class="hero" id="hero">
                 <div class="hero-content">
-                    <h1 id="hero-title" style="font-size:40px; margin-bottom:10px;">Carregando...</h1>
+                    <h1 id="hero-title" style="font-size:40px; margin-bottom:10px;">...</h1>
                     <p id="hero-desc">...</p>
                     <button class="btn btn-red" onclick="playHero()">▶ ASSISTIR</button>
                 </div>
@@ -166,29 +185,38 @@
         </div>
 
         <div id="page-tv" class="page" style="padding:100px 4%;">
-            <h2 style="color:var(--red); margin-bottom:20px;">TV Ao Vivo</h2>
-            <div id="tv-box"><video id="tv-video" controls></video></div>
-            <div class="channels">
-                <div class="ch-btn" onclick="playCh('https://stmv1.srvif.com/recordnews/recordnews/playlist.m3u8')">Record News</div>
-                <div class="ch-btn" onclick="playCh('https://cdn.jmvstream.com/w/CA-1361/index.m3u8')">Rede Brasil</div>
-                <div class="ch-btn" onclick="playCh('https://59f1cbe63db89.streamlock.net:1443/tvcatiafonseca/tvcatiafonseca/playlist.m3u8')">TV Gazeta</div>
-                <div class="ch-btn" onclick="playCh('https://nasa-i.akamaihd.net/hls/live/253565/NASA-NTV1-Public/master.m3u8')">NASA TV</div>
+            <h2 style="color:var(--red); margin-bottom:20px;">TV Ao Vivo (HLS)</h2>
+            <div id="tv-container"><video id="tv-video" controls></video></div>
+            <div class="channel-list">
+                <div class="ch-card" onclick="playTv('https://stmv1.srvif.com/recordnews/recordnews/playlist.m3u8')">Record News</div>
+                <div class="ch-card" onclick="playTv('https://cdn.jmvstream.com/w/CA-1361/index.m3u8')">Rede Brasil</div>
+                <div class="ch-card" onclick="playTv('https://59f1cbe63db89.streamlock.net:1443/tvcatiafonseca/tvcatiafonseca/playlist.m3u8')">TV Gazeta</div>
+                <div class="ch-card" onclick="playTv('https://nasa-i.akamaihd.net/hls/live/253565/NASA-NTV1-Public/master.m3u8')">NASA TV</div>
+            </div>
+        </div>
+
+        <div id="page-support" class="page" style="padding:100px 4%;">
+            <h2 style="text-align:center; margin-bottom:20px;">🤖 Suporte Inteligente</h2>
+            <div class="chat-box">
+                <div class="chat-feed" id="user-chat-feed">
+                    <div class="msg bot">Olá! Sou a IA do CineStream. Posso ajudar com senhas, travamentos ou planos. Digite sua dúvida ou "falar com atendente".</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="user-chat-input" class="auth-input" style="margin:0;" placeholder="Digite aqui...">
+                    <button class="btn btn-green" onclick="sendUserMsg()">Enviar</button>
+                </div>
             </div>
         </div>
 
         <div id="page-movies" class="page" style="padding:100px 4%;"><h2>Filmes</h2><div class="posters" id="grid-movies" style="flex-wrap:wrap;"></div></div>
         <div id="page-series" class="page" style="padding:100px 4%;"><h2>Séries</h2><div class="posters" id="grid-series" style="flex-wrap:wrap;"></div></div>
-
-        <div id="page-support" class="page" style="padding:100px 4%;">
-            <div style="max-width:800px; margin:0 auto;">
-                <h2>Suporte Chat</h2>
-                <div class="chat-layout">
-                    <div class="chat-feed" id="user-chat-feed"></div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" id="user-msg" class="auth-input" style="margin:0;" placeholder="Digite...">
-                    <button class="btn btn-red" onclick="sendUser()">Enviar</button>
-                </div>
+        <div id="page-trending" class="page" style="padding:100px 4%;"><h2>Em Alta</h2><div class="posters" id="grid-trending" style="flex-wrap:wrap;"></div></div>
+        
+        <div id="page-profile" class="page" style="padding:100px 4%;">
+            <h2>Meu Perfil</h2>
+            <div class="auth-box" style="margin-top:20px; text-align:left;">
+                <p>Email: <span id="prof-email"></span></p>
+                <p>Plano: <span id="prof-plan" style="color:var(--gold);"></span></p>
             </div>
         </div>
 
@@ -196,10 +224,10 @@
 
     <div id="video-modal">
         <div class="close-btn" onclick="closePlayer()">×</div>
-        <div style="position:absolute; top:20px; left:20px; z-index:6001;">
-            <button class="btn btn-gray" onclick="setPlayer(1)">🇧🇷 Opção 1</button>
-            <button class="btn btn-gray" onclick="setPlayer(2)">🇧🇷 Opção 2</button>
-            <button class="btn btn-gray" onclick="setPlayer(3)">🇺🇸 Opção 3</button>
+        <div class="player-controls">
+            <button class="btn btn-red" onclick="setPlayer(1)">🇧🇷 Player 1</button>
+            <button class="btn btn-red" onclick="setPlayer(2)">🇧🇷 Player 2</button>
+            <button class="btn btn-red" onclick="setPlayer(3)">🇺🇸 Player 3</button>
         </div>
         <iframe id="video-frame" allowfullscreen></iframe>
     </div>
@@ -208,25 +236,24 @@
         <div class="auth-box" style="border-color:var(--gold);">
             <h1 style="font-size:40px;">🔒</h1>
             <h2 style="color:var(--gold);">PREMIUM</h2>
-            <p>Conteúdo bloqueado.</p>
-            <button class="btn btn-gray" onclick="document.getElementById('paywall-modal').style.display='none'">Fechar</button>
+            <p>Fale com o suporte para assinar.</p>
+            <button class="btn btn-green" onclick="navTo('support'); document.getElementById('paywall-modal').style.display='none'">IR AO SUPORTE</button>
+            <br><br>
+            <u style="cursor:pointer;" onclick="document.getElementById('paywall-modal').style.display='none'">Fechar</u>
         </div>
     </div>
 
     <script>
         // CONFIG
-        const DB_KEY = 'cine_v12_users';
-        const CHAT_KEY = 'cine_v12_chats';
+        const DB_KEY = 'cine_v13_users';
+        const CHAT_KEY = 'cine_v13_chats';
         const API = 'c3162eed0616407fa43134e07880c7d5';
         const BASE = 'https://api.themoviedb.org/3';
         
-        let currentUser = null, activeChat = null, heroId = 0, currentMid = 0;
-        
-        // HELPERS
+        let currentUser = null, activeAdminChat = null, heroId = 0, currentMid = 0;
         const getDB = k => JSON.parse(localStorage.getItem(k)) || [];
         const saveDB = (k,v) => localStorage.setItem(k, JSON.stringify(v));
 
-        // INIT
         window.onload = () => {
             const s = JSON.parse(localStorage.getItem('cineSession'));
             if(s) {
@@ -242,31 +269,32 @@
         };
 
         // --- AUTH ---
-        function doLogin() {
-            const e = document.getElementById('login-email').value;
-            const p = document.getElementById('login-pass').value;
-            if(e === 'admin' && p === 'admin') {
-                localStorage.setItem('cineSession', JSON.stringify({role:'admin'}));
-                location.reload(); return;
-            }
-            const u = getDB(DB_KEY).find(x => x.email === e && x.pass === p);
-            if(u) {
-                localStorage.setItem('cineSession', JSON.stringify(u));
-                location.reload();
-            } else {
-                document.getElementById('error-txt').innerText = "Erro no login.";
-                document.getElementById('error-txt').style.display = 'block';
-            }
+        function toggleForm(type) {
+            document.getElementById('form-login').style.display = type === 'login' ? 'block' : 'none';
+            document.getElementById('form-register').style.display = type === 'register' ? 'block' : 'none';
+            document.getElementById('error-msg').style.display = 'none';
         }
 
-        function doRegisterUI() {
-            const e = prompt("Email:"); if(!e) return;
-            const p = prompt("Senha:"); if(!p) return;
+        function doLogin() {
+            const e = document.getElementById('log-email').value;
+            const p = document.getElementById('log-pass').value;
+            if(e==='admin' && p==='admin') { localStorage.setItem('cineSession', JSON.stringify({role:'admin'})); location.reload(); return; }
+            
+            const u = getDB(DB_KEY).find(x => x.email === e && x.pass === p);
+            if(u) { localStorage.setItem('cineSession', JSON.stringify(u)); location.reload(); }
+            else { document.getElementById('error-msg').innerText = "Dados incorretos."; document.getElementById('error-msg').style.display = 'block'; }
+        }
+
+        function doRegister() {
+            const e = document.getElementById('reg-email').value;
+            const p = document.getElementById('reg-pass').value;
             const db = getDB(DB_KEY);
             if(db.find(x => x.email === e)) return alert("Email já existe!");
-            db.push({ email: e, pass: p, plan: 'free' });
+            
+            db.push({email:e, pass:p, plan:'free'});
             saveDB(DB_KEY, db);
-            alert("Conta criada!");
+            alert("Conta criada! Faça login.");
+            toggleForm('login');
         }
 
         function logout() { localStorage.removeItem('cineSession'); location.reload(); }
@@ -276,93 +304,72 @@
             document.getElementById('auth-screen').style.display='none';
             document.getElementById('admin-screen').style.display='flex';
             renderUsers();
-            setInterval(() => { if(activeChat) renderAdminChat(activeChat); }, 2000);
+            setInterval(() => { if(activeAdminChat) renderAdminFeed(activeAdminChat); }, 3000);
         }
-
-        function tabAdmin(t) {
-            document.getElementById('adm-users').style.display = t==='users'?'block':'none';
-            document.getElementById('adm-chat').style.display = t==='chat'?'block':'none';
-            if(t==='users') renderUsers();
-            if(t==='chat') renderChatList();
+        function navAdmin(tab) {
+            document.getElementById('adm-tab-users').style.display = tab==='users'?'block':'none';
+            document.getElementById('adm-tab-chat').style.display = tab==='chat'?'block':'none';
+            if(tab==='users') renderUsers();
+            if(tab==='chat') renderChatList();
         }
-
         function renderUsers() {
-            const tb = document.getElementById('user-table'); tb.innerHTML = '';
-            getDB(DB_KEY).forEach((u, i) => {
-                const color = u.plan === 'premium' ? 'var(--gold)' : '#555';
-                tb.innerHTML += `<tr><td>${u.email}</td><td>${u.pass}</td><td style="color:${color};font-weight:bold;">${u.plan.toUpperCase()}</td><td><button onclick="changePlan(${i})" class="btn btn-gray">Trocar Plano</button> <button onclick="delUser(${i})" style="color:red;border:none;background:none;cursor:pointer;">X</button></td></tr>`;
+            const tb = document.getElementById('user-table'); tb.innerHTML='';
+            getDB(DB_KEY).forEach((u,i) => {
+                const cor = u.plan==='premium'?'var(--gold)':'#777';
+                tb.innerHTML += `<tr><td>${u.email}</td><td>${u.pass}</td><td style="color:${cor}">${u.plan.toUpperCase()}</td><td><button class="btn btn-green" onclick="swapPlan(${i})">Mudar Plano</button> <button style="color:red;border:none;background:none;cursor:pointer" onclick="delUser(${i})">X</button></td></tr>`;
             });
         }
-
-        function changePlan(i) {
-            const db = getDB(DB_KEY);
-            db[i].plan = db[i].plan === 'free' ? 'premium' : 'free';
+        function swapPlan(i) {
+            const db = getDB(DB_KEY); db[i].plan = db[i].plan==='free'?'premium':'free';
             saveDB(DB_KEY, db); renderUsers();
         }
-
         function delUser(i) {
-            if(confirm("Deletar?")) {
-                const db = getDB(DB_KEY); db.splice(i, 1);
-                saveDB(DB_KEY, db); renderUsers();
-            }
+            if(confirm("Excluir?")) { const db = getDB(DB_KEY); db.splice(i,1); saveDB(DB_KEY, db); renderUsers(); }
         }
 
-        // --- CHAT ---
+        // --- ADMIN CHAT ---
         function renderChatList() {
-            const l = document.getElementById('adm-chat-list'); l.innerHTML = '';
+            const list = document.getElementById('adm-chat-list'); list.innerHTML='';
             getDB(CHAT_KEY).forEach(c => {
-                l.innerHTML += `<div style="padding:15px; border-bottom:1px solid #333; cursor:pointer;" onclick="openChat('${c.email}')">${c.email}</div>`;
+                if(c.needsHuman) { // Só mostra quem pediu humano
+                    list.innerHTML += `<div style="padding:10px; border-bottom:1px solid #333; cursor:pointer;" onclick="openAdminChat('${c.email}')">👤 ${c.email}</div>`;
+                }
             });
         }
-        function openChat(e) { activeChat = e; document.getElementById('adm-chat-input').style.display='flex'; renderAdminChat(e); }
-        
-        function renderAdminChat(e) {
+        function openAdminChat(e) { activeAdminChat = e; renderAdminFeed(e); }
+        function renderAdminFeed(e) {
             const c = getDB(CHAT_KEY).find(x => x.email === e);
             const f = document.getElementById('adm-chat-feed'); f.innerHTML='';
-            if(c) c.msgs.forEach(m => f.innerHTML += `<div class="msg ${m.sender==='admin'?'me':'other'}">${m.text}</div>`);
+            if(c) c.msgs.forEach(m => f.innerHTML += `<div class="msg ${m.sender==='admin'?'me':'user'}">${m.text}</div>`);
         }
-        function sendAdmin() {
-            const t = document.getElementById('adm-msg').value; if(!t) return;
-            const db = getDB(CHAT_KEY); const c = db.find(x => x.email === activeChat);
+        function sendAdminMsg() {
+            const t = document.getElementById('adm-chat-input').value; if(!t) return;
+            const db = getDB(CHAT_KEY); const c = db.find(x => x.email === activeAdminChat);
             c.msgs.push({sender:'admin', text:t}); saveDB(CHAT_KEY, db);
-            document.getElementById('adm-msg').value=''; renderAdminChat(activeChat);
+            document.getElementById('adm-chat-input').value=''; renderAdminFeed(activeAdminChat);
         }
 
-        // USER CHAT
-        function renderUserChat() {
-            const db = getDB(CHAT_KEY); let c = db.find(x => x.email === currentUser.email);
-            const f = document.getElementById('user-chat-feed'); f.innerHTML='';
-            if(c) c.msgs.forEach(m => f.innerHTML += `<div class="msg ${m.sender==='user'?'me':'other'}">${m.text}</div>`);
-        }
-        function sendUser() {
-            const t = document.getElementById('user-msg').value; if(!t) return;
-            const db = getDB(CHAT_KEY); let c = db.find(x => x.email === currentUser.email);
-            if(!c) { c = {email:currentUser.email, msgs:[]}; db.push(c); }
-            c.msgs.push({sender:'user', text:t}); saveDB(CHAT_KEY, db);
-            document.getElementById('user-msg').value=''; renderUserChat();
-        }
-
-        // --- APP ---
+        // --- APP USER ---
         async function initApp() {
             document.getElementById('auth-screen').style.display='none';
             document.getElementById('app-screen').style.display='block';
             
-            const badge = document.getElementById('badge');
-            badge.innerText = currentUser.plan.toUpperCase();
-            badge.style.color = currentUser.plan === 'premium' ? 'var(--gold)' : 'white';
+            document.getElementById('prof-email').innerText = currentUser.email;
+            document.getElementById('prof-plan').innerText = currentUser.plan.toUpperCase();
+            
+            const b = document.getElementById('badge');
+            b.innerText = currentUser.plan==='premium'?'PREMIUM':'FREE';
+            b.style.color = currentUser.plan==='premium'?'var(--gold)':'white';
 
-            // Security Check Loop
+            // Auto-Kick
             setInterval(() => {
                 const u = getDB(DB_KEY).find(x => x.email === currentUser.email);
                 if(!u) { alert('Conta excluída.'); logout(); }
                 else if(u.plan !== currentUser.plan) { currentUser.plan = u.plan; localStorage.setItem('cineSession', JSON.stringify(currentUser)); location.reload(); }
             }, 3000);
 
-            // Chat Polling
-            setInterval(() => { if(document.getElementById('page-support').style.display==='block') renderUserChat(); }, 2000);
-
-            // Content
-            const hRes = await fetch(`${BASE}/trending/movie/week?api_key=${API}&language=pt-BR`);
+            // API Content
+            const hRes = await fetch(`${BASE}/trending/movie/day?api_key=${API}&language=pt-BR`);
             const hData = await hRes.json();
             const h = hData.results[0];
             heroId = h.id;
@@ -370,65 +377,30 @@
             document.getElementById('hero-title').innerText = h.title;
             document.getElementById('hero-desc').innerText = h.overview;
 
-            // Rows
             fillRow(hData.results, 'dynamic-rows', '🔥 Em Alta', true);
-            const genres = [{id:28,n:'Ação'}, {id:35,n:'Comédia'}, {id:27,n:'Terror'}];
-            for(let g of genres) {
+            const gs = [{id:28,n:'Ação'},{id:35,n:'Comédia'},{id:27,n:'Terror'}];
+            for(let g of gs) {
                 const r = await fetch(`${BASE}/discover/movie?api_key=${API}&with_genres=${g.id}&language=pt-BR`);
                 const d = await r.json();
-                fillRow(d.results, 'dynamic-rows', `🎬 ${g.n}`, false);
+                fillRow(d.results, 'dynamic-rows', g.n, false);
             }
         }
 
-        function fillRow(list, containerId, title, locked) {
-            const c = document.getElementById(containerId);
-            const div = document.createElement('div');
-            div.className = 'row';
-            let html = `<h2>${title}</h2><div class="posters">`;
-            list.forEach(f => {
-                if(f.poster_path) {
-                    html += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="tryPlay(${f.id}, ${locked})">`;
-                }
+        function fillRow(l, cid, title, lock) {
+            const c = document.getElementById(cid);
+            let h = `<div class="row"><h2>${title}</h2><div class="posters">`;
+            l.forEach(f => {
+                if(f.poster_path) h += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="checkPlay(${f.id}, ${lock})">`;
             });
-            html += `</div>`;
-            div.innerHTML = html;
-            c.appendChild(div);
+            h += `</div></div>`;
+            c.innerHTML += h;
         }
 
-        function navTo(p) {
-            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-            document.getElementById('page-'+p).classList.add('active');
-            toggleSidebar();
-            
-            if(p==='movies') loadGrid(`${BASE}/discover/movie?api_key=${API}&language=pt-BR`, 'grid-movies');
-            if(p==='series') loadGrid(`${BASE}/discover/tv?api_key=${API}&language=pt-BR`, 'grid-series');
-            if(p==='support') renderUserChat();
+        function checkPlay(id, lock) {
+            if(lock && currentUser.plan !== 'premium') document.getElementById('paywall-modal').style.display='flex';
+            else { currentMid = id; document.getElementById('video-modal').style.display='flex'; setPlayer(1); }
         }
-
-        async function loadGrid(url, elId) {
-            const el = document.getElementById(elId); el.innerHTML='Carregando...';
-            const r = await fetch(url); const d = await r.json(); el.innerHTML='';
-            d.results.forEach(f => {
-                if(f.poster_path) el.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="tryPlay(${f.id}, false)">`;
-            });
-        }
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
-        }
-
-        // PLAYER
-        function playHero() { tryPlay(heroId, false); }
-        function tryPlay(id, lock) {
-            if(lock && currentUser.plan !== 'premium') {
-                document.getElementById('paywall-modal').style.display='flex';
-            } else {
-                currentMid = id;
-                document.getElementById('video-modal').style.display='flex';
-                setPlayer(1);
-            }
-        }
+        function playHero() { checkPlay(heroId, false); }
         function setPlayer(n) {
             const f = document.getElementById('video-frame');
             if(n===1) f.src=`https://embed.warezcdn.link/filme/${currentMid}`;
@@ -437,20 +409,95 @@
         }
         function closePlayer() { document.getElementById('video-modal').style.display='none'; document.getElementById('video-frame').src=''; }
 
-        // TV
-        function playCh(url) {
-            const v = document.getElementById('tv-video');
+        // --- NAVIGATION ---
+        function navTo(p) {
+            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+            document.getElementById('page-'+p).classList.add('active');
+            toggleSidebar();
+            if(p==='movies') loadGrid('movie');
+            if(p==='series') loadGrid('tv');
+            if(p==='trending') loadGrid('trending');
+            if(p==='support') loadChat();
+        }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open')?'block':'none'; }
+
+        async function loadGrid(type) {
+            let url = '';
+            if(type==='movie') url = `${BASE}/discover/movie?api_key=${API}&language=pt-BR`;
+            if(type==='tv') url = `${BASE}/discover/tv?api_key=${API}&language=pt-BR`;
+            if(type==='trending') url = `${BASE}/trending/all/week?api_key=${API}&language=pt-BR`;
+            
+            const el = document.getElementById('grid-'+type); el.innerHTML='Carregando...';
+            const r = await fetch(url); const d = await r.json(); el.innerHTML='';
+            d.results.forEach(f => {
+                if(f.poster_path) el.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="checkPlay(${f.id}, false)">`;
+            });
+        }
+
+        // --- TV AO VIVO ---
+        function playTv(url) {
+            const video = document.getElementById('tv-video');
             if(Hls.isSupported()) {
-                const hls = new Hls(); hls.loadSource(url); hls.attachMedia(v); hls.on(Hls.Events.MANIFEST_PARSED,()=>v.play());
-            } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-                v.src=url; v.play();
+                const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url; video.addEventListener('loadedmetadata',()=>video.play());
             }
         }
 
-        window.onscroll = () => {
-            const nav = document.querySelector('.nav');
-            if(window.scrollY > 50) nav.classList.add('black'); else nav.classList.remove('black');
+        // --- IA CHATBOT ---
+        function loadChat() {
+            const db = getDB(CHAT_KEY);
+            const c = db.find(x => x.email === currentUser.email);
+            const f = document.getElementById('user-chat-feed');
+            // Mantém msg de boas vindas se vazio
+            if(c && c.msgs.length > 0) {
+                f.innerHTML = '';
+                c.msgs.forEach(m => f.innerHTML += `<div class="msg ${m.sender}">${m.text}</div>`);
+            }
+            setInterval(() => { if(document.getElementById('page-support').style.display === 'block') loadChat(); }, 3000);
         }
+
+        function sendUserMsg() {
+            const t = document.getElementById('user-chat-input').value.toLowerCase();
+            if(!t) return;
+            
+            const db = getDB(CHAT_KEY);
+            let c = db.find(x => x.email === currentUser.email);
+            if(!c) { c = {email:currentUser.email, msgs:[], needsHuman:false}; db.push(c); }
+            
+            // Adiciona msg do user
+            c.msgs.push({sender:'user', text:t});
+            document.getElementById('user-chat-input').value='';
+
+            // IA LOGIC
+            let reply = "";
+            if(t.includes('atendente') || t.includes('humano') || t.includes('admin')) {
+                c.needsHuman = true; // Avisa o Admin
+                reply = "Entendi. Estou chamando um atendente humano para você. Aguarde um momento.";
+            } else if(t.includes('trav') || t.includes('lent')) {
+                reply = "Se o vídeo estiver travando, tente trocar de Player (Botões 1, 2 ou 3) acima do vídeo.";
+            } else if(t.includes('senh')) {
+                reply = "Não é possível alterar senhas no momento. Peça ao Admin.";
+            } else if(t.includes('plan') || t.includes('pag')) {
+                reply = "O plano Premium remove anúncios e libera lançamentos. Fale com o Admin para ativar.";
+            } else if(t.includes('oi') || t.includes('ola')) {
+                reply = "Olá! Como posso ajudar você hoje?";
+            } else {
+                reply = "Não entendi bem. Tente perguntar sobre 'filmes', 'travamento' ou peça para 'falar com atendente'.";
+            }
+
+            // Se não chamou humano, a IA responde. Se chamou, só avisa.
+            setTimeout(() => {
+                c.msgs.push({sender: c.needsHuman && reply.includes('chamando') ? 'bot' : (reply.includes('chamando') ? 'bot' : 'bot'), text: reply});
+                saveDB(CHAT_KEY, db);
+                loadChat();
+            }, 500); // Delay IA
+            
+            saveDB(CHAT_KEY, db);
+            loadChat();
+        }
+
+        window.onscroll = () => { const n = document.querySelector('.nav'); window.scrollY>50?n.classList.add('black'):n.classList.remove('black'); }
     </script>
 </body>
 </html>
