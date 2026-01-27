@@ -3,314 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream Ultra</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    
+    <title>CineStream Ultra - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #E50914;
-            --dark: #141414;
-            --gray: #AAA;
-            --gradient: linear-gradient(to top, #141414 10%, transparent 90%);
+        :root { --primary: #E50914; --dark: #000; --gray: #333; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: var(--dark); color: white; overflow-x: hidden; }
+
+        /* --- TELA DE LOGIN & PLANOS (Bloqueio) --- */
+        #auth-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+            background-size: cover; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background-color: var(--dark);
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
-
-        /* --- ANIMAÇÕES (KEYFRAMES) --- */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes zoomSlow { from { transform: scale(1); } to { transform: scale(1.15); } }
-        @keyframes glow { 0% { box-shadow: 0 0 5px var(--primary); } 50% { box-shadow: 0 0 20px var(--primary); } 100% { box-shadow: 0 0 5px var(--primary); } }
-
-        /* --- NAVBAR BLUR --- */
-        .nav {
-            position: fixed; top: 0; width: 100%; height: 70px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 4%; z-index: 50;
-            background: rgba(20, 20, 20, 0.8);
-            backdrop-filter: blur(10px); /* Efeito de vidro fosco */
-            transition: 0.3s;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .logo { font-family: 'Bebas Neue', cursive; color: var(--primary); font-size: 32px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(229,9,20,0.5); cursor: pointer; }
+        .auth-container { background: rgba(0,0,0,0.85); padding: 40px; border-radius: 10px; width: 90%; max-width: 500px; text-align: center; }
+        .auth-container h1 { margin-bottom: 20px; font-weight: 800; color: var(--primary); }
         
-        .search-bar { position: relative; }
-        .search-bar input {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px 15px; border-radius: 20px; color: white; outline: none;
-            transition: 0.3s; width: 200px;
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { font-size: 12px; color: #aaa; }
+        .input-group input { 
+            width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #333; 
+            background: #333; color: white; margin-top: 5px;
         }
-        .search-bar input:focus { width: 300px; border-color: var(--primary); background: rgba(0,0,0,0.8); }
 
-        /* --- BANNER HERO (CINEMATOGRÁFICO) --- */
-        .hero {
-            position: relative; height: 85vh; width: 100%;
-            overflow: hidden;
+        .plans-container { display: flex; gap: 10px; margin: 20px 0; justify-content: center; }
+        .plan-card { 
+            border: 1px solid #444; padding: 10px; border-radius: 5px; cursor: pointer; width: 33%; transition: 0.3s;
+            font-size: 12px; opacity: 0.7;
         }
-        .hero-bg {
-            width: 100%; height: 100%; object-fit: cover;
-            animation: zoomSlow 20s infinite alternate; /* Imagem se mexe sozinha */
-        }
-        .hero-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, #141414 0%, rgba(20,20,20,0.6) 50%, transparent 100%),
-                        linear-gradient(0deg, #141414 0%, transparent 50%);
-        }
-        .hero-content {
-            position: absolute; top: 30%; left: 4%; max-width: 600px;
-            animation: fadeIn 1s ease-out;
-        }
-        .hero-title {
-            font-family: 'Bebas Neue', sans-serif; font-size: 5rem; line-height: 0.9;
-            margin-bottom: 20px; text-transform: uppercase;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
-        }
-        .hero-desc {
-            font-size: 1.1rem; color: #ddd; margin-bottom: 30px; line-height: 1.5;
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .btn {
-            padding: 12px 30px; font-weight: 600; border: none; border-radius: 5px;
-            cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
-            transition: 0.3s; font-size: 1rem;
-        }
-        .btn-play { background: white; color: black; }
-        .btn-play:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,255,255,0.4); }
-        .btn-info { background: rgba(109, 109, 109, 0.7); color: white; margin-left: 10px; }
-        .btn-info:hover { background: rgba(109, 109, 109, 0.4); }
+        .plan-card.selected { border-color: var(--primary); opacity: 1; transform: scale(1.05); background: rgba(229,9,20,0.1); }
+        .plan-price { font-size: 16px; font-weight: bold; color: var(--primary); display: block; margin-top: 5px; }
 
-        /* --- LISTAS DE FILMES --- */
-        .category { margin: 20px 0 40px 20px; animation: fadeIn 1.5s ease-out; }
-        .category h2 { 
-            font-size: 1.4rem; margin-bottom: 15px; color: #e5e5e5; 
-            border-left: 4px solid var(--primary); padding-left: 10px;
+        .btn-auth { 
+            width: 100%; padding: 15px; background: var(--primary); color: white; 
+            border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;
         }
+
+        /* --- APP PRINCIPAL (Escondido no início) --- */
+        #app-screen { display: none; } /* Começa invisível */
+
+        /* MENU HAMBURGUER */
+        .menu-btn { position: fixed; top: 20px; left: 20px; z-index: 100; cursor: pointer; font-size: 24px; }
+        .sidebar {
+            position: fixed; top: 0; left: -300px; width: 250px; height: 100%;
+            background: #111; z-index: 99; transition: 0.4s; padding-top: 80px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-item { 
+            padding: 15px 20px; border-bottom: 1px solid #222; cursor: pointer; color: #ccc; display: flex; align-items: center; gap: 10px;
+        }
+        .sidebar-item:hover { background: #222; color: white; }
         
-        .row-container {
-            display: flex; overflow-x: auto; padding: 20px 0; gap: 15px;
-            scroll-behavior: smooth;
-        }
-        .row-container::-webkit-scrollbar { display: none; } /* Esconde scroll */
+        /* RESTO DO CSS (Netflix Style) */
+        .hero { height: 70vh; position: relative; background-size: cover; background-position: center; }
+        .hero-content { position: absolute; bottom: 100px; left: 40px; max-width: 600px; }
+        .hero h1 { font-size: 4rem; text-shadow: 2px 2px 4px #000; line-height: 1; margin-bottom: 10px; }
+        .row { padding: 20px; }
+        .posters { display: flex; overflow-x: scroll; gap: 15px; padding-bottom: 20px; }
+        .posters::-webkit-scrollbar { display: none; }
+        .poster { height: 200px; border-radius: 5px; transition: 0.3s; cursor: pointer; }
+        .poster:hover { transform: scale(1.1); }
 
-        .card {
-            min-width: 160px; height: 240px; border-radius: 8px;
-            overflow: hidden; position: relative; cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .card img { width: 100%; height: 100%; object-fit: cover; }
-        .card:hover { 
-            transform: scale(1.15) translateY(-10px); 
-            z-index: 10; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 2px solid rgba(255,255,255,0.2);
-        }
+        /* MODAL DE PLAYER */
+        #player-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 200; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .close-player { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; z-index: 201; }
 
-        /* --- MODAL ELEGANTE --- */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 1000;
-            justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
-        }
-        .modal-box {
-            background: #181818; width: 90%; max-width: 1000px;
-            border-radius: 15px; overflow: hidden; position: relative;
-            box-shadow: 0 0 50px rgba(229,9,20,0.2);
-            transform: translateY(50px); transition: transform 0.3s;
-        }
-        .modal-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: #222; }
-        .server-controls { display: flex; gap: 10px; }
-        .server-tag { 
-            background: #333; padding: 5px 15px; border-radius: 20px; 
-            font-size: 12px; cursor: pointer; border: 1px solid #444; 
-        }
-        .server-tag.active { background: var(--primary); border-color: var(--primary); }
-        .close-modal { font-size: 30px; cursor: pointer; color: white; }
-        iframe { width: 100%; height: 500px; border: none; background: black; }
-
-        @media (max-width: 768px) {
-            .hero-title { font-size: 3rem; }
-            .hero-content { top: 20%; left: 5%; width: 90%; }
-            iframe { height: 35vh; }
-        }
     </style>
 </head>
 <body>
 
-    <nav class="nav">
-        <div class="logo" onclick="location.reload()">NETFLIX <span style="font-size: 15px; color: white;">ULTRA</span></div>
-        <div class="search-bar">
-            <input type="text" placeholder="Buscar título..." onkeyup="buscar(this.value)">
-        </div>
-    </nav>
-
-    <header class="hero" id="hero">
-        <img id="hero-img" class="hero-bg" src="" alt="">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1 class="hero-title" id="hero-title">Carregando...</h1>
-            <p class="hero-desc" id="hero-desc">Buscando os melhores filmes para você...</p>
-            <div style="display: flex; gap: 15px;">
-                <button class="btn btn-play" id="btn-hero-play">▶ Assistir Agora</button>
-                <button class="btn btn-info">ℹ Mais Info</button>
+    <div id="auth-screen">
+        <div class="auth-container" id="step-1">
+            <h1>CineStream</h1>
+            <p>Escolha seu plano para começar os 15 dias grátis.</p>
+            
+            <div class="plans-container">
+                <div class="plan-card" onclick="selectPlan(this, 'Premium')">
+                    Premium
+                    <span class="plan-price">R$ 11,99</span>
+                </div>
+                <div class="plan-card selected" onclick="selectPlan(this, 'Avançado')">
+                    Avançado
+                    <span class="plan-price">R$ 20,00</span>
+                </div>
+                <div class="plan-card" onclick="selectPlan(this, 'Ultra')">
+                    Ultra 4K
+                    <span class="plan-price">R$ 30,00</span>
+                </div>
             </div>
-        </div>
-    </header>
 
-    <div id="content-area">
-        <div class="category"><h2>🔥 Em Alta na Semana</h2><div class="row-container" id="trending"></div></div>
-        <div class="category"><h2>🎬 Ação e Aventura</h2><div class="row-container" id="action"></div></div>
-        <div class="category"><h2>😂 Comédias</h2><div class="row-container" id="comedy"></div></div>
-        <div class="category"><h2>👻 Terror e Suspense</h2><div class="row-container" id="horror"></div></div>
-        <div class="category"><h2>👽 Ficção Científica</h2><div class="row-container" id="scifi"></div></div>
+            <div class="input-group">
+                <label>Nome Completo</label>
+                <input type="text" id="reg-name" placeholder="Seu nome">
+            </div>
+            <div class="input-group">
+                <label>Endereço Completo</label>
+                <input type="text" id="reg-address" placeholder="Rua, Número, Cidade">
+            </div>
+            <div class="input-group">
+                <label>E-mail (Gmail)</label>
+                <input type="email" id="reg-email" placeholder="seuemail@gmail.com">
+            </div>
+
+            <button class="btn-auth" onclick="sendCode()">CONTINUAR</button>
+        </div>
+
+        <div class="auth-container" id="step-2" style="display: none;">
+            <h1>Verificação de Segurança</h1>
+            <p>Enviamos um código para: <span id="display-email" style="color:var(--primary)"></span></p>
+            <p style="font-size: 12px; color: #888;">(Simulação: O código aparecerá num alerta)</p>
+            
+            <div class="input-group">
+                <label>Código de 4 Dígitos</label>
+                <input type="number" id="verify-code" placeholder="0000" style="text-align: center; font-size: 20px; letter-spacing: 5px;">
+            </div>
+            <button class="btn-auth" onclick="validateLogin()">CONFIRMAR & ACESSAR</button>
+        </div>
     </div>
 
-    <div class="modal-overlay" id="modal">
-        <div class="modal-box">
-            <div class="modal-header">
-                <div class="server-controls">
-                    <div class="server-tag active" onclick="setServer(0, this)">Player 1 (Rápido)</div>
-                    <div class="server-tag" onclick="setServer(1, this)">Player 2 (Backup)</div>
-                    <div class="server-tag" onclick="setServer(2, this)">Player 3 (Alternativo)</div>
-                </div>
-                <span class="close-modal" onclick="fecharModal()">&times;</span>
-            </div>
-            <iframe id="player-frame" allowfullscreen></iframe>
+    <div id="app-screen">
+        
+        <div class="menu-btn" onclick="toggleMenu()">☰</div>
+        <div class="sidebar" id="sidebar">
+            <div style="padding: 20px; color: var(--primary); font-weight: bold;">MINHA CONTA</div>
+            <div class="sidebar-item">👤 Perfil (<span id="user-plan-display">Grátis</span>)</div>
+            <div class="sidebar-item">⚙️ Configurações</div>
+            <hr style="border-color: #333">
+            <div style="padding: 20px; color: #666; font-size: 12px;">CANAIS</div>
+            <div class="sidebar-item" onclick="alert('Mudando para Netflix...')">🔴 Netflix</div>
+            <div class="sidebar-item" onclick="alert('Mudando para Amazon...')">🔵 Amazon Prime</div>
+            <div class="sidebar-item" onclick="alert('Mudando para HBO...')">🟣 HBO Max</div>
+            <hr style="border-color: #333">
+            <div class="sidebar-item" onclick="logout()" style="color: red;">Sair</div>
         </div>
+
+        <div class="hero" id="hero-banner">
+            <div class="hero-content">
+                <h1 id="hero-title">Carregando...</h1>
+                <button class="btn-auth" style="width: auto; padding: 10px 30px; background: white; color: black;" onclick="playHero()">▶ Assistir</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <h3>Em Alta na Plataforma</h3>
+            <div class="posters" id="trending-row"></div>
+        </div>
+        <div class="row">
+            <h3>Ação e Aventura</h3>
+            <div class="posters" id="action-row"></div>
+        </div>
+
+    </div>
+
+    <div id="player-modal">
+        <div class="close-player" onclick="closePlayer()">×</div>
+        <iframe id="video-frame" src="" allowfullscreen></iframe>
     </div>
 
     <script>
-        const API_KEY = 'c3162eed0616407fa43134e07880c7d5';
+        // --- CONFIGURAÇÃO API ---
+        const API_KEY = 'c3162eed0616407fa43134e07880c7d5'; 
         const BASE_IMG = 'https://image.tmdb.org/t/p/original';
-        const POSTER_IMG = 'https://image.tmdb.org/t/p/w300';
         
-        let currentId = '';
-        let currentType = 'movie';
+        // --- SISTEMA DE LOGIN (Simulado) ---
+        let generatedCode = 0;
+        let selectedPlanName = 'Avançado';
 
-        // Inicialização
+        // Verifica se já está logado ao abrir
         window.onload = () => {
-            fetchBanner();
-            fetchCategory('trending/all/week', 'trending', true);
-            fetchCategory('discover/movie?with_genres=28', 'action');
-            fetchCategory('discover/movie?with_genres=35', 'comedy');
-            fetchCategory('discover/movie?with_genres=27', 'horror');
-            fetchCategory('discover/movie?with_genres=878', 'scifi');
+            if(localStorage.getItem('isLoggedIn') === 'true') {
+                showApp();
+            }
+            loadMovies();
         };
 
-        // Carregar Banner Principal
-        async function fetchBanner() {
-            const res = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&language=pt-BR`);
-            const data = await res.json();
-            const filme = data.results[Math.floor(Math.random() * 10)]; // Pega um dos top 10
-
-            document.getElementById('hero-img').src = BASE_IMG + filme.backdrop_path;
-            document.getElementById('hero-title').innerText = filme.title || filme.name;
-            document.getElementById('hero-desc').innerText = filme.overview || "Sem descrição disponível.";
-            
-            document.getElementById('btn-hero-play').onclick = () => abrirPlayer(filme.id, filme.media_type || 'movie');
+        function selectPlan(card, name) {
+            document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedPlanName = name;
         }
 
-        // Carregar Linhas
-        async function fetchCategory(endpoint, elementId, isTrending = false) {
-            const res = await fetch(`https://api.themoviedb.org/3/${endpoint}${endpoint.includes('?') ? '&' : '?'}api_key=${API_KEY}&language=pt-BR`);
-            const data = await res.json();
-            const container = document.getElementById(elementId);
+        function sendCode() {
+            const name = document.getElementById('reg-name').value;
+            const address = document.getElementById('reg-address').value;
+            const email = document.getElementById('reg-email').value;
 
-            data.results.forEach(item => {
-                if(!item.poster_path) return;
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.onclick = () => abrirPlayer(item.id, item.media_type || (isTrending ? item.media_type : 'movie'));
-                div.innerHTML = `<img src="${POSTER_IMG}${item.poster_path}" alt="${item.title}" loading="lazy">`;
-                container.appendChild(div);
-            });
-        }
+            // Validação simples
+            if(name.length < 3 || address.length < 5 || !email.includes('@')) {
+                alert("Por favor, preencha todos os dados reais.");
+                return;
+            }
 
-        // Sistema de Busca Rápida
-        async function buscar(query) {
-            if(query.length < 3) return;
-            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${query}&language=pt-BR`);
-            const data = await res.json();
+            // Gera código aleatório
+            generatedCode = Math.floor(1000 + Math.random() * 9000);
             
-            const container = document.getElementById('trending');
-            container.innerHTML = '';
-            document.querySelector('.category h2').innerText = `🔍 Resultados para: ${query}`;
-            
-            // Esconde outras categorias durante a busca
-            document.querySelectorAll('.category').forEach((el, index) => {
-                if(index > 0) el.style.display = 'none';
-            });
+            // Simula envio de email
+            document.getElementById('step-1').style.display = 'none';
+            document.getElementById('step-2').style.display = 'block';
+            document.getElementById('display-email').innerText = email;
 
-            data.results.forEach(item => {
-                if(!item.poster_path) return;
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.onclick = () => abrirPlayer(item.id, item.media_type);
-                div.innerHTML = `<img src="${POSTER_IMG}${item.poster_path}">`;
-                container.appendChild(div);
-            });
-        }
-
-        // --- LÓGICA DO PLAYER & SERVIDORES ---
-        const servers = [
-            (id, type) => `https://vidsrc.me/embed/${type === 'movie' ? 'movie' : 'tv'}?tmdb=${id}`,
-            (id, type) => `https://vidsrc.to/embed/${type === 'movie' ? 'movie' : 'tv'}/${id}`,
-            (id, type) => `https://multiembed.mov/?video_id=${id}&tmdb=1`
-        ];
-
-        function abrirPlayer(id, type) {
-            currentId = id;
-            currentType = type;
-            const modal = document.getElementById('modal');
-            const box = document.querySelector('.modal-box');
-            
-            // Animação de entrada
-            modal.style.display = 'flex';
+            // ALERTA DE SIMULAÇÃO (Na vida real, isso iria pro Backend)
             setTimeout(() => {
-                modal.style.opacity = '1';
-                box.style.transform = 'translateY(0)';
-            }, 10);
-
-            // Carrega o primeiro servidor
-            setServer(0, document.querySelector('.server-tag'));
+                alert(`📧 E-MAIL DO GMAIL:\n\nOlá ${name}!\nSeu código de verificação é: ${generatedCode}\n\nPlano escolhido: ${selectedPlanName} (Teste Grátis 15 Dias)`);
+            }, 1000);
         }
 
-        function setServer(index, element) {
-            // Atualiza visual dos botões
-            document.querySelectorAll('.server-tag').forEach(el => el.classList.remove('active'));
-            if(element) element.classList.add('active');
-
-            // Carrega vídeo
-            const iframe = document.getElementById('player-frame');
-            iframe.src = servers[index](currentId, currentType);
-        }
-
-        function fecharModal() {
-            const modal = document.getElementById('modal');
-            const box = document.querySelector('.modal-box');
-            
-            modal.style.opacity = '0';
-            box.style.transform = 'translateY(50px)';
-            
-            setTimeout(() => {
-                modal.style.display = 'none';
-                document.getElementById('player-frame').src = ''; // Para o som
-            }, 300);
-        }
-
-        // Se o usuário clicar fora do player, fecha também
-        window.onclick = function(event) {
-            const modal = document.getElementById('modal');
-            if (event.target == modal) {
-                fecharModal();
+        function validateLogin() {
+            const inputCode = document.getElementById('verify-code').value;
+            if(inputCode == generatedCode) {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userPlan', selectedPlanName);
+                showApp();
+            } else {
+                alert("Código incorreto! Verifique seu Gmail.");
             }
         }
+
+        function showApp() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            document.getElementById('user-plan-display').innerText = localStorage.getItem('userPlan') || 'Grátis';
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            location.reload();
+        }
+
+        // --- LÓGICA DO MENU ---
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // --- CARREGAMENTO DE FILMES ---
+        async function loadMovies() {
+            // Banner Hero
+            const resHero = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&language=pt-BR`);
+            const dataHero = await resHero.json();
+            const heroMovie = dataHero.results[0];
+            
+            document.getElementById('hero-banner').style.backgroundImage = `linear-gradient(to top, #000, transparent), url(${BASE_IMG}${heroMovie.backdrop_path})`;
+            document.getElementById('hero-title').innerText = heroMovie.title || heroMovie.name;
+            
+            // Configura o botão do Hero
+            window.heroId = heroMovie.id;
+            window.heroType = heroMovie.media_type;
+
+            // Lista Trending
+            const resTrend = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=pt-BR`);
+            const dataTrend = await resTrend.json();
+            fillRow('trending-row', dataTrend.results);
+
+            // Lista Ação
+            const resAction = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&language=pt-BR`);
+            const dataAction = await resAction.json();
+            fillRow('action-row', dataAction.results);
+        }
+
+        function fillRow(elementId, movies) {
+            const container = document.getElementById(elementId);
+            movies.forEach(m => {
+                if(m.poster_path) {
+                    const img = document.createElement('img');
+                    img.className = 'poster';
+                    img.src = `https://image.tmdb.org/t/p/w300${m.poster_path}`;
+                    img.onclick = () => openPlayer(m.id, 'movie');
+                    container.appendChild(img);
+                }
+            });
+        }
+
+        // --- PLAYER DE VÍDEO ---
+        function playHero() {
+            openPlayer(window.heroId, window.heroType);
+        }
+
+        function openPlayer(id, type) {
+            const modal = document.getElementById('player-modal');
+            const iframe = document.getElementById('video-frame');
+            // Usando servidor Vidsrc
+            iframe.src = `https://vidsrc.me/embed/${type === 'movie' ? 'movie' : 'tv'}?tmdb=${id}`;
+            modal.style.display = 'block';
+        }
+
+        function closePlayer() {
+            document.getElementById('player-modal').style.display = 'none';
+            document.getElementById('video-frame').src = '';
+        }
+
     </script>
 </body>
 </html>
