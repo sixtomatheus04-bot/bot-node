@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream - Dublado V4</title>
+    <title>CineStream - Brasil (Dublado)</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -66,7 +66,7 @@
             width: 60px; height: 60px; border-radius: 12px; cursor: pointer; background: #1f1f1f; border: 2px solid #333; 
             display: flex; align-items: center; justify-content: center; transition: 0.3s; position: relative; overflow: hidden;
         }
-        .brand-item:hover { transform: scale(1.15); border-color: white; background: #333; }
+        .brand-item:hover, .brand-item.active { transform: scale(1.15); border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.2); background: #333; }
         .brand-logo-txt { font-family: 'Bebas Neue'; font-size: 18px; letter-spacing: 1px; }
 
         /* LISTAS */
@@ -92,20 +92,22 @@
         .episode-item:hover { background: #333; border: 1px solid var(--red); }
         .episode-item img { width: 140px; border-radius: 4px; }
 
-        /* --- PLAYER COM SELETOR DE ÁUDIO --- */
+        /* --- PLAYER BRASILEIRO --- */
         #video-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 6000; }
         iframe { width: 100%; height: 100%; border: none; }
         .close-video { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; z-index: 6002; text-shadow: 0 0 10px black; }
         
         .player-controls {
-            position: absolute; top: 20px; left: 20px; z-index: 6002; display: flex; gap: 10px;
+            position: absolute; top: 20px; left: 20px; z-index: 6002; display: flex; flex-direction: column; gap: 5px;
         }
         .btn-source {
-            padding: 8px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px;
-            background: rgba(255,255,255,0.2); color: white; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px;
+            background: rgba(0,0,0,0.6); color: white; border: 1px solid #444; text-align: left;
         }
         .btn-source.active { background: var(--red); border-color: var(--red); }
-        .btn-source:hover { background: rgba(255,255,255,0.4); }
+        .player-tip {
+            color: #ffff00; background: rgba(0,0,0,0.8); padding: 5px 10px; border-radius: 4px; font-size: 13px; margin-bottom: 5px; border-left: 3px solid #ffff00;
+        }
 
     </style>
 </head>
@@ -186,9 +188,12 @@
         <span class="close-video" onclick="fecharVideo()">×</span>
         
         <div class="player-controls">
-            <button class="btn-source active" id="btn-p1" onclick="mudarPlayer(1)">🇧🇷 Nacional (Dub)</button>
-            <button class="btn-source" id="btn-p2" onclick="mudarPlayer(2)">🇺🇸 Internacional</button>
-            <button class="btn-source" id="btn-p3" onclick="mudarPlayer(3)">⚡ Opção 3</button>
+            <div class="player-tip">💡 Se começar em Inglês, clique na engrenagem ⚙️ ou selecione DUBLADO na tela.</div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-source active" id="btn-p1" onclick="mudarPlayer(1)">🇧🇷 Player 1 (Warez)</button>
+                <button class="btn-source" id="btn-p2" onclick="mudarPlayer(2)">🇧🇷 Player 2 (SuperFlix)</button>
+                <button class="btn-source" id="btn-p3" onclick="mudarPlayer(3)">🌎 Player 3 (Backup)</button>
+            </div>
         </div>
 
         <iframe id="video-frame" allowfullscreen></iframe>
@@ -211,46 +216,44 @@
 
         window.onload = () => { resetarFiltro(); };
 
-        // --- SISTEMA DE PLAYER INTELIGENTE V4 ---
+        // --- PLAYERS BRASILEIROS ---
         function mudarPlayer(opcao) {
-            // Remove active de todos
             document.querySelectorAll('.btn-source').forEach(b => b.classList.remove('active'));
             document.getElementById(`btn-p${opcao}`).classList.add('active');
 
             const iframe = document.getElementById('video-frame');
             let url = '';
 
-            // Lógica de Players
+            // Lógica de Players 100% Focados no Brasil
             if (opcao === 1) {
-                // OPÇÃO 1: SUPERFLIX (Foco Brasil/Dublado)
-                // Nota: Essa API geralmente aceita TMDb ID
+                // Warez (Muito famoso por ter Dublado direto)
+                if(currentType === 'movie') {
+                    url = `https://embed.warezcdn.link/filme/${currentId}`;
+                } else {
+                    url = `https://embed.warezcdn.link/serie/${currentId}/${currentSeason}/${currentEpisode}`;
+                }
+            } 
+            else if (opcao === 2) {
+                // SuperFlix (Tem menu para escolher Dublado)
                 if(currentType === 'movie') {
                     url = `https://superflixapi.top/filme/${currentId}`;
                 } else {
                     url = `https://superflixapi.top/serie/${currentId}/${currentSeason}/${currentEpisode}`;
                 }
             } 
-            else if (opcao === 2) {
-                // OPÇÃO 2: VIDSRC (Internacional/Legendado)
-                if(currentType === 'movie') {
-                    url = `https://vidsrc.me/embed/movie?tmdb=${currentId}`;
-                } else {
-                    url = `https://vidsrc.me/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}`;
-                }
-            } 
             else if (opcao === 3) {
-                // OPÇÃO 3: VIDSRC.CC (Híbrido)
+                // Embedder (Backup)
                 if(currentType === 'movie') {
-                    url = `https://vidsrc.cc/v2/embed/movie/${currentId}`;
+                    url = `https://embedder.net/e/movie?tmdb=${currentId}`;
                 } else {
-                    url = `https://vidsrc.cc/v2/embed/tv/${currentId}/${currentSeason}/${currentEpisode}`;
+                    url = `https://embedder.net/e/series?tmdb=${currentId}&sea=${currentSeason}&epi=${currentEpisode}`;
                 }
             }
 
             iframe.src = url;
         }
 
-        // --- FUNÇÕES DE NAVEGAÇÃO ---
+        // --- NAVEGAÇÃO ---
         function resetarFiltro() {
             activeNetwork = null; activeDublado = false;
             atualizarLabel("Início"); construirHome();
@@ -390,12 +393,12 @@
 
         function tocarFilme() { 
             document.getElementById('video-overlay').style.display = 'block';
-            mudarPlayer(1); // Inicia com o player Brasileiro (1)
+            mudarPlayer(1);
         }
         function tocarEpisodio(s, e) {
             currentSeason = s; currentEpisode = e;
             document.getElementById('video-overlay').style.display = 'block';
-            mudarPlayer(1); // Inicia com o player Brasileiro (1)
+            mudarPlayer(1);
         }
         function fecharVideo() { document.getElementById('video-overlay').style.display = 'none'; document.getElementById('video-frame').src = ''; }
         function fecharModal() { document.getElementById('detail-modal').style.display = 'none'; }
