@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream Ultimate</title>
+    <title>CineStream Ultimate v2</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
-        :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; --gray: #808080; }
+        :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { background: var(--black); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
         
-        /* SCROLLBAR CUSTOMIZADA */
         ::-webkit-scrollbar { width: 8px; background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--red); }
 
-        /* --- NAVBAR --- */
+        /* NAVBAR */
         .nav {
             position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between;
             background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent); z-index: 100; transition: 0.4s;
@@ -25,127 +24,79 @@
         
         .nav-left { display: flex; align-items: center; gap: 25px; }
         .hamburger { font-size: 26px; cursor: pointer; color: white; transition: 0.2s; }
-        .hamburger:hover { color: var(--red); transform: scale(1.1); }
-        .logo { 
-            color: var(--red); font-family: 'Bebas Neue'; font-size: 35px; cursor: pointer; letter-spacing: 1px;
-            text-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
-        }
+        .logo { color: var(--red); font-family: 'Bebas Neue'; font-size: 35px; cursor: pointer; letter-spacing: 1px; text-shadow: 0 0 10px rgba(229, 9, 20, 0.5); }
 
         .search-box {
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); 
             padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; backdrop-filter: blur(5px);
-            transition: 0.3s;
         }
-        .search-box:focus-within { border-color: var(--red); background: rgba(0,0,0,0.8); }
-        .search-box input {
-            background: transparent; border: none; color: white; padding: 5px; width: 250px; font-family: 'Outfit', sans-serif;
-        }
-        .search-box button { background: transparent; border: none; color: #ccc; cursor: pointer; font-size: 16px; }
+        .search-box input { background: transparent; border: none; color: white; padding: 5px; width: 250px; font-family: 'Outfit', sans-serif; }
+        .search-box button { background: transparent; border: none; color: #ccc; cursor: pointer; }
 
-        /* --- SIDEBAR --- */
+        /* SIDEBAR */
         .sidebar {
             position: fixed; top: 0; left: 0; width: 280px; height: 100vh; background: #111; z-index: 200;
-            transform: translateX(-100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            padding-top: 80px; border-right: 1px solid #333;
+            transform: translateX(-100%); transition: 0.4s; padding-top: 80px; border-right: 1px solid #333;
         }
         .sidebar.active { transform: translateX(0); box-shadow: 5px 0 30px rgba(0,0,0,0.8); }
         .sidebar a {
-            display: flex; align-items: center; gap: 15px;
-            padding: 15px 30px; color: #aaa; text-decoration: none; font-size: 16px; transition: 0.2s;
+            display: flex; align-items: center; gap: 15px; padding: 15px 30px; color: #aaa; text-decoration: none; font-size: 16px; transition: 0.2s;
         }
-        .sidebar a:hover { color: white; background: #222; border-left: 4px solid var(--red); padding-left: 35px; }
-        .close-sidebar {
-            position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; color: white;
-        }
-        .overlay-menu {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; backdrop-filter: blur(3px);
-        }
+        .sidebar a:hover { color: white; background: #222; border-left: 4px solid var(--red); }
+        .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; color: white; }
+        .overlay-menu { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; backdrop-filter: blur(3px); }
 
-        /* --- HERO (BANNER) --- */
-        .hero { height: 95vh; background-size: cover; background-position: center top; position: relative; }
-        .hero::after {
-            content: ''; position: absolute; width: 100%; height: 100%; bottom: 0; left: 0;
-            background: linear-gradient(to top, var(--black) 10%, transparent 60%);
-        }
-        .hero-content { 
-            position: absolute; bottom: 25%; left: 4%; max-width: 650px; z-index: 2; 
-            text-shadow: 2px 2px 10px black;
-        }
+        /* HERO */
+        .hero { height: 95vh; background-size: cover; background-position: center top; position: relative; transition: 0.5s; }
+        .hero::after { content: ''; position: absolute; width: 100%; height: 100%; bottom: 0; left: 0; background: linear-gradient(to top, var(--black) 10%, transparent 60%); }
+        .hero-content { position: absolute; bottom: 25%; left: 4%; max-width: 650px; z-index: 2; text-shadow: 2px 2px 10px black; }
         .hero-title { font-size: 70px; font-family: 'Bebas Neue'; line-height: 0.9; margin-bottom: 20px; }
-        .hero-desc { 
-            font-size: 17px; margin-bottom: 25px; line-height: 1.6; color: #ddd;
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .btn { 
-            padding: 12px 30px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; margin-right: 15px; 
-            transition: 0.3s; display: inline-flex; align-items: center; gap: 10px;
-        }
+        .hero-desc { font-size: 17px; margin-bottom: 25px; line-height: 1.6; color: #ddd; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .btn { padding: 12px 30px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; margin-right: 15px; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; }
         .btn-white { background: white; color: black; }
         .btn-white:hover { transform: scale(1.05); background: #eee; }
         .btn-gray { background: rgba(109, 109, 109, 0.4); color: white; backdrop-filter: blur(5px); }
-        .btn-gray:hover { background: rgba(109, 109, 109, 0.6); }
 
-        /* --- STREAMING BAR (FILTROS) --- */
+        /* FILTROS DE REDE */
         .brands-container {
             position: relative; z-index: 10; margin-top: -80px; padding: 0 4% 40px 4%;
-            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+            display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;
         }
         .brand-item {
-            width: 60px; height: 60px; border-radius: 12px; cursor: pointer;
-            background: #1f1f1f; border: 2px solid #333; display: flex; align-items: center; justify-content: center;
-            transition: 0.3s; position: relative; overflow: hidden;
+            width: 60px; height: 60px; border-radius: 12px; cursor: pointer; background: #1f1f1f; border: 2px solid #333; 
+            display: flex; align-items: center; justify-content: center; transition: 0.3s; position: relative; overflow: hidden;
         }
-        .brand-item:hover { transform: scale(1.15); border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
-        .brand-item img { width: 100%; height: 100%; object-fit: cover; }
+        .brand-item:hover, .brand-item.active { transform: scale(1.15); border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.2); background: #333; }
         .brand-logo-txt { font-family: 'Bebas Neue'; font-size: 18px; letter-spacing: 1px; }
 
-        /* --- LISTAS --- */
-        .container { position: relative; z-index: 10; padding-bottom: 50px; }
-        .row { margin-left: 4%; margin-bottom: 50px; }
-        .row h2 { 
-            color: #e5e5e5; font-size: 20px; font-weight: 600; margin-bottom: 15px; 
-            border-left: 4px solid var(--red); padding-left: 10px;
-        }
-        .posters { display: flex; overflow-x: auto; gap: 15px; padding: 10px 0; scrollbar-width: none; }
-        .posters::-webkit-scrollbar { display: none; }
-        
-        .poster { 
-            min-width: 160px; height: 240px; border-radius: 8px; transition: 0.3s; cursor: pointer; object-fit: cover;
-            border: 1px solid transparent;
-        }
+        /* LISTAS */
+        .container { position: relative; z-index: 10; padding-bottom: 50px; min-height: 100vh; }
+        .section-header { margin-left: 4%; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .row { margin-bottom: 50px; }
+        .row h2 { color: #e5e5e5; font-size: 20px; font-weight: 600; border-left: 4px solid var(--red); padding-left: 10px; }
+        .posters { display: flex; overflow-x: auto; gap: 15px; padding: 10px 4%; scrollbar-width: none; }
+        .poster { min-width: 160px; height: 240px; border-radius: 8px; transition: 0.3s; cursor: pointer; object-fit: cover; border: 1px solid transparent; }
         .poster:hover { transform: scale(1.1); margin: 0 10px; z-index: 20; border-color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .poster-large { min-width: 200px; height: 300px; }
 
-        /* --- RESULTADOS --- */
+        /* SEARCH & MODAL & PLAYER (Padrão) */
         #search-results { display: none; padding: 100px 4% 40px 4%; }
         .grid-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
         .grid-item img { width: 100%; height: 270px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .grid-item img:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--red); }
-        .section-title { font-size: 30px; font-family: 'Bebas Neue'; margin-bottom: 20px; color: var(--red); }
-
-        /* --- MODAL DETALHES --- */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; overflow-y: auto; justify-content: center; padding-top: 50px; backdrop-filter: blur(5px); }
-        .modal-content { background: #181818; width: 90%; max-width: 900px; border-radius: 12px; position: relative; margin-bottom: 50px; border: 1px solid #333; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-        .close-modal { position: absolute; top: 15px; right: 20px; background: rgba(0,0,0,0.5); color: white; border-radius: 50%; width: 40px; height: 40px; border: none; cursor: pointer; z-index: 10; font-size: 24px; transition: 0.2s; }
-        .close-modal:hover { background: var(--red); }
         
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; overflow-y: auto; justify-content: center; padding-top: 50px; backdrop-filter: blur(5px); }
+        .modal-content { background: #181818; width: 90%; max-width: 900px; border-radius: 12px; position: relative; margin-bottom: 50px; border: 1px solid #333; }
+        .close-modal { position: absolute; top: 15px; right: 20px; background: rgba(0,0,0,0.5); color: white; border-radius: 50%; width: 40px; height: 40px; border: none; cursor: pointer; z-index: 10; font-size: 24px; }
         .modal-hero { height: 450px; background-size: cover; border-radius: 12px 12px 0 0; position: relative; }
-        .modal-gradient { position: absolute; bottom: 0; width: 100%; height: 150px; background: linear-gradient(to top, #181818, transparent); }
         .modal-info { padding: 40px; margin-top: -60px; position: relative; }
         
-        .season-select { background: #333; color: white; padding: 12px; border: 1px solid #555; width: 100%; margin: 20px 0; border-radius: 6px; font-size: 16px; }
-        .episodes-list { display: flex; flex-direction: column; gap: 10px; }
-        .episode-item { display: flex; gap: 20px; padding: 15px; background: #222; border-radius: 8px; cursor: pointer; align-items: center; transition: 0.2s; border: 1px solid transparent; }
-        .episode-item:hover { border-color: var(--red); background: #2a2a2a; }
+        .season-select { background: #333; color: white; padding: 12px; border: 1px solid #555; width: 100%; margin: 20px 0; border-radius: 6px; }
+        .episode-item { display: flex; gap: 20px; padding: 15px; background: #222; border-radius: 8px; cursor: pointer; align-items: center; transition: 0.2s; margin-bottom: 10px; }
+        .episode-item:hover { background: #333; border: 1px solid var(--red); }
         .episode-item img { width: 140px; border-radius: 4px; }
-        .ep-title { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
-        .ep-desc { font-size: 13px; color: #aaa; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-        /* PLAYER */
         #video-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 6000; }
         iframe { width: 100%; height: 100%; border: none; }
-        .close-video { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; z-index: 6001; text-shadow: 0 0 10px black; }
-
+        .close-video { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; z-index: 6001; }
     </style>
 </head>
 <body>
@@ -154,6 +105,7 @@
         <div class="nav-left">
             <div class="hamburger" onclick="toggleMenu()">☰</div>
             <div class="logo" onclick="location.reload()">CINESTREAM</div>
+            <div id="current-filter-label" style="color: #aaa; font-size: 14px; border: 1px solid #333; padding: 5px 10px; border-radius: 20px; display: none;">Todos</div>
         </div>
         <div class="search-box">
             <input type="text" id="search-input" placeholder="Pesquisar...">
@@ -165,22 +117,13 @@
     <div class="sidebar" id="sidebar">
         <div class="close-sidebar" onclick="toggleMenu()">×</div>
         <a href="#" onclick="location.reload()">🏠 Início</a>
+        <a href="#" onclick="filtrarPortugues()">🇧🇷 Em Português</a>
         <a href="#" onclick="filtrarGenero(28, 'Ação')">💥 Ação</a>
         <a href="#" onclick="filtrarGenero(12, 'Aventura')">🗺️ Aventura</a>
-        <a href="#" onclick="filtrarGenero(16, 'Animação')">🎨 Animação</a>
         <a href="#" onclick="filtrarGenero(35, 'Comédia')">😂 Comédia</a>
-        <a href="#" onclick="filtrarGenero(80, 'Crime')">🚔 Crime</a>
-        <a href="#" onclick="filtrarGenero(99, 'Documentário')">🌍 Documentário</a>
-        <a href="#" onclick="filtrarGenero(18, 'Drama')">🎭 Drama</a>
-        <a href="#" onclick="filtrarGenero(10751, 'Família')">👨‍👩‍👧‍👦 Família</a>
-        <a href="#" onclick="filtrarGenero(14, 'Fantasia')">🧙‍♂️ Fantasia</a>
-        <a href="#" onclick="filtrarGenero(36, 'História')">📜 História</a>
         <a href="#" onclick="filtrarGenero(27, 'Terror')">👻 Terror</a>
-        <a href="#" onclick="filtrarGenero(10402, 'Música')">🎵 Música</a>
-        <a href="#" onclick="filtrarGenero(9648, 'Mistério')">🔎 Mistério</a>
         <a href="#" onclick="filtrarGenero(10749, 'Romance')">❤️ Romance</a>
-        <a href="#" onclick="filtrarGenero(878, 'Ficção Científica')">🚀 Sci-Fi</a>
-        <a href="#" onclick="filtrarGenero(53, 'Suspense')">🔪 Suspense</a>
+        <a href="#" onclick="filtrarGenero(878, 'Sci-Fi')">🚀 Ficção</a>
     </div>
 
     <div id="app-home">
@@ -196,34 +139,34 @@
         </header>
 
         <div class="brands-container">
-            <div class="brand-item" onclick="filtrarRede(213, 'Netflix', '#E50914')">
+            <div class="brand-item" onclick="resetarFiltro()" title="Todos">
+                <div class="brand-logo-txt" style="font-size: 14px;">TUDO</div>
+            </div>
+            <div class="brand-item" onclick="filtrarPortugues()" title="Nacionais e Dublados">
+                <div class="brand-logo-txt" style="font-size: 25px;">🇧🇷</div>
+            </div>
+            
+            <div class="brand-item" onclick="ativarRede(213, 'Netflix', '#E50914')">
                 <div class="brand-logo-txt" style="color:#E50914;">N</div>
             </div>
-            <div class="brand-item" onclick="filtrarRede(2739, 'Disney+', '#113CCF')">
+            <div class="brand-item" onclick="ativarRede(2739, 'Disney+', '#113CCF')">
                 <div class="brand-logo-txt" style="color:#113CCF;">D+</div>
             </div>
-            <div class="brand-item" onclick="filtrarRede(1024, 'Amazon Prime', '#00A8E1')">
+            <div class="brand-item" onclick="ativarRede(1024, 'Prime Video', '#00A8E1')">
                 <div class="brand-logo-txt" style="color:#00A8E1;">Prime</div>
             </div>
-            <div class="brand-item" onclick="filtrarRede(49, 'HBO', '#fff')">
+            <div class="brand-item" onclick="ativarRede(49, 'HBO', '#fff')">
                 <div class="brand-logo-txt" style="color:white;">HBO</div>
-            </div>
-            <div class="brand-item" onclick="filtrarRede(2552, 'Apple TV+', '#A3AAAE')">
-                <div class="brand-logo-txt" style="color:#A3AAAE;">TV</div>
-            </div>
-             <div class="brand-item" onclick="filtrarRede(453, 'Hulu', '#1CE783')">
-                <div class="brand-logo-txt" style="color:#1CE783;">Hulu</div>
             </div>
         </div>
 
-        <div class="container" id="main-container">
-            </div>
+        <div class="container" id="main-container"></div>
     </div>
 
     <div id="search-results">
-        <h2 class="section-title" id="search-title">Resultados</h2>
+        <h2 class="section-title" id="search-title" style="font-family:'Bebas Neue'; font-size:30px; margin-bottom:20px;">Resultados</h2>
         <div class="grid-results" id="search-grid"></div>
-        <button class="btn btn-gray" onclick="location.reload()" style="margin-top: 20px;">Voltar ao Início</button>
+        <button class="btn btn-gray" onclick="location.reload()" style="margin-top:20px;">Voltar</button>
     </div>
 
     <div class="modal-overlay" id="detail-modal">
@@ -234,14 +177,14 @@
             </div>
             <div class="modal-info">
                 <h1 id="modal-title" style="font-size: 40px; margin-bottom: 10px;">Titulo</h1>
-                <p id="modal-desc" style="color:#ccc; margin-bottom: 30px; line-height: 1.6;">Sinopse...</p>
+                <p id="modal-desc" style="color:#ccc; margin-bottom: 30px;">Sinopse...</p>
                 
                 <div id="area-filme">
-                    <button class="btn btn-white" onclick="tocarFilme()">▶ Assistir Agora</button>
+                    <button class="btn btn-white" onclick="tocarFilme()">▶ Assistir Filme</button>
                 </div>
                 
                 <div id="area-serie" style="display: none;">
-                    <h3 style="margin-bottom: 10px; color: #aaa;">Selecionar Temporada</h3>
+                    <h3>Temporadas</h3>
                     <select id="season-select" class="season-select" onchange="carregarEpisodios(this.value)"></select>
                     <div id="episodes-list" class="episodes-list"></div>
                 </div>
@@ -261,99 +204,137 @@
         const POSTER_URL = 'https://image.tmdb.org/t/p/w300';
 
         let currentId, currentType;
+        let activeNetwork = null; // Guarda qual streaming está ativo
+        let activeLang = null;    // Guarda se o filtro PT está ativo
 
-        // Lista de TODOS os gêneros para criar o "Início Infinito"
         const GENRES = [
             {id: 28, name: "Ação"}, {id: 12, name: "Aventura"}, {id: 16, name: "Animação"}, 
             {id: 35, name: "Comédia"}, {id: 80, name: "Crime"}, {id: 99, name: "Documentário"},
             {id: 18, name: "Drama"}, {id: 10751, name: "Família"}, {id: 14, name: "Fantasia"},
             {id: 36, name: "História"}, {id: 27, name: "Terror"}, {id: 10402, name: "Música"},
-            {id: 9648, name: "Mistério"}, {id: 10749, name: "Romance"}, {id: 878, name: "Ficção Científica"},
-            {id: 10770, name: "Cinema TV"}, {id: 53, name: "Thriller"}, {id: 10752, name: "Guerra"},
-            {id: 37, name: "Faroeste"}
+            {id: 9648, name: "Mistério"}, {id: 10749, name: "Romance"}, {id: 878, name: "Ficção Científica"}
         ];
 
         window.onload = () => {
-            initHome();
+            resetarFiltro(); // Carrega tudo por padrão
         };
 
-        function initHome() {
-            carregarHero();
-            const container = document.getElementById('main-container');
-            
-            // 1. Cria primeiro os Destaques
-            container.innerHTML = `
-                <div class="row"><h2>🔥 Tendências da Semana</h2><div class="posters" id="row-trend"></div></div>
-                <div class="row"><h2>📺 Séries em Alta</h2><div class="posters" id="row-tv"></div></div>
-            `;
-            loadRow(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=pt-BR`, 'row-trend', true);
-            loadRow(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}&language=pt-BR`, 'row-tv');
+        // --- LÓGICA DE RECONSTRUÇÃO DA HOME ---
+        function resetarFiltro() {
+            activeNetwork = null;
+            activeLang = null;
+            atualizarLabel("Catálogo Completo");
+            construirHome();
+        }
 
-            // 2. Loop para criar categorias infinitas baseadas nos gêneros
-            GENRES.forEach(genre => {
-                const rowId = `row-${genre.id}`;
-                container.innerHTML += `<div class="row"><h2>${genre.name}</h2><div class="posters" id="${rowId}"></div></div>`;
-                loadRow(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genre.id}&language=pt-BR`, rowId);
+        function ativarRede(networkId, nome, cor) {
+            activeNetwork = networkId;
+            activeLang = null; // Desliga filtro de língua para focar na rede
+            atualizarLabel(`Catálogo: ${nome}`, cor);
+            construirHome(); // Reconstrói tudo com o filtro da rede
+        }
+
+        function filtrarPortugues() {
+            activeNetwork = null;
+            activeLang = 'pt';
+            atualizarLabel("Nacionais e Dublados", "#00ff00");
+            construirHome();
+        }
+
+        function atualizarLabel(texto, cor = "#aaa") {
+            const lbl = document.getElementById('current-filter-label');
+            lbl.innerText = texto;
+            lbl.style.display = 'block';
+            lbl.style.borderColor = cor;
+            lbl.style.color = cor;
+            document.getElementById('app-home').style.display = 'block';
+            document.getElementById('search-results').style.display = 'none';
+        }
+
+        // --- CONSTRUTOR DE PÁGINA (A MÁGICA ACONTECE AQUI) ---
+        function construirHome() {
+            const container = document.getElementById('main-container');
+            container.innerHTML = ''; // Limpa tudo
+
+            // 1. Define URL base para Destaques e Listas
+            // Se tiver rede, usamos discover. Se não, usamos trending.
+            let urlHero, urlTrend, urlTv;
+
+            if (activeNetwork) {
+                // Modo Streaming (Netflix, Disney...)
+                urlHero = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_networks=${activeNetwork}&language=pt-BR&sort_by=popularity.desc`;
+                urlTrend = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_networks=${activeNetwork}&language=pt-BR&sort_by=popularity.desc`;
+                urlTv = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_networks=${activeNetwork}&language=pt-BR&sort_by=popularity.desc`;
+            } else if (activeLang) {
+                // Modo Português
+                urlHero = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=pt&language=pt-BR&sort_by=popularity.desc`;
+                urlTrend = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=pt&language=pt-BR`;
+                urlTv = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_original_language=pt&language=pt-BR`;
+            } else {
+                // Modo Normal (Tudo)
+                urlHero = `${BASE_URL}/trending/all/day?api_key=${API_KEY}&language=pt-BR`;
+                urlTrend = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=pt-BR`;
+                urlTv = `${BASE_URL}/trending/tv/week?api_key=${API_KEY}&language=pt-BR`;
+            }
+
+            // 2. Carrega Hero e Primeiras Listas
+            carregarHero(urlHero);
+            
+            container.innerHTML += `<div class="row"><h2>🔥 Destaques</h2><div class="posters" id="row-trend"></div></div>`;
+            carregarLista(urlTrend, 'row-trend', true);
+
+            container.innerHTML += `<div class="row"><h2>📺 Séries</h2><div class="posters" id="row-tv"></div></div>`;
+            carregarLista(urlTv, 'row-tv');
+
+            // 3. Loop dos Gêneros (Infinito)
+            GENRES.forEach(g => {
+                const rowId = `row-${g.id}`;
+                container.innerHTML += `<div class="row"><h2>${g.name}</h2><div class="posters" id="${rowId}"></div></div>`;
+                
+                // Constrói URL do Gênero com os filtros ativos
+                let urlGenre = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${g.id}&language=pt-BR&sort_by=popularity.desc`;
+                
+                if(activeNetwork) urlGenre += `&with_networks=${activeNetwork}`;
+                if(activeLang) urlGenre += `&with_original_language=pt`;
+
+                carregarLista(urlGenre, rowId);
             });
         }
 
-        async function loadRow(url, elementId, isLarge = false) {
+        async function carregarHero(url) {
+            const res = await fetch(url);
+            const data = await res.json();
+            const item = data.results[0] || data.results[1]; // Pega o primeiro
+            
+            if(item) {
+                document.getElementById('hero').style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
+                document.getElementById('hero-title').innerText = item.title || item.name;
+                document.getElementById('hero-desc').innerText = item.overview;
+                document.getElementById('hero-btn').onclick = () => abrirDetalhes(item.id, item.media_type || 'movie');
+                document.getElementById('hero-info').onclick = () => abrirDetalhes(item.id, item.media_type || 'movie');
+            }
+        }
+
+        async function carregarLista(url, elementId, grande = false) {
             const res = await fetch(url);
             const data = await res.json();
             const container = document.getElementById(elementId);
             
             data.results.forEach(item => {
                 if(item.poster_path) {
-                    const type = item.media_type || (url.includes('/tv') ? 'tv' : 'movie');
+                    // Tenta adivinhar o tipo se não vier na API (discover não manda media_type)
+                    let type = item.media_type;
+                    if(!type) type = url.includes('/tv') ? 'tv' : 'movie';
+
                     container.innerHTML += `
                         <img src="${POSTER_URL}${item.poster_path}" 
-                        class="poster ${isLarge ? 'poster-large' : ''}" 
+                        class="poster ${grande ? 'poster-large' : ''}" 
                         onclick="abrirDetalhes(${item.id}, '${type}')" loading="lazy">`;
                 }
             });
         }
 
-        async function carregarHero() {
-            const res = await fetch(`${BASE_URL}/trending/all/day?api_key=${API_KEY}&language=pt-BR`);
-            const data = await res.json();
-            const item = data.results[0]; // Pega o top 1
-            
-            document.getElementById('hero').style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
-            document.getElementById('hero-title').innerText = item.title || item.name;
-            document.getElementById('hero-desc').innerText = item.overview;
-            
-            document.getElementById('hero-btn').onclick = () => abrirDetalhes(item.id, item.media_type);
-            document.getElementById('hero-info').onclick = () => abrirDetalhes(item.id, item.media_type);
-        }
-
-        // --- FILTROS DE REDE (Netflix, Disney, etc) ---
-        function filtrarRede(networkId, nome, cor) {
-            document.getElementById('app-home').style.display = 'none';
-            document.getElementById('search-results').style.display = 'block';
-            const title = document.getElementById('search-title');
-            title.innerText = `Catálogo: ${nome}`;
-            title.style.color = cor;
-            
-            const grid = document.getElementById('search-grid');
-            grid.innerHTML = '<p>Carregando catálogo...</p>';
-            
-            // Busca Séries da Rede
-            fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&with_networks=${networkId}&language=pt-BR&sort_by=popularity.desc`)
-            .then(res => res.json())
-            .then(data => {
-                grid.innerHTML = '';
-                data.results.forEach(item => {
-                    if(item.poster_path) {
-                        grid.innerHTML += `
-                            <div class="grid-item">
-                                <img src="${POSTER_URL}${item.poster_path}" onclick="abrirDetalhes(${item.id}, 'tv')">
-                            </div>`;
-                    }
-                });
-            });
-        }
-
-        // --- BUSCA ---
+        // --- SISTEMA DE BUSCA ---
         document.getElementById('search-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') fazerPesquisa(); });
 
         async function fazerPesquisa() {
@@ -363,7 +344,6 @@
             document.getElementById('app-home').style.display = 'none';
             document.getElementById('search-results').style.display = 'block';
             document.getElementById('search-title').innerText = `Resultados: "${query}"`;
-            document.getElementById('search-title').style.color = 'var(--red)';
             
             const grid = document.getElementById('search-grid');
             grid.innerHTML = 'Buscando...';
@@ -374,16 +354,17 @@
             grid.innerHTML = '';
             data.results.forEach(item => {
                 if(item.poster_path) {
-                    grid.innerHTML += `
-                        <div class="grid-item">
-                            <img src="${POSTER_URL}${item.poster_path}" onclick="abrirDetalhes(${item.id}, '${item.media_type}')">
-                        </div>`;
+                    grid.innerHTML += `<div class="grid-item"><img src="${POSTER_URL}${item.poster_path}" onclick="abrirDetalhes(${item.id}, '${item.media_type}')"></div>`;
                 }
             });
         }
 
+        // --- SIDEBAR GENRES ---
         function filtrarGenero(id, nome) {
             toggleMenu();
+            // Simplesmente limpa filtros de rede e foca no genero
+            activeNetwork = null; 
+            activeLang = null;
             document.getElementById('app-home').style.display = 'none';
             document.getElementById('search-results').style.display = 'block';
             document.getElementById('search-title').innerText = `Categoria: ${nome}`;
@@ -396,9 +377,7 @@
             .then(data => {
                 grid.innerHTML = '';
                 data.results.forEach(item => {
-                    if(item.poster_path) {
-                        grid.innerHTML += `<div class="grid-item"><img src="${POSTER_URL}${item.poster_path}" onclick="abrirDetalhes(${item.id}, 'movie')"></div>`;
-                    }
+                    if(item.poster_path) grid.innerHTML += `<div class="grid-item"><img src="${POSTER_URL}${item.poster_path}" onclick="abrirDetalhes(${item.id}, 'movie')"></div>`;
                 });
             });
         }
@@ -436,7 +415,7 @@
 
         async function carregarEpisodios(season) {
             const list = document.getElementById('episodes-list');
-            list.innerHTML = '<p style="color:#aaa">Carregando episódios...</p>';
+            list.innerHTML = '<p style="color:#aaa">Carregando...</p>';
             const res = await fetch(`${BASE_URL}/tv/${currentId}/season/${season}?api_key=${API_KEY}&language=pt-BR`);
             const data = await res.json();
             list.innerHTML = '';
@@ -445,10 +424,7 @@
                 list.innerHTML += `
                     <div class="episode-item" onclick="tocarEpisodio(${season}, ${ep.episode_number})">
                         <img src="${img}">
-                        <div>
-                            <div class="ep-title">${ep.episode_number}. ${ep.name}</div>
-                            <div class="ep-desc">${ep.overview || 'Sem descrição.'}</div>
-                        </div>
+                        <div><div class="ep-title">${ep.episode_number}. ${ep.name}</div></div>
                         <div style="margin-left:auto; font-size:20px;">▶</div>
                     </div>`;
             });
@@ -473,7 +449,6 @@
             document.getElementById('detail-modal').style.display = 'none';
         }
 
-        // Scroll Effect Navbar
         window.onscroll = () => {
             const nav = document.getElementById('navbar');
             if(window.scrollY > 50) nav.classList.add('black'); else nav.classList.remove('black');
