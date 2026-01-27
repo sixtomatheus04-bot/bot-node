@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Meu App de Filmes</title>
+    <style>
+        body { background: #141414; color: white; font-family: Arial; }
+        .search-box { text-align: center; padding: 20px; }
+        input { padding: 10px; width: 60%; border-radius: 5px; border: none; }
+        
+        /* Grade de Filmes */
+        #lista-filmes { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+            gap: 20px; padding: 20px; 
+        }
+        .filme-card { cursor: pointer; transition: 0.3s; }
+        .filme-card:hover { transform: scale(1.1); }
+        .filme-card img { width: 100%; border-radius: 10px; }
+        .filme-card p { text-align: center; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="search-box">
+        <h1>CineApp 🎬</h1>
+        <input type="text" id="input-busca" placeholder="Digite o nome do filme..." onkeyup="buscarFilme()">
+    </div>
+
+    <div id="lista-filmes">
+        </div>
+
+    <script>
+        const API_KEY = 'SUA_CHAVE_API_AQUI'; // <--- COLOQUE SUA CHAVE AQUI
+
+        async function buscarFilme() {
+            const query = document.getElementById('input-busca').value;
+            if (query.length < 3) return; // Só busca se tiver mais de 3 letras
+
+            const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=pt-BR`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                exibirFilmes(data.results);
+            } catch (error) {
+                console.error("Erro ao buscar filmes", error);
+            }
+        }
+
+        function exibirFilmes(filmes) {
+            const container = document.getElementById('lista-filmes');
+            container.innerHTML = ''; // Limpa a lista anterior
+
+            filmes.forEach(filme => {
+                if (!filme.poster_path) return; // Pula filmes sem capa
+
+                const card = document.createElement('div');
+                card.className = 'filme-card';
+                // No clique, vamos apenas mostrar o ID por enquanto
+                card.onclick = () => alert("ID do Filme: " + filme.id); 
+
+                card.innerHTML = `
+                    <img src="https://image.tmdb.org/t/p/w500${filme.poster_path}" alt="${filme.title}">
+                    <p>${filme.title}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
