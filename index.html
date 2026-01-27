@@ -3,65 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream V14 - Business</title>
+    <title>CineStream V15 - Payments</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
-        :root { --red: #E50914; --black: #0a0a0a; --gold: #FFD700; --green: #2ecc71; --blue: #3498db; }
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Outfit', sans-serif; }
+        :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; --gold: #FFD700; --green: #2ecc71; }
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Outfit', sans-serif; text-decoration: none; }
         body { background: var(--black); color: white; overflow-x: hidden; }
 
         /* UTILITÁRIOS */
         .screen { display: none; width: 100%; min-height: 100vh; }
-        .btn { padding: 12px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-red { background: var(--red); color: white; }
+        .active-flex { display: flex; }
+        .active-block { display: block; }
+        .btn { padding: 12px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 15px; }
+        .btn-red { background: var(--red); color: white; } .btn-red:hover { background: #b20710; }
         .btn-green { background: var(--green); color: black; }
         .btn-gold { background: var(--gold); color: black; }
-        
-        /* ANIMAÇÃO DE NOTIFICAÇÃO */
-        @keyframes shake { 0% { transform: rotate(0deg); } 25% { transform: rotate(10deg); } 50% { transform: rotate(0deg); } 75% { transform: rotate(-10deg); } 100% { transform: rotate(0deg); } }
-        .notify-anim { animation: shake 0.5s infinite; color: var(--red) !important; }
 
-        /* 1. AUTH */
+        /* 1. AUTH SCREEN */
         #auth-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 3000;
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
-            background-size: cover; display: flex; align-items: center; justify-content: center; flex-direction: column;
+            background-size: cover; align-items: center; justify-content: center; flex-direction: column;
         }
         .auth-box { background: rgba(0,0,0,0.9); padding: 40px; border-radius: 12px; width: 380px; text-align: center; border: 1px solid #333; }
         .auth-input { width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; }
 
-        /* 2. ADMIN */
-        #admin-screen { background: #111; padding: 0; display: none; }
+        /* 2. PLANS SCREEN (NOVO) */
+        #plans-screen { background: #000; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
+        .plans-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
+        .plan-card { 
+            background: #111; border: 2px solid #333; padding: 30px; border-radius: 15px; width: 300px; text-align: center; cursor: pointer; transition: 0.3s; position: relative;
+        }
+        .plan-card:hover { transform: translateY(-10px); }
+        .plan-card.premium { border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.1); }
+        .plan-price { font-size: 35px; font-weight: bold; margin: 15px 0; }
+        .plan-features { text-align: left; margin: 20px 0; color: #ccc; line-height: 2; list-style: none; padding: 0; }
+        .check { color: var(--green); margin-right: 10px; }
+
+        /* 3. PAYMENT SCREEN (NOVO) */
+        #payment-screen { background: #000; align-items: center; justify-content: center; flex-direction: column; }
+        .pay-box { background: white; color: black; padding: 30px; border-radius: 10px; width: 400px; text-align: center; }
+        .qr-placeholder { width: 180px; height: 180px; margin: 20px auto; border: 2px dashed #000; display: flex; align-items: center; justify-content: center; background: #f0f0f0; }
+        .pix-copy { background: #eee; padding: 10px; font-family: monospace; font-size: 12px; margin-bottom: 20px; border-radius: 5px; word-break: break-all; }
+
+        /* 4. ADMIN SCREEN */
+        #admin-screen { background: #111; padding: 0; }
         .admin-sidebar { width: 250px; background: #050505; border-right: 1px solid #333; height: 100vh; padding: 20px; position: fixed; }
         .admin-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
         .adm-item { padding: 15px; cursor: pointer; color: #888; font-weight: bold; display: flex; gap: 10px; align-items: center; border-radius: 5px; margin-bottom: 5px; }
         .adm-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
-        
-        /* Admin Notification Box */
-        #admin-notification {
-            position: fixed; top: 20px; right: 20px; background: var(--red); color: white; padding: 15px 25px; border-radius: 8px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: none; z-index: 9999; font-weight: bold; animation: slideIn 0.3s;
-        }
+        table { width: 100%; border-collapse: collapse; background: #1a1a1a; margin-top: 20px; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #222; color: var(--green); }
 
-        /* 3. APP UI */
+        /* 5. APP UI */
         #app-screen { display: none; }
         .nav { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, black, transparent); z-index: 100; transition: 0.3s; }
         .nav.black { background: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        
+        /* Sidebar User */
         .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: #000; border-right: 1px solid #333; z-index: 200; transform: translateX(-100%); transition: 0.3s; padding-top: 80px; }
         .sidebar.open { transform: translateX(0); }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
         .menu-item { padding: 15px 30px; display: flex; align-items: center; gap: 15px; color: #aaa; cursor: pointer; transition: 0.2s; }
         .menu-item:hover { color: white; background: #1a1a1a; border-left: 4px solid var(--red); }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
 
-        /* PAGES */
+        /* CONTENT */
         .page { display: none; padding-top: 80px; padding-bottom: 50px; min-height: 100vh; animation: fadeIn 0.4s; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* HERO & LISTS */
         .hero { height: 80vh; background-size: cover; background-position: center; margin-top: -80px; position: relative; }
         .hero-content { position: absolute; bottom: 20%; left: 4%; max-width: 600px; text-shadow: 2px 2px 10px black; }
         .row { margin-bottom: 40px; padding-left: 4%; }
@@ -69,91 +83,103 @@
         .poster { width: 160px; height: 240px; border-radius: 8px; cursor: pointer; transition: 0.3s; object-fit: cover; }
         .poster:hover { transform: scale(1.1); z-index: 10; }
 
-        /* CHECKOUT (PAGAMENTO) */
-        #checkout-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; align-items: center; justify-content: center;
-        }
-        .checkout-box { background: white; color: black; padding: 30px; border-radius: 10px; width: 400px; text-align: center; }
-        .qr-code { width: 200px; height: 200px; background: #eee; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px dashed #000; }
-        .pix-code { background: #eee; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; word-break: break-all; margin-bottom: 20px; }
-
-        /* CHAT & TV */
-        .chat-box { background: #1a1a1a; border-radius: 10px; border: 1px solid #333; max-width: 800px; margin: 0 auto; height: 600px; display: flex; flex-direction: column; }
+        /* TV & CHAT */
+        #tv-container { width: 90%; max-width: 900px; margin: 0 auto; background: black; aspect-ratio: 16/9; }
+        .chat-box { background: #1a1a1a; border-radius: 10px; border: 1px solid #333; max-width: 800px; margin: 0 auto; height: 500px; display: flex; flex-direction: column; }
         .chat-feed { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .msg { padding: 10px; border-radius: 8px; max-width: 80%; font-size: 14px; }
         .msg.bot { background: #333; border: 1px solid var(--blue); align-self: flex-start; }
         .msg.user { background: var(--green); color: black; align-self: flex-end; }
-        .msg.admin { background: #222; border: 1px solid var(--gold); color: var(--gold); align-self: flex-start; }
-
-        #tv-container { width: 90%; max-width: 900px; margin: 0 auto; background: black; aspect-ratio: 16/9; }
-        video { width: 100%; height: 100%; }
 
         /* MODAIS */
-        #video-modal, #paywall-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; align-items: center; justify-content: center; }
+        #video-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; align-items: center; justify-content: center; }
         iframe { width: 100%; height: 100%; border: none; }
         .close-btn { position: absolute; top: 20px; right: 20px; font-size: 40px; cursor: pointer; z-index: 6000; color: white; }
     </style>
 </head>
 <body>
 
-    <audio id="notify-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
-
-    <div id="admin-notification">🔔 Novo Chamado de Suporte!</div>
-
-    <div id="auth-screen">
+    <div id="auth-screen" class="active-flex screen">
         <div class="auth-box">
             <h1 style="color:var(--red); font-size:40px; margin-bottom:10px;">CINESTREAM</h1>
-            <p style="color:#aaa; margin-bottom:20px;">BUSINESS EDITION</p>
             <p id="error-msg" style="color:#ff5555; display:none;"></p>
             
             <div id="form-login">
                 <input type="text" id="log-email" class="auth-input" placeholder="Email ou 'admin'">
                 <input type="password" id="log-pass" class="auth-input" placeholder="Senha">
                 <button class="btn btn-red" style="width:100%" onclick="doLogin()">ENTRAR</button>
-                <p style="margin-top:15px; color:#ccc; cursor:pointer; font-size:14px;" onclick="toggleForm('register')">Criar conta</p>
+                <p style="margin-top:15px; color:#ccc; cursor:pointer;" onclick="toggleForm('register')">Criar conta</p>
             </div>
 
             <div id="form-register" style="display:none;">
                 <input type="text" id="reg-email" class="auth-input" placeholder="Novo Email">
                 <input type="password" id="reg-pass" class="auth-input" placeholder="Nova Senha">
-                <button class="btn btn-green" style="width:100%" onclick="doRegister()">CADASTRAR</button>
-                <p style="margin-top:15px; color:#ccc; cursor:pointer; font-size:14px;" onclick="toggleForm('login')">Voltar</p>
+                <button class="btn btn-green" style="width:100%" onclick="doRegister()">CRIAR CONTA</button>
+                <p style="margin-top:15px; color:#ccc; cursor:pointer;" onclick="toggleForm('login')">Voltar</p>
             </div>
         </div>
     </div>
 
-    <div id="admin-screen">
+    <div id="plans-screen" class="screen">
+        <h1 style="color:white; margin-bottom:10px;">Escolha seu Plano</h1>
+        <p style="color:#aaa;">Você precisa selecionar um plano para continuar.</p>
+        
+        <div class="plans-container">
+            <div class="plan-card" onclick="selectPlan('free')">
+                <h3>GRÁTIS</h3>
+                <div class="plan-price">R$ 0,00</div>
+                <ul class="plan-features">
+                    <li><span class="check">✔</span> Acesso limitado</li>
+                    <li><span class="check">✔</span> Com Anúncios</li>
+                    <li><span class="check" style="color:red">✖</span> Sem lançamentos</li>
+                </ul>
+                <button class="btn btn-gray" style="width:100%">ESCOLHER</button>
+            </div>
+
+            <div class="plan-card premium" onclick="selectPlan('premium')">
+                <div style="color:var(--gold); font-weight:bold; margin-bottom:5px;">MAIS VENDIDO</div>
+                <h3 style="color:var(--gold);">PREMIUM</h3>
+                <div class="plan-price">R$ 29,90</div>
+                <ul class="plan-features">
+                    <li><span class="check">✔</span> Tudo Liberado</li>
+                    <li><span class="check">✔</span> Sem Anúncios</li>
+                    <li><span class="check">✔</span> Qualidade 4K</li>
+                </ul>
+                <button class="btn btn-gold" style="width:100%">ASSINAR AGORA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="payment-screen" class="screen">
+        <div class="pay-box">
+            <h2 style="color:var(--green); margin-bottom:10px;">Pagamento Seguro</h2>
+            <p style="margin-bottom:20px;">Plano Premium - R$ 29,90</p>
+            
+            <div class="qr-placeholder">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=CineStreamPagamento" alt="QR">
+            </div>
+            
+            <p style="font-size:12px; color:#555; text-align:left;">Código Pix (Copia e Cola):</p>
+            <div class="pix-copy">00020126360014BR.GOV.BCB.PIX0114...CINESTREAM...</div>
+            
+            <button class="btn btn-green" style="width:100%; font-size:18px;" onclick="confirmPayment()">✅ JÁ PAGUEI</button>
+            <button class="btn" style="background:transparent; color:#aaa; margin-top:10px;" onclick="cancelPayment()">Cancelar</button>
+        </div>
+    </div>
+
+    <div id="admin-screen" class="screen">
         <div class="admin-sidebar">
-            <h2 style="color:var(--green); margin-bottom:30px;">ADMIN PAINEL</h2>
+            <h2 style="color:var(--green); margin-bottom:30px;">ADMIN</h2>
             <div class="adm-item active" onclick="navAdmin('users')"><i class="fas fa-users"></i> Usuários</div>
-            <div class="adm-item" id="adm-chat-btn" onclick="navAdmin('chat')"><i class="fas fa-headset"></i> Atendimento</div>
             <div class="adm-item" onclick="logout()" style="color:#ff5555; margin-top:50px;"><i class="fas fa-sign-out-alt"></i> Sair</div>
         </div>
-        <div class="admin-content">
-            <div id="adm-users">
-                <h2>Contas</h2>
-                <table style="width:100%; margin-top:20px; background:#1a1a1a;">
-                    <thead><tr style="background:#222; color:var(--green);"><th>Email</th><th>Senha</th><th>Plano</th><th>Ação</th></tr></thead>
-                    <tbody id="user-table"></tbody>
-                </table>
-            </div>
-            <div id="adm-chat" style="display:none;">
-                <h2>Suporte ao Vivo</h2>
-                <div style="display:flex; height:600px; border:1px solid #333; margin-top:20px; background:#000;">
-                    <div id="chat-list" style="width:30%; border-right:1px solid #333; overflow-y:auto;"></div>
-                    <div style="width:70%; display:flex; flex-direction:column;">
-                        <div id="adm-chat-feed" style="flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;"></div>
-                        <div style="padding:15px; display:flex; gap:10px;">
-                            <input id="adm-msg" class="auth-input" style="margin:0;" placeholder="Responder...">
-                            <button class="btn btn-green" onclick="sendAdmin()">Enviar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="admin-content" id="adm-users">
+            <h2>Gerenciar Planos</h2>
+            <table id="user-table"></table>
         </div>
     </div>
 
-    <div id="app-screen">
+    <div id="app-screen" class="screen">
         <nav class="nav" id="navbar">
             <div style="display:flex; align-items:center; gap:15px;">
                 <i class="fas fa-bars" style="font-size:22px; cursor:pointer;" onclick="toggleSidebar()"></i>
@@ -187,68 +213,53 @@
             </div>
         </div>
 
+        <div id="page-movies" class="page" style="padding:100px 4%;"><h2>Filmes</h2><div class="posters" id="grid-movies" style="flex-wrap:wrap;"></div></div>
+
         <div id="page-tv" class="page" style="padding:100px 4%;">
             <h2 style="color:var(--red); margin-bottom:20px;">TV Ao Vivo</h2>
             <div id="tv-container"><video id="tv-video" controls></video></div>
-            <div class="channel-list" style="display:flex; gap:10px; margin-top:20px; overflow-x:auto;">
+            <div style="display:flex; gap:10px; margin-top:20px; overflow-x:auto;">
                 <button class="btn btn-gray" onclick="playTv('https://stmv1.srvif.com/recordnews/recordnews/playlist.m3u8')">Record News</button>
-                <button class="btn btn-gray" onclick="playTv('https://cdn.jmvstream.com/w/CA-1361/index.m3u8')">Rede Brasil</button>
                 <button class="btn btn-gray" onclick="playTv('https://nasa-i.akamaihd.net/hls/live/253565/NASA-NTV1-Public/master.m3u8')">NASA</button>
             </div>
         </div>
 
         <div id="page-support" class="page" style="padding:100px 4%;">
             <div class="chat-box">
-                <div class="chat-feed" id="user-chat-feed"></div>
-                <div class="chat-input-area" style="background:#111; padding:15px; display:flex; gap:10px;">
+                <div class="chat-feed" id="chat-feed"><div class="msg bot">Olá! Sou a IA. Dúvidas sobre planos ou filmes?</div></div>
+                <div style="padding:15px; display:flex; gap:10px;">
                     <input id="user-msg" class="auth-input" style="margin:0;" placeholder="Digite...">
-                    <button class="btn btn-green" onclick="sendUser()">Enviar</button>
+                    <button class="btn btn-green" onclick="sendMsg()">Enviar</button>
                 </div>
             </div>
         </div>
 
-        <div id="page-movies" class="page" style="padding:100px 4%;"><h2>Filmes</h2><div class="posters" id="grid-movies" style="flex-wrap:wrap;"></div></div>
         <div id="page-profile" class="page" style="padding:100px 4%;">
             <h2>Perfil</h2>
             <p>Email: <span id="prof-email"></span></p>
             <p>Plano: <span id="prof-plan" style="color:var(--gold);"></span></p>
-        </div>
-    </div>
-
-    <div id="checkout-modal">
-        <div class="checkout-box">
-            <h2 style="color:var(--green);">Pagamento Seguro</h2>
-            <p>Plano Premium - R$ 29,90</p>
-            <div class="qr-code"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PagamentoCineStream" alt="QR"></div>
-            <div class="pix-code">00020126360014BR.GOV.BCB.PIX... (Copia e Cola)</div>
-            <button class="btn btn-green" style="width:100%; font-size:18px;" onclick="processarPagamento()">✅ JÁ PAGUEI</button>
-            <p style="margin-top:10px; font-size:12px; color:red; cursor:pointer;" onclick="document.getElementById('checkout-modal').style.display='none'">Cancelar</p>
-        </div>
-    </div>
-
-    <div id="paywall-modal">
-        <div class="auth-box" style="border-color:var(--gold);">
-            <h1 style="font-size:50px;">🔒</h1>
-            <h2 style="color:var(--gold);">Conteúdo Premium</h2>
-            <button class="btn btn-gold" style="width:100%; margin-top:20px;" onclick="abrirCheckout()">ASSINAR AGORA</button>
-            <p style="margin-top:15px; cursor:pointer;" onclick="document.getElementById('paywall-modal').style.display='none'">Voltar</p>
+            <button class="btn btn-gold" style="margin-top:20px;" onclick="showScreen('plans-screen')">MUDAR PLANO</button>
         </div>
     </div>
 
     <div id="video-modal">
         <div class="close-btn" onclick="document.getElementById('video-modal').style.display='none'; document.getElementById('video-frame').src='';">×</div>
+        <div style="position:absolute; top:20px; left:20px; z-index:6001; display:flex; gap:10px;">
+            <button class="btn btn-red" onclick="setPlayer(1)">🇧🇷 Opção 1</button>
+            <button class="btn btn-red" onclick="setPlayer(2)">🇧🇷 Opção 2</button>
+        </div>
         <iframe id="video-frame" allowfullscreen></iframe>
     </div>
 
     <script>
-        const DB_KEY = 'cine_v14_users';
-        const CHAT_KEY = 'cine_v14_chats';
+        const DB_KEY = 'cine_v15_db';
         const API = 'c3162eed0616407fa43134e07880c7d5';
         const BASE = 'https://api.themoviedb.org/3';
-        
-        let currentUser = null, activeChat = null, heroId = 0, currentMid = 0;
-        const getDB = k => JSON.parse(localStorage.getItem(k)) || [];
-        const saveDB = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+        let currentUser = null;
+        let heroId = 0, currentMid = 0;
+
+        const getDB = () => JSON.parse(localStorage.getItem(DB_KEY)) || [];
+        const saveDB = (d) => localStorage.setItem(DB_KEY, JSON.stringify(d));
 
         // INIT
         window.onload = () => {
@@ -256,14 +267,33 @@
             if(s) {
                 if(s.role === 'admin') initAdmin();
                 else {
-                    const u = getDB(DB_KEY).find(x => x.email === s.email);
-                    if(u) { currentUser = u; initApp(); } 
-                    else logout();
+                    const u = getDB().find(x => x.email === s.email);
+                    if(u) {
+                        currentUser = u;
+                        // SE PLANO FOR NULL (Recém criado), VAI PARA PLANOS
+                        if(!u.plan) showScreen('plans-screen'); 
+                        else initApp();
+                    } else logout();
                 }
             } else {
-                document.getElementById('auth-screen').style.display = 'flex';
+                showScreen('auth-screen');
             }
         };
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => {
+                s.style.display = 'none';
+                s.classList.remove('active-flex', 'active-block');
+            });
+            const el = document.getElementById(id);
+            if(id === 'app-screen') {
+                el.style.display = 'block';
+                el.classList.add('active-block'); // App precisa de block para scroll
+            } else {
+                el.style.display = 'flex';
+                el.classList.add('active-flex'); // Outros precisam de flex para centro
+            }
+        }
 
         // --- AUTH ---
         function toggleForm(f) {
@@ -274,215 +304,167 @@
             const e = document.getElementById('log-email').value;
             const p = document.getElementById('log-pass').value;
             if(e==='admin' && p==='admin') { localStorage.setItem('cineSession', JSON.stringify({role:'admin'})); location.reload(); return; }
-            const u = getDB(DB_KEY).find(x => x.email === e && x.pass === p);
+            const u = getDB().find(x => x.email === e && x.pass === p);
             if(u) { localStorage.setItem('cineSession', JSON.stringify(u)); location.reload(); }
-            else alert("Dados inválidos");
+            else alert("Erro no login");
         }
         function doRegister() {
             const e = document.getElementById('reg-email').value;
             const p = document.getElementById('reg-pass').value;
-            const db = getDB(DB_KEY);
-            if(db.find(x => x.email === e)) return alert("Email existe!");
-            db.push({email:e, pass:p, plan:'free'}); saveDB(DB_KEY, db);
-            alert("Conta criada!"); toggleForm('login');
+            const db = getDB();
+            if(db.find(x => x.email === e)) return alert("Email já existe!");
+            
+            // CRIA COM PLANO NULL PARA FORÇAR ESCOLHA
+            const newUser = {email:e, pass:p, plan: null}; 
+            db.push(newUser);
+            saveDB(db);
+            
+            // LOGA DIRETO E MANDA PARA PLANOS
+            currentUser = newUser;
+            localStorage.setItem('cineSession', JSON.stringify(newUser));
+            showScreen('plans-screen');
         }
         function logout() { localStorage.removeItem('cineSession'); location.reload(); }
 
-        // --- AUTOMATED PAYMENTS ---
-        function abrirCheckout() {
-            document.getElementById('paywall-modal').style.display = 'none';
-            document.getElementById('checkout-modal').style.display = 'flex';
+        // --- PLAN & PAYMENT ---
+        function selectPlan(type) {
+            if(type === 'free') {
+                updateUserPlan('free');
+                alert("Plano Grátis Ativado!");
+                initApp();
+            } else {
+                showScreen('payment-screen');
+            }
         }
-        function processarPagamento() {
-            const btn = document.querySelector('#checkout-modal .btn-green');
+        function cancelPayment() { showScreen('plans-screen'); }
+        function confirmPayment() {
+            const btn = document.querySelector('#payment-screen .btn-green');
             btn.innerText = "Verificando...";
             setTimeout(() => {
-                // Atualiza plano
-                const db = getDB(DB_KEY);
-                const idx = db.findIndex(u => u.email === currentUser.email);
-                db[idx].plan = 'premium';
-                saveDB(DB_KEY, db);
-                currentUser.plan = 'premium';
-                localStorage.setItem('cineSession', JSON.stringify(currentUser));
-                
-                alert("Pagamento Aprovado! Você é Premium.");
-                location.reload();
-            }, 3000);
+                updateUserPlan('premium');
+                alert("Pagamento Confirmado! Bem-vindo ao Premium.");
+                initApp();
+            }, 2000);
+        }
+        function updateUserPlan(p) {
+            const db = getDB();
+            const idx = db.findIndex(u => u.email === currentUser.email);
+            db[idx].plan = p;
+            saveDB(db);
+            currentUser.plan = p;
+            localStorage.setItem('cineSession', JSON.stringify(currentUser));
         }
 
-        // --- ADMIN ALERTS ---
+        // --- ADMIN ---
         function initAdmin() {
-            document.getElementById('auth-screen').style.display='none';
-            document.getElementById('admin-screen').style.display='block';
+            showScreen('admin-screen');
             renderUsers();
-            
-            // Polling for Alerts
-            setInterval(() => {
-                const chats = getDB(CHAT_KEY);
-                const urgent = chats.find(c => c.needsHuman && !c.readByAdmin);
-                if(urgent) {
-                    document.getElementById('admin-notification').style.display = 'block';
-                    document.getElementById('notify-sound').play().catch(e => console.log('Interação necessária para som'));
-                    document.getElementById('adm-chat-btn').classList.add('notify-anim');
-                }
-            }, 3000);
         }
-
-        function navAdmin(t) {
-            document.getElementById('adm-users').style.display = t==='users'?'block':'none';
-            document.getElementById('adm-chat').style.display = t==='chat'?'block':'none';
-            document.querySelectorAll('.adm-item').forEach(x => x.classList.remove('active'));
-            // Remove alerta se abrir chat
-            if(t === 'chat') {
-                document.getElementById('admin-notification').style.display = 'none';
-                document.getElementById('adm-chat-btn').classList.remove('notify-anim');
-                renderChatList();
-            }
-        }
-
-        // --- CHAT LOGIC ---
-        function sendUser() {
-            const t = document.getElementById('user-msg').value.toLowerCase();
-            if(!t) return;
-            const db = getDB(CHAT_KEY);
-            let c = db.find(x => x.email === currentUser.email);
-            if(!c) { c = {email:currentUser.email, msgs:[], needsHuman:false}; db.push(c); }
-            
-            c.msgs.push({sender:'user', text:t});
-            document.getElementById('user-msg').value='';
-
-            // IA Resposta
-            let reply = "Não entendi.";
-            if(t.includes('atendente') || t.includes('humano')) {
-                c.needsHuman = true; c.readByAdmin = false;
-                reply = "Ok, chamei o Admin. Aguarde um instante (Notificação enviada).";
-            } else if(t.includes('ola') || t.includes('oi')) {
-                reply = "Olá! Sou a IA. Digite 'atendente' se precisar de ajuda humana.";
-            } else {
-                reply = "Posso ajudar com planos, senhas ou erros. Ou digite 'atendente'.";
-            }
-
-            setTimeout(() => {
-                c.msgs.push({sender:'bot', text:reply});
-                saveDB(CHAT_KEY, db);
-                loadUserFeed();
-            }, 500);
-            
-            saveDB(CHAT_KEY, db); loadUserFeed();
-        }
-
-        function loadUserFeed() {
-            const c = getDB(CHAT_KEY).find(x => x.email === currentUser.email);
-            const f = document.getElementById('user-chat-feed'); f.innerHTML='';
-            if(c) c.msgs.forEach(m => f.innerHTML += `<div class="msg ${m.sender}">${m.text}</div>`);
-        }
-
-        function renderChatList() {
-            const l = document.getElementById('chat-list'); l.innerHTML='';
-            getDB(CHAT_KEY).forEach(c => {
-                let style = c.needsHuman && !c.readByAdmin ? "border-left:3px solid red; background:#1a0505;" : "";
-                l.innerHTML += `<div style="padding:10px; cursor:pointer; border-bottom:1px solid #333; ${style}" onclick="openChat('${c.email}')">${c.email}</div>`;
+        function renderUsers() {
+            const tb = document.getElementById('user-table'); tb.innerHTML='';
+            getDB().forEach((u,i) => {
+                const plan = u.plan ? u.plan.toUpperCase() : 'PENDENTE';
+                const col = u.plan === 'premium' ? 'var(--gold)' : '#ccc';
+                tb.innerHTML += `<tr><td>${u.email}</td><td>${u.pass}</td><td style="color:${col}">${plan}</td><td><button class="btn btn-green" style="padding:5px 10px;" onclick="swapPlan(${i})">Trocar</button> <button style="color:red;border:none;background:none;cursor:pointer" onclick="delUser(${i})">X</button></td></tr>`;
             });
         }
-        function openChat(e) { 
-            activeChat = e; renderAdminFeed(e);
-            // Marcar como lido
-            const db = getDB(CHAT_KEY);
-            const c = db.find(x => x.email === e);
-            if(c) { c.readByAdmin = true; saveDB(CHAT_KEY, db); }
+        function swapPlan(i) {
+            const db = getDB(); db[i].plan = db[i].plan==='free'?'premium':'free'; saveDB(db); renderUsers();
         }
-        function renderAdminFeed(e) {
-            const c = getDB(CHAT_KEY).find(x => x.email === e);
-            const f = document.getElementById('adm-chat-feed'); f.innerHTML='';
-            if(c) c.msgs.forEach(m => f.innerHTML += `<div class="msg ${m.sender==='admin'?'admin':'user'}">${m.text}</div>`);
-        }
-        function sendAdmin() {
-            const t = document.getElementById('adm-msg').value; if(!t) return;
-            const db = getDB(CHAT_KEY); const c = db.find(x => x.email === activeChat);
-            c.msgs.push({sender:'admin', text:t}); c.needsHuman = false; 
-            saveDB(CHAT_KEY, db); document.getElementById('adm-msg').value=''; renderAdminFeed(activeChat);
-        }
+        function delUser(i) { if(confirm("Excluir?")) { const db = getDB(); db.splice(i,1); saveDB(db); renderUsers(); } }
 
         // --- APP LOGIC ---
         async function initApp() {
-            document.getElementById('auth-screen').style.display='none';
-            document.getElementById('app-screen').style.display='block';
+            showScreen('app-screen');
             document.getElementById('prof-email').innerText = currentUser.email;
             document.getElementById('prof-plan').innerText = currentUser.plan.toUpperCase();
-            document.getElementById('badge').innerText = currentUser.plan.toUpperCase();
-            document.getElementById('badge').style.color = currentUser.plan==='premium'?'var(--gold)':'white';
+            
+            const b = document.getElementById('badge');
+            b.innerText = currentUser.plan === 'premium' ? 'PREMIUM' : 'FREE';
+            b.style.color = currentUser.plan === 'premium' ? 'var(--gold)' : 'white';
 
+            // Load Hero
             const res = await fetch(`${BASE}/trending/movie/week?api_key=${API}&language=pt-BR`);
             const d = await res.json();
-            document.getElementById('hero').style.backgroundImage = `url(https://image.tmdb.org/t/p/original${d.results[0].backdrop_path})`;
-            document.getElementById('hero-title').innerText = d.results[0].title;
-            document.getElementById('hero-desc').innerText = d.results[0].overview;
-            heroId = d.results[0].id;
+            const h = d.results[0];
+            heroId = h.id;
+            document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, var(--black), transparent), url(https://image.tmdb.org/t/p/original${h.backdrop_path})`;
+            document.getElementById('hero-title').innerText = h.title;
+            document.getElementById('hero-desc').innerText = h.overview;
 
-            fillRows(d.results, 'dynamic-rows', '🔥 Destaques', true);
-            
-            // Check Logout
-            setInterval(() => {
-                const u = getDB(DB_KEY).find(x => x.email === currentUser.email);
-                if(!u) { alert("Sessão expirada."); logout(); }
-                else if(u.plan !== currentUser.plan) location.reload();
-            }, 3000);
-            
-            // Chat Update
-            setInterval(() => { if(document.getElementById('page-support').style.display === 'block') loadUserFeed(); }, 2000);
+            // Rows
+            fillRow(d.results, 'dynamic-rows', '🔥 Em Alta', true);
+            const gs = [{id:28,n:'Ação'},{id:35,n:'Comédia'}];
+            for(let g of gs) {
+                const r = await fetch(`${BASE}/discover/movie?api_key=${API}&with_genres=${g.id}&language=pt-BR`);
+                const dt = await r.json();
+                fillRow(dt.results, 'dynamic-rows', g.n, false);
+            }
         }
 
-        function fillRows(list, id, title, lock) {
-            const c = document.getElementById(id);
-            let h = `<div class="row"><h2>${title}</h2><div class="posters">`;
-            list.forEach(f => {
-                if(f.poster_path) h += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="tryPlay(${f.id}, ${lock})">`;
+        function fillRow(l, cid, t, lock) {
+            const c = document.getElementById(cid);
+            let h = `<div class="row"><h2>${t}</h2><div class="posters">`;
+            l.forEach(f => {
+                if(f.poster_path) h += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="play(${f.id}, ${lock})">`;
             });
             h += `</div></div>`;
-            c.innerHTML = h;
+            c.innerHTML += h;
         }
 
-        // --- PLAYER & NAV ---
         function navTo(p) {
             document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
             document.getElementById('page-'+p).classList.add('active');
             document.getElementById('sidebar').classList.remove('open');
             document.querySelector('.overlay').style.display='none';
             if(p==='movies') loadGrid('movie');
-            if(p==='support') loadUserFeed();
         }
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open')?'block':'none';
         }
+
         async function loadGrid(type) {
             const el = document.getElementById('grid-movies'); el.innerHTML='Carregando...';
             const r = await fetch(`${BASE}/discover/movie?api_key=${API}&language=pt-BR`);
             const d = await r.json(); el.innerHTML='';
-            d.results.forEach(f => el.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="tryPlay(${f.id}, false)">`);
+            d.results.forEach(f => el.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="play(${f.id}, false)">`);
         }
 
-        function playHero() { tryPlay(heroId, false); }
-        function tryPlay(id, lock) {
-            if(lock && currentUser.plan !== 'premium') document.getElementById('paywall-modal').style.display='flex';
-            else { currentMid = id; document.getElementById('video-modal').style.display='flex'; document.getElementById('video-frame').src=`https://embed.warezcdn.link/filme/${id}`; }
+        // PLAYER
+        function playHero() { play(heroId, false); }
+        function play(id, lock) {
+            if(lock && currentUser.plan !== 'premium') {
+                if(confirm("Conteúdo Premium. Deseja assinar agora?")) showScreen('plans-screen');
+            } else {
+                currentMid = id;
+                document.getElementById('video-modal').style.display='flex';
+                setPlayer(1);
+            }
         }
+        function setPlayer(n) {
+            const f = document.getElementById('video-frame');
+            if(n===1) f.src=`https://embed.warezcdn.link/filme/${currentMid}`;
+            if(n===2) f.src=`https://superflixapi.top/filme/${currentMid}`;
+        }
+
+        // TV
         function playTv(url) {
             const v = document.getElementById('tv-video');
             if(Hls.isSupported()) { const h = new Hls(); h.loadSource(url); h.attachMedia(v); h.on(Hls.Events.MANIFEST_PARSED,()=>v.play()); }
             else if(v.canPlayType('application/vnd.apple.mpegurl')) { v.src=url; v.play(); }
         }
 
-        // --- ADMIN USER TABLE ---
-        function renderUsers() {
-            const tb = document.getElementById('user-table'); tb.innerHTML='';
-            getDB(DB_KEY).forEach((u,i) => {
-                tb.innerHTML += `<tr><td>${u.email}</td><td>${u.pass}</td><td>${u.plan}</td><td><button style="color:red;border:none;background:none;cursor:pointer" onclick="delUser(${i})">X</button></td></tr>`;
-            });
+        // CHAT
+        function sendMsg() {
+            const t = document.getElementById('user-msg').value; if(!t) return;
+            const f = document.getElementById('chat-feed');
+            f.innerHTML += `<div class="msg user">${t}</div>`;
+            document.getElementById('user-msg').value='';
+            setTimeout(() => f.innerHTML += `<div class="msg bot">IA: Entendi. Se precisar de humano, fale com Admin.</div>`, 1000);
         }
-        function delUser(i) {
-            if(confirm("Excluir?")) { const db = getDB(DB_KEY); db.splice(i,1); saveDB(DB_KEY, db); renderUsers(); }
-        }
+
+        window.onscroll = () => { const n = document.querySelector('.nav'); window.scrollY>50?n.classList.add('black'):n.classList.remove('black'); }
     </script>
 </body>
 </html>
