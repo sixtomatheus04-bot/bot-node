@@ -3,47 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream - Usuário</title>
+    <title>CineStream Master System</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --red: #E50914; --black: #0a0a0a; --gold: #FFD700; }
+        :root { --red: #E50914; --black: #0a0a0a; --gold: #FFD700; --green: #2ecc71; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { background: var(--black); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
-        
-        /* LOGO ESTILIZADO (SEM IMAGEM PARA EVITAR ERRO 404) */
-        .brand-logo { color: var(--red); font-weight: 700; font-size: 35px; letter-spacing: 2px; text-shadow: 2px 2px 0px rgba(0,0,0,0.5); cursor: pointer; }
 
-        /* TELAS DE AUTH E PLANOS */
-        #auth-screen, #plan-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 2000; background: #000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        #auth-screen { background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg'); background-size: cover; }
-        
-        .box { background: rgba(0,0,0,0.85); padding: 50px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #333; backdrop-filter: blur(10px); }
+        /* --- TELAS GERAIS --- */
+        .screen { display: none; width: 100%; min-height: 100vh; }
+        .active-screen { display: flex; }
+
+        /* --- TELA 1: LOGIN GERAL --- */
+        #auth-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 2000;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+            background-size: cover; align-items: center; justify-content: center; flex-direction: column;
+        }
+        .login-box {
+            background: rgba(0,0,0,0.85); padding: 50px; border-radius: 12px; width: 100%; max-width: 400px;
+            text-align: center; border: 1px solid #333; backdrop-filter: blur(10px);
+        }
+        .brand-logo { color: var(--red); font-weight: 700; font-size: 40px; margin-bottom: 20px; letter-spacing: 2px; }
         input { width: 100%; padding: 15px; background: #333; border: 1px solid #444; border-radius: 5px; color: white; margin-bottom: 15px; }
-        .btn { width: 100%; padding: 15px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 16px; }
+        .btn { width: 100%; padding: 15px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 16px; transition: 0.3s; }
         .btn:hover { background: #f00; }
-        
-        /* APP */
-        #app-screen { display: none; }
+        .error-msg { color: #ff5555; background: rgba(255, 85, 85, 0.1); padding: 10px; border-radius: 4px; display: none; margin-bottom: 15px; border: 1px solid #ff5555; font-size: 14px; }
+
+        /* --- TELA 2: ADMIN (A PLANILHA) --- */
+        #admin-screen { background: #111; padding: 40px; flex-direction: column; align-items: flex-start; }
+        .admin-header { display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+        .admin-table { width: 100%; border-collapse: collapse; background: #1a1a1a; border-radius: 8px; overflow: hidden; }
+        .admin-table th, .admin-table td { padding: 15px; text-align: left; border-bottom: 1px solid #333; }
+        .admin-table th { background: #222; color: var(--green); }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-premium { background: var(--gold); color: black; }
+        .badge-free { background: #555; color: white; }
+        .btn-reload { background: #333; color: var(--green); border: 1px solid var(--green); padding: 10px 20px; cursor: pointer; margin-right: 10px; border-radius: 4px; }
+        .btn-reload:hover { background: var(--green); color: black; }
+
+        /* --- TELA 3: PLANOS --- */
+        #plan-screen { background: #000; align-items: center; justify-content: center; flex-direction: column; }
+        .plan-container { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
+        .plan-card { background:#111; padding:30px; border:2px solid #333; border-radius:10px; width:280px; text-align:center; cursor:pointer; position:relative; }
+        .plan-card:hover { transform:scale(1.05); border-color:var(--red); }
+        .plan-card.premium { border-color:var(--gold); box-shadow:0 0 20px rgba(255,215,0,0.2); }
+
+        /* --- TELA 4: APP (NETFLIX) --- */
+        #app-screen { display: block; } /* Controlado via JS */
         .nav { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, black, transparent); z-index: 100; transition: 0.3s; }
         .nav.black { background: #000; }
-        
         .hero { height: 80vh; background-size: cover; background-position: center; position: relative; }
         .hero-content { position: absolute; bottom: 20%; left: 4%; max-width: 600px; text-shadow: 2px 2px 10px black; }
-        
         .row { margin-bottom: 40px; padding-left: 4%; }
         .posters { display: flex; overflow-x: auto; gap: 15px; padding: 10px 0; scrollbar-width: none; }
         .poster-wrapper { position: relative; min-width: 160px; height: 240px; border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; }
         .poster-wrapper:hover { transform: scale(1.1); z-index: 10; }
         .poster-img { width: 100%; height: 100%; object-fit: cover; }
-        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; }
+        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; backdrop-filter: blur(2px); }
 
-        /* PLANOS */
-        .plan-container { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
-        .plan-card { background:#111; padding:30px; border:2px solid #333; border-radius:10px; width:250px; text-align:center; cursor:pointer; }
-        .plan-card:hover { border-color:var(--red); }
-
-        /* PLAYER */
-        #video-modal, #paywall-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; }
+        /* MODAIS */
+        #paywall-modal, #video-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; }
         iframe { width: 100%; height: 100%; border: none; }
         .close-btn { position: absolute; top: 20px; right: 20px; font-size: 40px; color: white; cursor: pointer; z-index: 6001; }
         .player-controls { position: absolute; top: 20px; left: 20px; display: flex; gap: 10px; z-index: 6000; }
@@ -53,46 +73,69 @@
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div class="box">
-            <div class="brand-logo" style="margin-bottom:20px;">CINESTREAM</div>
-            <p id="auth-msg" style="color:#ff5555; display:none; margin-bottom:10px;"></p>
-            
+    <div id="auth-screen" class="screen active-screen">
+        <div class="login-box">
+            <div class="brand-logo">CINESTREAM</div>
+            <div id="auth-msg" class="error-msg"></div>
+
             <div id="login-form">
-                <input type="email" id="email" placeholder="Email">
+                <input type="text" id="email" placeholder="Email ou Usuário">
                 <input type="password" id="pass" placeholder="Senha">
-                <button class="btn" onclick="login()">ENTRAR</button>
-                <p style="margin-top:15px; font-size:13px; color:#ccc;">Não tem conta? <u style="cursor:pointer; color:white;" onclick="toggleAuth(true)">Criar agora</u></p>
+                <button class="btn" onclick="fazerLogin()">ENTRAR</button>
+                <div style="margin-top:15px; font-size:13px; color:#aaa; cursor:pointer; display:none;" id="forgot-btn" onclick="alert('Email de recuperação enviado!')">Esqueceu a senha?</div>
+                <p style="margin-top:20px; font-size:14px; color:#ccc;">Não tem conta? <u style="cursor:pointer; color:white;" onclick="toggleAuth(true)">Criar agora</u></p>
             </div>
 
             <div id="register-form" style="display:none;">
-                <input type="email" id="reg-email" placeholder="Criar Email">
-                <input type="password" id="reg-pass" placeholder="Criar Senha">
-                <button class="btn" onclick="registrar()">CADASTRAR</button>
-                <p style="margin-top:15px; font-size:13px; color:#ccc;">Já tem conta? <u style="cursor:pointer; color:white;" onclick="toggleAuth(false)">Fazer Login</u></p>
+                <input type="email" id="reg-email" placeholder="Seu melhor Email">
+                <input type="password" id="reg-pass" placeholder="Crie uma Senha">
+                <button class="btn" onclick="fazerCadastro()">CADASTRAR</button>
+                <p style="margin-top:20px; font-size:14px; color:#ccc;">Já tem conta? <u style="cursor:pointer; color:white;" onclick="toggleAuth(false)">Fazer Login</u></p>
             </div>
         </div>
     </div>
 
-    <div id="plan-screen" style="display:none;">
-        <h2 style="font-size:30px; margin-bottom:30px;">Escolha seu Plano</h2>
+    <div id="admin-screen" class="screen">
+        <div class="admin-header">
+            <h1 style="color:var(--green);">Painel Administrativo</h1>
+            <div>
+                <button class="btn-reload" onclick="carregarAdmin()">🔄 RECARREGAR LISTA</button>
+                <button onclick="logout()" style="background:#333; color:white; border:none; padding:10px 20px; cursor:pointer;">Sair</button>
+            </div>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Senha</th>
+                    <th>Plano</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="admin-tbody"></tbody>
+        </table>
+    </div>
+
+    <div id="plan-screen" class="screen">
+        <h2 style="font-size:30px; margin-bottom:30px;">Finalize seu Cadastro</h2>
         <div class="plan-container">
             <div class="plan-card" onclick="setPlan('free')">
                 <h3>GRÁTIS</h3><h1>R$ 0</h1><p>Com Anúncios</p>
                 <button class="btn" style="background:#333; margin-top:10px;">ESCOLHER</button>
             </div>
-            <div class="plan-card" onclick="setPlan('premium')" style="border-color:var(--gold);">
+            <div class="plan-card premium" onclick="setPlan('premium')">
+                <div style="color:var(--gold); font-weight:bold; margin-bottom:5px;">RECOMENDADO</div>
                 <h3 style="color:var(--gold);">PREMIUM</h3><h1>R$ 29</h1><p>Tudo Liberado</p>
                 <button class="btn" style="background:var(--gold); color:black; margin-top:10px;">ASSINAR</button>
             </div>
         </div>
     </div>
 
-    <div id="app-screen">
+    <div id="app-screen" class="screen">
         <nav class="nav" id="navbar">
-            <div class="brand-logo" style="font-size:25px;">CINESTREAM</div>
+            <div class="brand-logo" style="font-size:25px; margin:0;">CINESTREAM</div>
             <div style="display:flex; align-items:center; gap:10px;">
-                <div id="badge" style="font-size:12px; padding:5px; background:#333; border-radius:4px; font-weight:bold;">FREE</div>
+                <div id="badge" style="font-size:12px; padding:5px; background:#333; border-radius:4px;">FREE</div>
                 <button onclick="logout()" style="background:transparent; border:1px solid #666; color:white; padding:5px; cursor:pointer;">Sair</button>
             </div>
         </nav>
@@ -111,7 +154,7 @@
     </div>
 
     <div id="paywall-modal">
-        <div class="box" style="border-color:var(--gold);">
+        <div class="login-box" style="border-color:var(--gold);">
             <h1 style="font-size:50px;">🔒</h1>
             <h2 style="color:var(--gold);">Conteúdo Premium</h2>
             <button class="btn" style="background:var(--gold); color:black; margin-top:20px;" onclick="setPlan('premium')">ASSINAR AGORA</button>
@@ -124,94 +167,105 @@
         <div class="player-controls">
             <button class="btn-src active" onclick="trocar(1)">🇧🇷 Player 1</button>
             <button class="btn-src" onclick="trocar(2)">🇺🇸 Player 2</button>
-            <button class="btn-src" onclick="trocar(3)">🇧🇷 Player 3</button>
         </div>
         <iframe id="video-frame" allowfullscreen></iframe>
     </div>
 
     <script>
-        const DB_KEY = 'cine_db_final';
+        const DB_KEY = 'cine_master_db';
         const API_KEY = 'c3162eed0616407fa43134e07880c7d5';
         let currentUser = null;
         let heroId = 0, currentMovie = 0;
 
+        // BANCO DE DADOS
         function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
         function saveDB(d) { localStorage.setItem(DB_KEY, JSON.stringify(d)); }
 
-        // --- SEGURANÇA EM TEMPO REAL ---
-        setInterval(() => {
-            if(currentUser) {
-                const db = getDB();
-                const validUser = db.find(u => u.email === currentUser.email);
-                if(!validUser) {
-                    alert("Sua conta foi excluída pelo administrador.");
-                    logout();
-                } else if(validUser.plan !== currentUser.plan) {
-                    currentUser.plan = validUser.plan;
-                    localStorage.setItem('cineSession', JSON.stringify(currentUser));
-                    atualizarUI(); // ESSA É A FUNÇÃO QUE FALTAVA
-                }
-            }
-        }, 3000);
+        // --- SISTEMA DE NAVEGAÇÃO ENTRE TELAS ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(id).classList.add('active-screen');
+        }
 
         window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem('cineSession'));
-            if(saved) {
-                const db = getDB();
-                const fresh = db.find(u => u.email === saved.email);
-                if(fresh) {
-                    currentUser = fresh;
-                    if(!currentUser.plan) irParaPlanos();
-                    else iniciarApp();
+            // Verifica se tem alguém logado
+            const session = JSON.parse(localStorage.getItem('cineSession'));
+            if(session) {
+                if(session.role === 'admin') {
+                    showScreen('admin-screen');
+                    carregarAdmin();
+                } else {
+                    // Verifica se o usuário ainda existe
+                    const db = getDB();
+                    const validUser = db.find(u => u.email === session.email);
+                    if(validUser) {
+                        currentUser = validUser;
+                        if(!currentUser.plan) showScreen('plan-screen');
+                        else iniciarApp();
+                    } else {
+                        logout(); // Usuário foi deletado
+                    }
                 }
+            } else {
+                showScreen('auth-screen');
             }
         }
 
+        // --- AUTH LOGIC ---
         function toggleAuth(isReg) {
             document.getElementById('login-form').style.display = isReg ? 'none' : 'block';
             document.getElementById('register-form').style.display = isReg ? 'block' : 'none';
             document.getElementById('auth-msg').style.display = 'none';
         }
 
-        function login() {
+        function fazerLogin() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
-            const db = getDB();
-            const user = db.find(u => u.email === email && u.pass === pass);
+            const msg = document.getElementById('auth-msg');
+            const forgot = document.getElementById('forgot-btn');
             
-            if(user) {
+            msg.style.display = 'none'; forgot.style.display = 'none';
+
+            // LOGIN DE ADMIN (SECRETO)
+            if(email === 'admin' && pass === 'admin') {
+                localStorage.setItem('cineSession', JSON.stringify({ role: 'admin' }));
+                showScreen('admin-screen');
+                carregarAdmin();
+                return;
+            }
+
+            // LOGIN DE USUÁRIO
+            const db = getDB();
+            const user = db.find(u => u.email === email);
+
+            if(!user) {
+                msg.innerText = "Usuário não encontrado. Crie uma conta.";
+                msg.style.display = 'block';
+            } else if (user.pass !== pass) {
+                msg.innerText = "Senha incorreta.";
+                msg.style.display = 'block';
+                forgot.style.display = 'block';
+            } else {
                 currentUser = user;
                 localStorage.setItem('cineSession', JSON.stringify(user));
-                if(!user.plan) irParaPlanos();
+                if(!user.plan) showScreen('plan-screen');
                 else iniciarApp();
-            } else {
-                mostrarErro("Email ou senha incorretos.");
             }
         }
 
-        function registrar() {
+        function fazerCadastro() {
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
-            if(!email || !pass) return mostrarErro("Preencha tudo.");
-            
+            if(!email || !pass) return alert("Preencha tudo!");
+
             const db = getDB();
-            if(db.find(u => u.email === email)) return mostrarErro("Email já existe.");
+            if(db.find(u => u.email === email)) return alert("Email já existe!");
 
             currentUser = { email, pass, plan: null };
             db.push(currentUser);
             saveDB(db);
             localStorage.setItem('cineSession', JSON.stringify(currentUser));
-            irParaPlanos();
-        }
-
-        function mostrarErro(msg) {
-            const el = document.getElementById('auth-msg');
-            el.innerText = msg; el.style.display = 'block';
-        }
-
-        function irParaPlanos() {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('plan-screen').style.display = 'flex';
+            showScreen('plan-screen');
         }
 
         function setPlan(p) {
@@ -219,9 +273,6 @@
             const db = getDB();
             const idx = db.findIndex(u => u.email === currentUser.email);
             if(idx !== -1) { db[idx].plan = p; saveDB(db); }
-            localStorage.setItem('cineSession', JSON.stringify(currentUser));
-            document.getElementById('plan-screen').style.display = 'none';
-            document.getElementById('paywall-modal').style.display = 'none';
             iniciarApp();
         }
 
@@ -230,34 +281,59 @@
             location.reload();
         }
 
-        // --- APP & CORREÇÃO DO ERRO ---
-        async function iniciarApp() {
-            try {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('plan-screen').style.display = 'none';
-                document.getElementById('app-screen').style.display = 'block';
-                
-                atualizarUI(); // CHAMA A FUNÇÃO CORRIGIDA
+        // --- ADMIN LOGIC ---
+        function carregarAdmin() {
+            const db = getDB();
+            const tbody = document.getElementById('admin-tbody');
+            tbody.innerHTML = '';
+            
+            if(db.length === 0) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#666;">Nenhum usuário.</td></tr>';
 
-                // Hero Content
-                const hRes = await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}&language=pt-BR`);
-                const hData = await hRes.json();
-                const h = hData.results[0];
-                heroId = h.id;
-                document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, #000, transparent), url(https://image.tmdb.org/t/p/original${h.backdrop_path})`;
-                document.getElementById('hero-title').innerText = h.title;
-                document.getElementById('hero-desc').innerText = h.overview;
-
-                // Loads lists
-                loadRow(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=pt-BR`, 'row-premium', true);
-                loadRow(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&language=pt-BR`, 'row-action', false);
-                loadRow(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=35&language=pt-BR`, 'row-comedy', false);
-            } catch (error) {
-                console.error("Erro ao iniciar app:", error);
-            }
+            db.forEach((u, i) => {
+                const badge = u.plan === 'premium' ? '<span class="badge badge-premium">PREMIUM</span>' : '<span class="badge badge-free">FREE</span>';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${u.email}</td>
+                        <td>${u.pass}</td>
+                        <td>${badge}</td>
+                        <td><button onclick="deletar(${i})" style="color:#ff5555; background:none; border:none; cursor:pointer;">Excluir</button></td>
+                    </tr>`;
+            });
         }
 
-        // *** ESTA É A FUNÇÃO QUE FALTAVA E CAUSAVA O TRAVAMENTO ***
+        function deletar(i) {
+            if(confirm("Excluir usuário? Ele será deslogado.")) {
+                const db = getDB();
+                db.splice(i, 1);
+                saveDB(db);
+                carregarAdmin();
+            }
+        }
+        
+        // Auto-Reload do Admin
+        setInterval(() => {
+            const session = JSON.parse(localStorage.getItem('cineSession'));
+            if(session && session.role === 'admin') carregarAdmin();
+        }, 5000);
+
+        // --- APP LOGIC ---
+        async function iniciarApp() {
+            showScreen('app-screen');
+            atualizarUI();
+            
+            const hRes = await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}&language=pt-BR`);
+            const hData = await hRes.json();
+            const h = hData.results[0];
+            heroId = h.id;
+            document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, #000, transparent), url(https://image.tmdb.org/t/p/original${h.backdrop_path})`;
+            document.getElementById('hero-title').innerText = h.title;
+            document.getElementById('hero-desc').innerText = h.overview;
+
+            loadRow(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=pt-BR`, 'row-premium', true);
+            loadRow(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&language=pt-BR`, 'row-action', false);
+            loadRow(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=35&language=pt-BR`, 'row-comedy', false);
+        }
+
         function atualizarUI() {
             const b = document.getElementById('badge');
             b.innerText = currentUser.plan === 'premium' ? "PREMIUM 👑" : "GRÁTIS";
@@ -272,7 +348,7 @@
                 if(f.poster_path) {
                     const locked = isPrem && currentUser.plan !== 'premium';
                     const div = document.createElement('div'); div.className = 'poster-wrapper';
-                    div.innerHTML = `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster-img">` + (locked ? `<div class="lock-overlay">🔒 Premium</div>` : ``);
+                    div.innerHTML = `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster-img">` + (locked ? `<div class="lock-overlay"><div style="font-size:30px">🔒</div>Premium</div>` : ``);
                     div.onclick = () => verificar(f.id, locked);
                     el.appendChild(div);
                 }
@@ -286,15 +362,10 @@
 
         function trocar(opt) {
             const f = document.getElementById('video-frame');
-            // Remove active
-            document.querySelectorAll('.btn-src').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-
-            if(opt===1) f.src=`https://embed.warezcdn.link/filme/${currentMovie}`; // Warez
-            if(opt===2) f.src=`https://vidsrc.me/embed/movie?tmdb=${currentMovie}`; // VidSrc
-            if(opt===3) f.src=`https://superflixapi.top/filme/${currentMovie}`; // SuperFlix
+            document.querySelectorAll('.btn-src').forEach(b => b.classList.remove('active')); event.target.classList.add('active');
+            if(opt===1) f.src=`https://embed.warezcdn.link/filme/${currentMovie}`;
+            if(opt===2) f.src=`https://vidsrc.me/embed/movie?tmdb=${currentMovie}`;
         }
-
         function fecharPlayer() { document.getElementById('video-modal').style.display = 'none'; document.getElementById('video-frame').src=''; }
         window.onscroll = () => { const n = document.getElementById('navbar'); window.scrollY>50 ? n.classList.add('black') : n.classList.remove('black'); }
     </script>
