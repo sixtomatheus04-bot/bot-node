@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream</title>
+    <title>CineStream - Usuário</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root { --red: #E50914; --black: #0a0a0a; --gold: #FFD700; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { background: var(--black); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
         
-        /* LOGIN & PLANOS */
+        /* LOGO ESTILIZADO (SEM IMAGEM PARA EVITAR ERRO 404) */
+        .brand-logo { color: var(--red); font-weight: 700; font-size: 35px; letter-spacing: 2px; text-shadow: 2px 2px 0px rgba(0,0,0,0.5); cursor: pointer; }
+
+        /* TELAS DE AUTH E PLANOS */
         #auth-screen, #plan-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 2000; background: #000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         #auth-screen { background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg'); background-size: cover; }
         
         .box { background: rgba(0,0,0,0.85); padding: 50px; border-radius: 12px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #333; backdrop-filter: blur(10px); }
         input { width: 100%; padding: 15px; background: #333; border: 1px solid #444; border-radius: 5px; color: white; margin-bottom: 15px; }
-        .btn { width: 100%; padding: 15px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        .btn { width: 100%; padding: 15px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 16px; }
+        .btn:hover { background: #f00; }
         
         /* APP */
         #app-screen { display: none; }
@@ -34,7 +38,7 @@
         .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; }
 
         /* PLANOS */
-        .plan-container { display:flex; gap:20px; }
+        .plan-container { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; }
         .plan-card { background:#111; padding:30px; border:2px solid #333; border-radius:10px; width:250px; text-align:center; cursor:pointer; }
         .plan-card:hover { border-color:var(--red); }
 
@@ -51,7 +55,7 @@
 
     <div id="auth-screen">
         <div class="box">
-            <h2 style="margin-bottom:20px; color:var(--red);">CINESTREAM</h2>
+            <div class="brand-logo" style="margin-bottom:20px;">CINESTREAM</div>
             <p id="auth-msg" style="color:#ff5555; display:none; margin-bottom:10px;"></p>
             
             <div id="login-form">
@@ -86,9 +90,9 @@
 
     <div id="app-screen">
         <nav class="nav" id="navbar">
-            <div style="font-weight:bold; font-size:25px; color:var(--red);">CINESTREAM</div>
+            <div class="brand-logo" style="font-size:25px;">CINESTREAM</div>
             <div style="display:flex; align-items:center; gap:10px;">
-                <div id="badge" style="font-size:12px; padding:5px; background:#333; border-radius:4px;">FREE</div>
+                <div id="badge" style="font-size:12px; padding:5px; background:#333; border-radius:4px; font-weight:bold;">FREE</div>
                 <button onclick="logout()" style="background:transparent; border:1px solid #666; color:white; padding:5px; cursor:pointer;">Sair</button>
             </div>
         </nav>
@@ -102,6 +106,7 @@
         <div style="margin-top:-80px; position:relative; z-index:10; padding-bottom:50px;">
             <div class="row"><h2>🔥 Premium <span style="font-size:12px; color:var(--gold); border:1px solid var(--gold); padding:2px 5px; margin-left:10px;">VIP</span></h2><div class="posters" id="row-premium"></div></div>
             <div class="row"><h2>🎬 Ação</h2><div class="posters" id="row-action"></div></div>
+            <div class="row"><h2>😂 Comédia</h2><div class="posters" id="row-comedy"></div></div>
         </div>
     </div>
 
@@ -119,6 +124,7 @@
         <div class="player-controls">
             <button class="btn-src active" onclick="trocar(1)">🇧🇷 Player 1</button>
             <button class="btn-src" onclick="trocar(2)">🇺🇸 Player 2</button>
+            <button class="btn-src" onclick="trocar(3)">🇧🇷 Player 3</button>
         </div>
         <iframe id="video-frame" allowfullscreen></iframe>
     </div>
@@ -136,21 +142,17 @@
         setInterval(() => {
             if(currentUser) {
                 const db = getDB();
-                // Verifica se o usuário ainda existe no banco
                 const validUser = db.find(u => u.email === currentUser.email);
                 if(!validUser) {
-                    alert("Sua conta foi excluída ou desativada pelo administrador.");
+                    alert("Sua conta foi excluída pelo administrador.");
                     logout();
-                } else {
-                    // Atualiza o plano em tempo real se o admin mudar
-                    if(validUser.plan !== currentUser.plan) {
-                        currentUser.plan = validUser.plan;
-                        localStorage.setItem('cineSession', JSON.stringify(currentUser));
-                        atualizarUI();
-                    }
+                } else if(validUser.plan !== currentUser.plan) {
+                    currentUser.plan = validUser.plan;
+                    localStorage.setItem('cineSession', JSON.stringify(currentUser));
+                    atualizarUI(); // ESSA É A FUNÇÃO QUE FALTAVA
                 }
             }
-        }, 2000); // Roda a cada 2 segundos
+        }, 3000);
 
         window.onload = () => {
             const saved = JSON.parse(localStorage.getItem('cineSession'));
@@ -228,26 +230,35 @@
             location.reload();
         }
 
-        // APP LOGIC
+        // --- APP & CORREÇÃO DO ERRO ---
         async function iniciarApp() {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('app-screen').style.display = 'block';
-            atualizarUI();
-            
-            // Hero
-            const hRes = await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}&language=pt-BR`);
-            const hData = await hRes.json();
-            const h = hData.results[0];
-            heroId = h.id;
-            document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, #000, transparent), url(https://image.tmdb.org/t/p/original${h.backdrop_path})`;
-            document.getElementById('hero-title').innerText = h.title;
-            document.getElementById('hero-desc').innerText = h.overview;
+            try {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('plan-screen').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'block';
+                
+                atualizarUI(); // CHAMA A FUNÇÃO CORRIGIDA
 
-            loadRow(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=pt-BR`, 'row-premium', true);
-            loadRow(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&language=pt-BR`, 'row-action', false);
+                // Hero Content
+                const hRes = await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${API_KEY}&language=pt-BR`);
+                const hData = await hRes.json();
+                const h = hData.results[0];
+                heroId = h.id;
+                document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, #000, transparent), url(https://image.tmdb.org/t/p/original${h.backdrop_path})`;
+                document.getElementById('hero-title').innerText = h.title;
+                document.getElementById('hero-desc').innerText = h.overview;
+
+                // Loads lists
+                loadRow(`https://api.themoviedb.org/3/trending/movie/week?api_key=${API_KEY}&language=pt-BR`, 'row-premium', true);
+                loadRow(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=28&language=pt-BR`, 'row-action', false);
+                loadRow(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=35&language=pt-BR`, 'row-comedy', false);
+            } catch (error) {
+                console.error("Erro ao iniciar app:", error);
+            }
         }
 
-        function actualizarUI() {
+        // *** ESTA É A FUNÇÃO QUE FALTAVA E CAUSAVA O TRAVAMENTO ***
+        function atualizarUI() {
             const b = document.getElementById('badge');
             b.innerText = currentUser.plan === 'premium' ? "PREMIUM 👑" : "GRÁTIS";
             b.style.background = currentUser.plan === 'premium' ? "var(--gold)" : "#333";
@@ -275,9 +286,15 @@
 
         function trocar(opt) {
             const f = document.getElementById('video-frame');
-            if(opt===1) f.src=`https://embed.warezcdn.link/filme/${currentMovie}`;
-            if(opt===2) f.src=`https://vidsrc.me/embed/movie?tmdb=${currentMovie}`;
+            // Remove active
+            document.querySelectorAll('.btn-src').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if(opt===1) f.src=`https://embed.warezcdn.link/filme/${currentMovie}`; // Warez
+            if(opt===2) f.src=`https://vidsrc.me/embed/movie?tmdb=${currentMovie}`; // VidSrc
+            if(opt===3) f.src=`https://superflixapi.top/filme/${currentMovie}`; // SuperFlix
         }
+
         function fecharPlayer() { document.getElementById('video-modal').style.display = 'none'; document.getElementById('video-frame').src=''; }
         window.onscroll = () => { const n = document.getElementById('navbar'); window.scrollY>50 ? n.classList.add('black') : n.classList.remove('black'); }
     </script>
