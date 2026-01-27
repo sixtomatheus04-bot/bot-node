@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream Ultimate v2</title>
+    <title>CineStream - Dublados</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -30,7 +30,7 @@
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); 
             padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; backdrop-filter: blur(5px);
         }
-        .search-box input { background: transparent; border: none; color: white; padding: 5px; width: 250px; font-family: 'Outfit', sans-serif; }
+        .search-box input { background: transparent; border: none; color: white; padding: 5px; width: 200px; font-family: 'Outfit', sans-serif; }
         .search-box button { background: transparent; border: none; color: #ccc; cursor: pointer; }
 
         /* SIDEBAR */
@@ -71,14 +71,13 @@
 
         /* LISTAS */
         .container { position: relative; z-index: 10; padding-bottom: 50px; min-height: 100vh; }
-        .section-header { margin-left: 4%; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .row { margin-bottom: 50px; }
         .row h2 { color: #e5e5e5; font-size: 20px; font-weight: 600; border-left: 4px solid var(--red); padding-left: 10px; }
         .posters { display: flex; overflow-x: auto; gap: 15px; padding: 10px 4%; scrollbar-width: none; }
         .poster { min-width: 160px; height: 240px; border-radius: 8px; transition: 0.3s; cursor: pointer; object-fit: cover; border: 1px solid transparent; }
         .poster:hover { transform: scale(1.1); margin: 0 10px; z-index: 20; border-color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
 
-        /* SEARCH & MODAL & PLAYER (Padrão) */
+        /* SEARCH & MODAL & PLAYER */
         #search-results { display: none; padding: 100px 4% 40px 4%; }
         .grid-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
         .grid-item img { width: 100%; height: 270px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: 0.3s; }
@@ -117,9 +116,9 @@
     <div class="sidebar" id="sidebar">
         <div class="close-sidebar" onclick="toggleMenu()">×</div>
         <a href="#" onclick="location.reload()">🏠 Início</a>
-        <a href="#" onclick="filtrarPortugues()">🇧🇷 Em Português</a>
+        <a href="#" onclick="filtrarDublados()">🇧🇷 Dublados</a>
         <a href="#" onclick="filtrarGenero(28, 'Ação')">💥 Ação</a>
-        <a href="#" onclick="filtrarGenero(12, 'Aventura')">🗺️ Aventura</a>
+        <a href="#" onclick="filtrarGenero(16, 'Animação')">🎨 Animação</a>
         <a href="#" onclick="filtrarGenero(35, 'Comédia')">😂 Comédia</a>
         <a href="#" onclick="filtrarGenero(27, 'Terror')">👻 Terror</a>
         <a href="#" onclick="filtrarGenero(10749, 'Romance')">❤️ Romance</a>
@@ -142,7 +141,8 @@
             <div class="brand-item" onclick="resetarFiltro()" title="Todos">
                 <div class="brand-logo-txt" style="font-size: 14px;">TUDO</div>
             </div>
-            <div class="brand-item" onclick="filtrarPortugues()" title="Nacionais e Dublados">
+            
+            <div class="brand-item" onclick="filtrarDublados()" title="Filmes Dublados">
                 <div class="brand-logo-txt" style="font-size: 25px;">🇧🇷</div>
             </div>
             
@@ -204,40 +204,36 @@
         const POSTER_URL = 'https://image.tmdb.org/t/p/w300';
 
         let currentId, currentType;
-        let activeNetwork = null; // Guarda qual streaming está ativo
-        let activeLang = null;    // Guarda se o filtro PT está ativo
+        let activeNetwork = null;
+        let activeDublado = false;
 
         const GENRES = [
             {id: 28, name: "Ação"}, {id: 12, name: "Aventura"}, {id: 16, name: "Animação"}, 
             {id: 35, name: "Comédia"}, {id: 80, name: "Crime"}, {id: 99, name: "Documentário"},
             {id: 18, name: "Drama"}, {id: 10751, name: "Família"}, {id: 14, name: "Fantasia"},
-            {id: 36, name: "História"}, {id: 27, name: "Terror"}, {id: 10402, name: "Música"},
-            {id: 9648, name: "Mistério"}, {id: 10749, name: "Romance"}, {id: 878, name: "Ficção Científica"}
+            {id: 27, name: "Terror"}, {id: 878, name: "Ficção Científica"}
         ];
 
-        window.onload = () => {
-            resetarFiltro(); // Carrega tudo por padrão
-        };
+        window.onload = () => { resetarFiltro(); };
 
-        // --- LÓGICA DE RECONSTRUÇÃO DA HOME ---
         function resetarFiltro() {
             activeNetwork = null;
-            activeLang = null;
-            atualizarLabel("Catálogo Completo");
+            activeDublado = false;
+            atualizarLabel("Início");
             construirHome();
         }
 
         function ativarRede(networkId, nome, cor) {
             activeNetwork = networkId;
-            activeLang = null; // Desliga filtro de língua para focar na rede
+            activeDublado = false;
             atualizarLabel(`Catálogo: ${nome}`, cor);
-            construirHome(); // Reconstrói tudo com o filtro da rede
+            construirHome();
         }
 
-        function filtrarPortugues() {
+        function filtrarDublados() {
             activeNetwork = null;
-            activeLang = 'pt';
-            atualizarLabel("Nacionais e Dublados", "#00ff00");
+            activeDublado = true;
+            atualizarLabel("Em Português / Dublados", "#00ff00");
             construirHome();
         }
 
@@ -251,33 +247,32 @@
             document.getElementById('search-results').style.display = 'none';
         }
 
-        // --- CONSTRUTOR DE PÁGINA (A MÁGICA ACONTECE AQUI) ---
         function construirHome() {
             const container = document.getElementById('main-container');
-            container.innerHTML = ''; // Limpa tudo
+            container.innerHTML = '';
 
-            // 1. Define URL base para Destaques e Listas
-            // Se tiver rede, usamos discover. Se não, usamos trending.
             let urlHero, urlTrend, urlTv;
+            // Configurações Globais de Busca
+            const commonParams = `&language=pt-BR&include_adult=false&sort_by=popularity.desc`;
 
             if (activeNetwork) {
-                // Modo Streaming (Netflix, Disney...)
-                urlHero = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_networks=${activeNetwork}&language=pt-BR&sort_by=popularity.desc`;
-                urlTrend = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_networks=${activeNetwork}&language=pt-BR&sort_by=popularity.desc`;
-                urlTv = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_networks=${activeNetwork}&language=pt-BR&sort_by=popularity.desc`;
-            } else if (activeLang) {
-                // Modo Português
-                urlHero = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=pt&language=pt-BR&sort_by=popularity.desc`;
-                urlTrend = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_original_language=pt&language=pt-BR`;
-                urlTv = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_original_language=pt&language=pt-BR`;
+                // Streaming
+                urlHero = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_networks=${activeNetwork}${commonParams}`;
+                urlTrend = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_networks=${activeNetwork}${commonParams}`;
+                urlTv = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_networks=${activeNetwork}${commonParams}`;
+            } else if (activeDublado) {
+                // Modo Dublado (Removemos 'with_original_language=pt' e usamos 'region=BR')
+                // Isso traz filmes internacionais populares no Brasil
+                urlHero = `${BASE_URL}/discover/movie?api_key=${API_KEY}&region=BR${commonParams}`;
+                urlTrend = `${BASE_URL}/discover/movie?api_key=${API_KEY}&region=BR${commonParams}`;
+                urlTv = `${BASE_URL}/discover/tv?api_key=${API_KEY}&region=BR&with_original_language=pt|en${commonParams}`;
             } else {
-                // Modo Normal (Tudo)
+                // Padrão
                 urlHero = `${BASE_URL}/trending/all/day?api_key=${API_KEY}&language=pt-BR`;
                 urlTrend = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=pt-BR`;
                 urlTv = `${BASE_URL}/trending/tv/week?api_key=${API_KEY}&language=pt-BR`;
             }
 
-            // 2. Carrega Hero e Primeiras Listas
             carregarHero(urlHero);
             
             container.innerHTML += `<div class="row"><h2>🔥 Destaques</h2><div class="posters" id="row-trend"></div></div>`;
@@ -286,16 +281,14 @@
             container.innerHTML += `<div class="row"><h2>📺 Séries</h2><div class="posters" id="row-tv"></div></div>`;
             carregarLista(urlTv, 'row-tv');
 
-            // 3. Loop dos Gêneros (Infinito)
             GENRES.forEach(g => {
                 const rowId = `row-${g.id}`;
                 container.innerHTML += `<div class="row"><h2>${g.name}</h2><div class="posters" id="${rowId}"></div></div>`;
                 
-                // Constrói URL do Gênero com os filtros ativos
-                let urlGenre = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${g.id}&language=pt-BR&sort_by=popularity.desc`;
+                let urlGenre = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${g.id}${commonParams}`;
                 
                 if(activeNetwork) urlGenre += `&with_networks=${activeNetwork}`;
-                if(activeLang) urlGenre += `&with_original_language=pt`;
+                if(activeDublado) urlGenre += `&region=BR`;
 
                 carregarLista(urlGenre, rowId);
             });
@@ -304,7 +297,7 @@
         async function carregarHero(url) {
             const res = await fetch(url);
             const data = await res.json();
-            const item = data.results[0] || data.results[1]; // Pega o primeiro
+            const item = data.results[0] || data.results[1];
             
             if(item) {
                 document.getElementById('hero').style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
@@ -322,7 +315,6 @@
             
             data.results.forEach(item => {
                 if(item.poster_path) {
-                    // Tenta adivinhar o tipo se não vier na API (discover não manda media_type)
                     let type = item.media_type;
                     if(!type) type = url.includes('/tv') ? 'tv' : 'movie';
 
@@ -334,7 +326,6 @@
             });
         }
 
-        // --- SISTEMA DE BUSCA ---
         document.getElementById('search-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') fazerPesquisa(); });
 
         async function fazerPesquisa() {
@@ -359,12 +350,10 @@
             });
         }
 
-        // --- SIDEBAR GENRES ---
         function filtrarGenero(id, nome) {
             toggleMenu();
-            // Simplesmente limpa filtros de rede e foca no genero
             activeNetwork = null; 
-            activeLang = null;
+            activeDublado = false;
             document.getElementById('app-home').style.display = 'none';
             document.getElementById('search-results').style.display = 'block';
             document.getElementById('search-title').innerText = `Categoria: ${nome}`;
@@ -388,7 +377,6 @@
             overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
         }
 
-        // --- DETALHES E PLAYER ---
         async function abrirDetalhes(id, type) {
             currentId = id;
             currentType = type;
