@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream - Modo Debug</title>
+    <title>CineStream - Correção Final</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #000; color: white; font-family: sans-serif; display: flex; height: 100vh; margin: 0; }
         
-        /* Área de Login */
+        /* Painel Esquerdo (Login) */
         .left-panel { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .box { background: #1a1a1a; padding: 40px; border-radius: 10px; width: 100%; max-width: 400px; text-align: center; }
         
         input { width: 100%; padding: 15px; margin: 10px 0; background: #333; border: 1px solid #444; color: white; box-sizing: border-box; }
         
-        button { 
-            width: 100%; padding: 15px; margin-top: 10px; cursor: pointer; font-weight: bold; font-size: 16px; border: none; transition: 0.3s;
-        }
+        button { width: 100%; padding: 15px; margin-top: 10px; cursor: pointer; font-weight: bold; font-size: 16px; border: none; transition: 0.3s; }
         .btn-entrar { background: #E50914; color: white; }
-        .btn-entrar:disabled { background: #555; cursor: not-allowed; }
-        
+        .btn-entrar:hover { background: #f40612; }
         .btn-criar { background: transparent; border: 1px solid #777; color: #ccc; margin-top: 10px; }
 
-        /* Área de LOG (Diagnóstico) */
-        .right-panel { flex: 1; background: #111; border-left: 1px solid #333; padding: 20px; font-family: monospace; overflow-y: auto; }
+        /* Painel Direito (Diagnóstico) */
+        .right-panel { flex: 1; background: #111; border-left: 1px solid #333; padding: 20px; font-family: monospace; overflow-y: auto; font-size: 14px; }
         .log-entry { margin-bottom: 5px; border-bottom: 1px solid #222; padding-bottom: 2px; }
-        .log-error { color: #ff4444; }
         .log-success { color: #00C851; }
+        .log-error { color: #ff4444; font-weight: bold; }
         .log-info { color: #33b5e5; }
 
-        /* App Screen */
-        #app-screen { display: none; width: 100%; text-align: center; padding-top: 100px; }
-        img.poster { width: 150px; margin: 10px; border-radius: 5px; }
+        /* Tela do App */
+        #app-screen { display: none; width: 100%; text-align: center; padding-top: 50px; }
+        .filme-card { display: inline-block; margin: 10px; }
+        .filme-card img { width: 150px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .filme-card img:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -40,150 +39,130 @@
         <div class="left-panel">
             <div class="box">
                 <h1 style="color: #E50914;">CineStream</h1>
-                <p>Modo Diagnóstico</p>
+                <p>Login Real</p>
 
-                <input type="email" id="email" placeholder="Digite um e-mail válido">
+                <input type="email" id="email" placeholder="E-mail">
                 <input type="password" id="password" placeholder="Senha (mín. 6 dígitos)">
 
                 <button id="btn-login" class="btn-entrar" onclick="processar('login')">ENTRAR</button>
-                <button id="btn-signup" class="btn-criar" onclick="processar('signup')">CRIAR CONTA NOVA</button>
+                <button id="btn-signup" class="btn-criar" onclick="processar('signup')">CRIAR CONTA</button>
             </div>
         </div>
 
         <div class="right-panel" id="debug-console">
-            <div style="color: yellow; font-weight: bold; margin-bottom: 10px;">CONSOLE DE DIAGNÓSTICO:</div>
-            </div>
+            <div style="color: yellow; font-weight: bold; margin-bottom: 15px;">STATUS DO SISTEMA:</div>
+        </div>
     </div>
 
     <div id="app-screen">
-        <h1>BEM-VINDO AO CINESTREAM!</h1>
-        <p>Login realizado com sucesso.</p>
-        <p>Usuário: <span id="user-display" style="color: #E50914;"></span></p>
+        <h1>BEM-VINDO!</h1>
+        <p>Logado como: <span id="user-display" style="color: #E50914;"></span></p>
         <br>
-        <div id="filmes-lista">Carregando filmes...</div>
-        <br>
-        <button onclick="sair()" style="width: 200px; background: #333; color: white; padding: 10px;">SAIR</button>
+        <div id="filmes-lista"></div>
+        <br><br>
+        <button onclick="sair()" style="width: 200px; background: #333; color: white;">SAIR</button>
     </div>
 
     <script>
-        // --- 1. CONFIGURAÇÃO (SUAS CHAVES) ---
+        // --- 1. CONFIGURAÇÃO ---
         const SUPABASE_URL = 'https://jfzgzkurjnznfnlvdghv.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impmemd6a3Vyam56bmZubHZkZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0NzI1NjUsImV4cCI6MjA4NTA0ODU2NX0.ntJQabnc1pJvlRwdyldLD7h-60WUN3bgtY2isHrwmDs';
 
-        // Função para escrever no painel preto à direita
+        // Função para escrever no painel preto
         function log(msg, type = 'info') {
             const painel = document.getElementById('debug-console');
             const div = document.createElement('div');
             div.className = `log-entry log-${type}`;
-            const hora = new Date().toLocaleTimeString();
-            div.innerText = `[${hora}] ${msg}`;
+            div.innerText = `> ${msg}`;
             painel.appendChild(div);
-            painel.scrollTop = painel.scrollHeight; // Rola pra baixo
         }
 
-        // --- 2. INICIALIZAR SUPABASE ---
-        let supabase;
+        // --- 2. INICIAR CONEXÃO ---
+        // Usei "clienteSupabase" para evitar o erro de nome duplicado
+        let clienteSupabase; 
+
         try {
-            log("Iniciando biblioteca Supabase...", "info");
-            if (!window.supabase) throw new Error("A biblioteca Supabase não carregou. Verifique sua internet.");
-            
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            log("Supabase iniciado com sucesso!", "success");
+            if (!window.supabase) {
+                log("ERRO: A biblioteca Supabase não carregou. Verifique sua internet.", "error");
+            } else {
+                clienteSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                log("Sistema iniciado. Conexão pronta.", "success");
+            }
         } catch (e) {
-            log("ERRO FATAL: " + e.message, "error");
-            alert("Erro: " + e.message);
+            log("ERRO FATAL NO CÓDIGO: " + e.message, "error");
         }
 
-        // --- 3. FUNÇÃO PRINCIPAL (LOGIN/CRIAR) ---
+        // --- 3. FUNÇÃO PROCESSAR (Login/Criar) ---
         async function processar(acao) {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const btnLogin = document.getElementById('btn-login');
-            const btnSignup = document.getElementById('btn-signup');
+            
+            if (!email || !password) return log("Erro: Preencha e-mail e senha.", "error");
+            if (password.length < 6) return log("Erro: Senha muito curta (mínimo 6).", "error");
 
-            // Validações básicas
-            if (!email.includes('@')) {
-                log("Erro: E-mail inválido digitado.", "error");
-                return alert("Digite um e-mail válido.");
-            }
-            if (password.length < 6) {
-                log("Erro: Senha muito curta (mínimo 6).", "error");
-                return alert("A senha precisa ter pelo menos 6 números/letras.");
-            }
-
-            // Trava botões para não clicar 2 vezes
-            btnLogin.disabled = true;
-            btnLogin.innerText = "Aguarde...";
-            btnSignup.style.display = 'none';
+            log("Aguarde... Processando...", "info");
 
             try {
-                let result;
-                
+                let resultado;
+
                 if (acao === 'signup') {
-                    log(`Tentando CRIAR conta para: ${email}...`, "info");
-                    result = await supabase.auth.signUp({ email, password });
+                    // Tenta Criar
+                    resultado = await clienteSupabase.auth.signUp({ email, password });
                 } else {
-                    log(`Tentando ENTRAR com: ${email}...`, "info");
-                    result = await supabase.auth.signInWithPassword({ email, password });
+                    // Tenta Entrar
+                    resultado = await clienteSupabase.auth.signInWithPassword({ email, password });
                 }
 
-                // Verifica erros do Supabase
-                if (result.error) {
-                    throw result.error; // Joga pro catch
-                }
-
-                // Sucesso!
-                log("Sucesso! Operação realizada.", "success");
+                if (resultado.error) {
+                    // Se o servidor recusou
+                    log("FALHA: " + resultado.error.message, "error");
+                    
+                    // Traduções comuns de erro
+                    if(resultado.error.message.includes("Invalid login")) log("Dica: E-mail ou senha errados.", "info");
+                    if(resultado.error.message.includes("already registered")) log("Dica: Esse e-mail já existe. Tente ENTRAR.", "info");
                 
-                if (acao === 'signup' && !result.data.session) {
-                    log("Conta criada, MAS precisa confirmar e-mail! Vá no Supabase e desative 'Confirm Email' se quiser login direto.", "error");
-                    alert("Conta criada! Se o login não foi automático, verifique se você desativou a confirmação de e-mail no painel.");
+                } else {
+                    // SUCESSO!
+                    log("SUCESSO! Operação realizada.", "success");
+                    if (acao === 'signup' && !resultado.data.session) {
+                        log("⚠️ ATENÇÃO: Conta criada, mas o login automático falhou. Verifique se você desativou a confirmação de e-mail no painel do Supabase.", "error");
+                    }
                 }
 
             } catch (erro) {
-                log("ERRO DO SERVIDOR: " + erro.message, "error");
-                alert("Ocorreu um erro: " + erro.message);
-            } finally {
-                // Destrava botões
-                btnLogin.disabled = false;
-                btnLogin.innerText = "ENTRAR";
-                btnSignup.style.display = 'inline-block';
+                log("ERRO DE CONEXÃO: " + erro.message, "error");
             }
         }
 
-        // --- 4. MONITORAR ESTADO (Se logar, muda a tela) ---
-        supabase.auth.onAuthStateChange((event, session) => {
-            log(`Status mudou: ${event}`, "info");
-            if (session) {
-                log(`Usuário conectado: ${session.user.email}`, "success");
-                abrirApp(session.user.email);
-            } else {
-                log("Nenhum usuário logado no momento.", "info");
-            }
-        });
+        // --- 4. MONITORAR SE ENTROU ---
+        if (clienteSupabase) {
+            clienteSupabase.auth.onAuthStateChange((event, session) => {
+                if (session) {
+                    log("Usuário detectado! Entrando...", "success");
+                    abrirApp(session.user.email);
+                }
+            });
+        }
 
-        // --- 5. ABRIR O APP E CARREGAR FILMES ---
+        // --- 5. TELA DO APP ---
         async function abrirApp(email) {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
             document.getElementById('user-display').innerText = email;
 
-            // Carregar filmes reais só pra testar
-            log("Buscando filmes na API...", "info");
+            // Busca filmes reais
             const res = await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=c3162eed0616407fa43134e07880c7d5&language=pt-BR`);
             const data = await res.json();
             
-            const container = document.getElementById('filmes-lista');
-            container.innerHTML = '';
-            data.results.slice(0, 5).forEach(f => {
-                container.innerHTML += `<img class="poster" src="https://image.tmdb.org/t/p/w200${f.poster_path}">`;
+            const lista = document.getElementById('filmes-lista');
+            lista.innerHTML = '';
+            data.results.slice(0, 6).forEach(f => {
+                lista.innerHTML += `<div class="filme-card"><img src="https://image.tmdb.org/t/p/w200${f.poster_path}"></div>`;
             });
-            log("Filmes carregados!", "success");
         }
 
         async function sair() {
-            log("Saindo...", "info");
-            await supabase.auth.signOut();
+            await clienteSupabase.auth.signOut();
             window.location.reload();
         }
 
