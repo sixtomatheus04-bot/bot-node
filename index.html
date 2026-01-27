@@ -3,136 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream V10 - Master</title>
+    <title>CineStream V11 - Ultimate</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
-        :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; --gold: #FFD700; --green: #25D366; --gray: #222; }
+        :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; --gold: #FFD700; --green: #2ecc71; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; text-decoration: none; font-family: 'Outfit', sans-serif; }
         body { background: var(--black); color: white; overflow-x: hidden; }
 
         /* UTILITÁRIOS */
         .screen { display: none; width: 100%; min-height: 100vh; }
-        .active-screen { display: flex; } /* Flex para centralizar logins */
-        .app-active { display: block; } /* Block para o App rolar */
+        .active-screen { display: flex; } 
+        .app-active { display: block; }
         
         .btn { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-red { background: var(--red); color: white; }
-        .btn-red:hover { background: #b20710; }
-        
-        /* 1. AUTH SCREEN */
+        .btn-green { background: var(--green); color: black; }
+        .btn:hover { opacity: 0.8; transform: scale(1.05); }
+
+        /* 1. LOGIN SCREEN */
         #auth-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 2000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 3000;
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
             background-size: cover; align-items: center; justify-content: center; flex-direction: column;
         }
         .auth-box { background: rgba(0,0,0,0.85); padding: 50px; border-radius: 12px; width: 400px; text-align: center; border: 1px solid #333; backdrop-filter: blur(10px); }
-        .auth-input { width: 100%; padding: 15px; background: #333; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; font-size: 16px; }
+        .auth-input { width: 100%; padding: 15px; background: #333; border: 1px solid #444; color: white; margin-bottom: 15px; border-radius: 5px; }
 
-        /* 2. ADMIN SCREEN (Super Completo) */
-        #admin-screen { background: #111; flex-direction: column; padding: 0; }
+        /* 2. ADMIN SCREEN */
+        #admin-screen { background: #111; padding: 0; }
         .admin-sidebar { width: 250px; background: #000; border-right: 1px solid #333; height: 100vh; position: fixed; padding: 20px; }
         .admin-content { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
-        .admin-menu-item { padding: 15px; cursor: pointer; color: #aaa; font-weight: bold; border-radius: 5px; margin-bottom: 5px; }
+        .admin-menu-item { padding: 15px; cursor: pointer; color: #aaa; font-weight: bold; margin-bottom: 5px; display: flex; gap: 10px; align-items: center; }
         .admin-menu-item:hover, .admin-menu-item.active { background: #222; color: white; border-left: 4px solid var(--green); }
         
-        /* Admin Chat */
-        .chat-layout { display: flex; height: 70vh; background: #1a1a1a; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
-        .chat-users-list { width: 30%; border-right: 1px solid #333; overflow-y: auto; background: #111; }
-        .chat-user-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .chat-user-item:hover { background: #222; }
-        .chat-user-item.unread { border-left: 3px solid var(--red); background: #1a0505; }
-        .chat-area { width: 70%; display: flex; flex-direction: column; background: #0d0d0d; }
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .chat-input-area { padding: 15px; background: #1a1a1a; display: flex; gap: 10px; }
+        table { width: 100%; border-collapse: collapse; background: #1a1a1a; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #222; color: var(--green); }
+
+        /* Chat Layout (Admin & User) */
+        .chat-layout { display: flex; height: 60vh; background: #1a1a1a; border-radius: 10px; border: 1px solid #333; overflow: hidden; }
+        .chat-sidebar { width: 30%; border-right: 1px solid #333; overflow-y: auto; background: #111; }
+        .chat-main { width: 70%; display: flex; flex-direction: column; background: #0d0d0d; }
+        .chat-feed { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-input { padding: 15px; background: #1a1a1a; display: flex; gap: 10px; }
+        
+        .msg { padding: 8px 15px; border-radius: 10px; max-width: 70%; font-size: 14px; }
+        .msg.me { background: var(--green); color: black; align-self: flex-end; }
+        .msg.other { background: #333; color: white; align-self: flex-start; }
 
         /* 3. APP SCREEN */
         #app-screen { display: none; }
         
-        /* Navbar com Pesquisa */
+        /* Navbar & Search */
         .nav { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, black, transparent); z-index: 100; transition: 0.3s; }
         .nav.black { background: #000; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-        .search-bar { background: rgba(255,255,255,0.1); border: 1px solid #444; border-radius: 20px; padding: 5px 15px; display: flex; align-items: center; width: 300px; backdrop-filter: blur(5px); }
-        .search-bar input { background: transparent; border: none; color: white; width: 100%; outline: none; margin-left: 10px; }
+        .search-container { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 5px 15px; display: flex; align-items: center; width: 300px; backdrop-filter: blur(5px); }
+        .search-container input { background: transparent; border: none; color: white; width: 100%; margin-left: 10px; }
 
-        /* Sidebar Usuário */
-        .sidebar { position: fixed; top: 0; left: 0; width: 250px; height: 100vh; background: #000; border-right: 1px solid #333; z-index: 200; transform: translateX(-100%); transition: 0.4s; padding-top: 80px; }
+        /* Sidebar User */
+        .sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: #000; border-right: 1px solid #333; z-index: 200; transform: translateX(-100%); transition: 0.4s; padding-top: 80px; }
         .sidebar.open { transform: translateX(0); }
-        .sidebar-item { padding: 15px 30px; display: flex; align-items: center; gap: 15px; color: #aaa; cursor: pointer; transition: 0.2s; }
-        .sidebar-item:hover { color: white; background: #1a1a1a; border-left: 4px solid var(--red); }
+        .menu-item { padding: 15px 30px; display: flex; align-items: center; gap: 15px; color: #ccc; cursor: pointer; transition: 0.2s; font-size: 16px; }
+        .menu-item:hover { color: white; background: #1a1a1a; border-left: 4px solid var(--red); }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
 
-        /* Conteúdo Infinito */
-        .hero { height: 85vh; background-size: cover; background-position: center; position: relative; margin-top: -70px; }
+        /* Content Sections */
+        .page-section { display: none; padding-top: 80px; padding-bottom: 50px; min-height: 100vh; animation: fadeIn 0.5s; }
+        .page-section.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Hero & Posters */
+        .hero { height: 85vh; background-size: cover; background-position: center; position: relative; margin-top: -80px; }
         .hero-content { position: absolute; bottom: 20%; left: 4%; max-width: 700px; text-shadow: 2px 2px 10px black; }
-        .container-fluid { padding: 0 4%; margin-top: -100px; position: relative; z-index: 10; padding-bottom: 50px; }
-        .row { margin-bottom: 40px; }
-        .row h2 { font-size: 20px; margin-bottom: 10px; border-left: 4px solid var(--red); padding-left: 10px; color: #eee; }
+        .row { margin-bottom: 40px; padding-left: 4%; }
         .posters { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
         .poster { width: 160px; height: 240px; border-radius: 8px; cursor: pointer; transition: 0.3s; object-fit: cover; }
         .poster:hover { transform: scale(1.1); z-index: 10; }
 
-        /* Tela de Chat do Usuário */
-        #user-chat-interface { height: 80vh; background: #111; border-radius: 10px; display: flex; flex-direction: column; margin-top: 20px; border: 1px solid #333; }
-        .msg { padding: 10px 15px; border-radius: 10px; max-width: 70%; font-size: 14px; line-height: 1.4; }
-        .msg.me { background: var(--green); color: black; align-self: flex-end; border-bottom-right-radius: 0; }
-        .msg.other { background: #333; color: white; align-self: flex-start; border-bottom-left-radius: 0; }
-        .msg-time { font-size: 10px; opacity: 0.7; text-align: right; margin-top: 5px; }
+        /* TV Player */
+        #tv-player-box { width: 90%; max-width: 900px; margin: 20px auto; background: black; aspect-ratio: 16/9; border: 1px solid #333; }
+        video { width: 100%; height: 100%; }
+        .channel-grid { display: flex; gap: 10px; overflow-x: auto; padding: 20px 4%; }
+        .channel-btn { min-width: 120px; padding: 15px; background: #222; text-align: center; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+        .channel-btn:hover { border-color: var(--red); background: #333; }
 
         /* Modais */
         #video-modal, #paywall-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; align-items: center; justify-content: center; }
         iframe { width: 100%; height: 100%; border: none; }
-        .close-btn { position: absolute; top: 20px; right: 30px; font-size: 40px; cursor: pointer; z-index: 6000; text-shadow: 0 0 5px black; }
-        .search-results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; padding: 100px 4%; display: none; }
+        .close-btn { position: absolute; top: 20px; right: 30px; font-size: 40px; cursor: pointer; z-index: 6000; }
+        
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; padding: 20px 4%; }
 
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" class="screen active-screen">
+    <div id="auth-screen" class="active-screen">
         <div class="auth-box">
             <h1 style="color:var(--red); font-size:45px; margin-bottom:10px; font-weight:800;">CINESTREAM</h1>
-            <p style="color:#aaa; margin-bottom:30px; font-size:12px;">V10 MASTER EDITION</p>
-            <p id="msg-error" style="color: #ff5555; display: none; margin-bottom: 15px;"></p>
+            <p style="color:#aaa; margin-bottom:30px;">V11 MASTER</p>
+            <p id="msg-error" style="color:#ff5555; display:none; margin-bottom:10px;"></p>
             
-            <input type="text" id="email" class="auth-input" placeholder="Email (ou 'admin')">
-            <input type="password" id="pass" class="auth-input" placeholder="Senha">
+            <input type="text" id="login-email" class="auth-input" placeholder="Email ou 'admin'">
+            <input type="password" id="login-pass" class="auth-input" placeholder="Senha">
             
-            <button class="btn btn-red" style="width:100%" onclick="login()">ACESSAR</button>
-            <p style="margin-top:20px; color:#ccc; font-size:14px; cursor:pointer;" onclick="criarContaUI()">Novo? <u>Criar conta</u></p>
+            <button class="btn btn-red" style="width:100%" onclick="loginSystem()">ENTRAR</button>
+            <p style="margin-top:20px; color:#ccc; font-size:14px; cursor:pointer;" onclick="criarContaUI()">Novo aqui? <u>Criar conta</u></p>
         </div>
     </div>
 
     <div id="admin-screen" class="screen">
         <div class="admin-sidebar">
-            <h2 style="color:var(--green); margin-bottom:40px;">PAINEL ADMIN</h2>
-            <div class="admin-menu-item active" onclick="showAdminTab('users')"><i class="fas fa-users"></i> Usuários</div>
-            <div class="admin-menu-item" onclick="showAdminTab('chat')"><i class="fas fa-comments"></i> Bate-papo Suporte</div>
+            <h2 style="color:var(--green); margin-bottom:40px;">ADMIN PAINEL</h2>
+            <div class="admin-menu-item active" onclick="tabAdmin('users')"><i class="fas fa-users"></i> Usuários</div>
+            <div class="admin-menu-item" onclick="tabAdmin('chat')"><i class="fas fa-comments"></i> Chat Suporte</div>
             <div class="admin-menu-item" onclick="logout()" style="color:#ff5555; margin-top:50px;"><i class="fas fa-power-off"></i> Sair</div>
         </div>
 
         <div class="admin-content">
-            <div id="adm-tab-users">
-                <h2 style="margin-bottom:20px;">Gerenciar Usuários</h2>
-                <table style="width:100%; border-collapse:collapse; background:#1a1a1a;">
-                    <thead><tr style="background:#222; color:var(--green);"><th style="padding:15px;">Email</th><th>Senha</th><th>Plano</th><th>Ação</th></tr></thead>
+            <div id="adm-users">
+                <h2 style="margin-bottom:20px;">Gerenciar Assinaturas</h2>
+                <table style="width:100%;">
+                    <thead><tr><th>Email</th><th>Senha</th><th>Plano Atual</th><th>Ações</th></tr></thead>
                     <tbody id="user-table"></tbody>
                 </table>
             </div>
-
-            <div id="adm-tab-chat" style="display:none;">
-                <h2 style="margin-bottom:20px;">Suporte ao Cliente</h2>
+            <div id="adm-chat" style="display:none;">
+                <h2 style="margin-bottom:20px;">Atendimento ao Cliente</h2>
                 <div class="chat-layout">
-                    <div class="chat-users-list" id="chat-list">
-                        </div>
-                    <div class="chat-area">
-                        <div id="admin-chat-feed" class="chat-messages">
-                            <p style="color:#666; text-align:center; margin-top:50px;">Selecione um usuário para conversar.</p>
-                        </div>
-                        <div class="chat-input-area" id="admin-chat-input" style="display:none;">
-                            <input type="text" id="adm-msg-input" class="auth-input" style="margin:0;" placeholder="Digite sua resposta...">
-                            <button class="btn btn-red" onclick="adminSendMsg()">Enviar</button>
+                    <div class="chat-sidebar" id="admin-chat-list"></div>
+                    <div class="chat-main">
+                        <div class="chat-feed" id="admin-chat-feed"><p style="color:#555; text-align:center; margin-top:20px;">Selecione um usuário.</p></div>
+                        <div class="chat-input" id="admin-chat-input" style="display:none;">
+                            <input type="text" id="adm-msg" class="auth-input" style="margin:0;" placeholder="Responder...">
+                            <button class="btn btn-green" onclick="sendAdminMsg()">Enviar</button>
                         </div>
                     </div>
                 </div>
@@ -140,119 +148,133 @@
         </div>
     </div>
 
-    <div id="app-screen" class="screen app-active">
+    <div id="app-screen" class="screen">
         
         <nav class="nav" id="navbar">
             <div style="display:flex; align-items:center; gap:20px;">
                 <i class="fas fa-bars" style="font-size:24px; cursor:pointer;" onclick="toggleSidebar()"></i>
                 <div style="font-size:24px; font-weight:bold; color:var(--red);">CINESTREAM</div>
             </div>
-            
-            <div class="search-bar">
+            <div class="search-container">
                 <i class="fas fa-search" style="color:#aaa;"></i>
-                <input type="text" id="search-input" placeholder="Pesquisar filmes, séries..." onkeyup="searchContent()">
+                <input type="text" id="search-bar" placeholder="Buscar filmes..." onkeyup="doSearch()">
             </div>
-
             <div style="display:flex; align-items:center; gap:15px;">
-                <div id="user-plan-badge" style="background:#333; padding:5px 10px; border-radius:4px; font-size:12px;">FREE</div>
-                <i class="fas fa-user-circle" style="font-size:28px; cursor:pointer;" onclick="navTo('profile')"></i>
+                <div id="badge-plan" style="background:#333; padding:5px 10px; border-radius:4px; font-size:12px;">FREE</div>
+                <i class="fas fa-user-circle" style="font-size:28px; cursor:pointer;" onclick="nav('profile')"></i>
             </div>
         </nav>
 
         <div class="overlay" onclick="toggleSidebar()"></div>
         <div class="sidebar" id="sidebar">
-            <div class="sidebar-item" onclick="navTo('home')"><i class="fas fa-home"></i> Início</div>
-            <div class="sidebar-item" onclick="navTo('chat')"><i class="fas fa-headset"></i> Suporte Chat <span style="font-size:10px; background:var(--red); padding:2px 5px; border-radius:4px; margin-left:auto;">LIVE</span></div>
-            <div class="sidebar-item" onclick="navTo('config')"><i class="fas fa-cog"></i> Configurações</div>
+            <div class="menu-item" onclick="nav('home')"><i class="fas fa-home"></i> Início</div>
+            <div class="menu-item" onclick="nav('movies')"><i class="fas fa-film"></i> Filmes</div>
+            <div class="menu-item" onclick="nav('series')"><i class="fas fa-tv"></i> Séries</div>
+            <div class="menu-item" onclick="nav('trending')"><i class="fas fa-fire"></i> Em Alta</div>
+            <div class="menu-item" onclick="nav('tv')"><i class="fas fa-broadcast-tower"></i> TV Ao Vivo</div>
             <hr style="border-color:#333;">
-            <div class="sidebar-item" onclick="logout()" style="color:#ff5555;"><i class="fas fa-sign-out-alt"></i> Sair</div>
+            <div class="menu-item" onclick="nav('profile')"><i class="fas fa-user"></i> Perfil</div>
+            <div class="menu-item" onclick="nav('config')"><i class="fas fa-cog"></i> Configurações</div>
+            <div class="menu-item" onclick="nav('support')"><i class="fas fa-headset"></i> Suporte</div>
+            <div class="menu-item" onclick="logout()" style="color:#ff5555;"><i class="fas fa-sign-out-alt"></i> Sair</div>
         </div>
 
-        <div id="sec-home">
+        <div id="page-home" class="page-section active" style="padding:0;">
             <div class="hero" id="hero">
                 <div class="hero-content">
-                    <h1 id="hero-title" style="font-size:50px; font-weight:800; line-height:1;">...</h1>
-                    <p id="hero-desc" style="margin:20px 0; max-width:600px; line-height:1.5;">...</p>
-                    <button class="btn btn-red" onclick="playHero()">▶ ASSISTIR AGORA</button>
+                    <h1 id="hero-title" style="font-size:50px; font-weight:800;">Carregando...</h1>
+                    <p id="hero-desc">...</p>
+                    <button class="btn btn-red" onclick="playHero()">▶ ASSISTIR</button>
                 </div>
             </div>
-            <div class="container-fluid" id="infinite-container">
-                </div>
+            <div style="margin-top:-100px; position:relative; z-index:10; padding:0 4%;">
+                <div id="dynamic-rows"></div> </div>
         </div>
 
-        <div id="sec-search" class="search-results-grid"></div>
+        <div id="page-search" class="page-section result-grid"></div>
 
-        <div id="sec-chat" style="display:none; padding:100px 4%;">
+        <div id="page-grid" class="page-section result-grid"></div>
+
+        <div id="page-tv" class="page-section" style="padding:100px 4%;">
+            <h2 style="margin-bottom:20px; color:var(--red);">📺 TV Ao Vivo (Grátis)</h2>
+            <div id="tv-player-box"><video id="tv-video" controls></video></div>
+            <div class="channel-grid">
+                <div class="channel-btn" onclick="playChannel('https://stmv1.srvif.com/recordnews/recordnews/playlist.m3u8')">Record News</div>
+                <div class="channel-btn" onclick="playChannel('https://cdn.jmvstream.com/w/CA-1361/index.m3u8')">Rede Brasil</div>
+                <div class="channel-btn" onclick="playChannel('https://59f1cbe63db89.streamlock.net:1443/tvcatiafonseca/tvcatiafonseca/playlist.m3u8')">TV Gazeta</div>
+                <div class="channel-btn" onclick="playChannel('https://nasa-i.akamaihd.net/hls/live/253565/NASA-NTV1-Public/master.m3u8')">NASA TV</div>
+                <div class="channel-btn" onclick="playChannel('https://rbmn-live.akamaized.net/hls/live/590964/Bootsy/master.m3u8')">Red Bull TV</div>
+            </div>
+        </div>
+
+        <div id="page-support" class="page-section" style="padding:100px 4%;">
             <div style="max-width:800px; margin:0 auto;">
-                <h2 style="margin-bottom:20px;">💬 Fale com o Suporte</h2>
-                <div class="chat-layout" style="height:60vh;">
-                    <div class="chat-area" style="width:100%;">
-                        <div id="user-chat-feed" class="chat-messages"></div>
-                        <div class="chat-input-area" style="background:#111;">
-                            <input type="text" id="user-msg-input" class="auth-input" style="margin:0;" placeholder="Digite aqui...">
-                            <button class="btn btn-red" onclick="userSendMsg()">Enviar</button>
+                <h2>💬 Fale com o Suporte</h2>
+                <div class="chat-layout" style="margin-top:20px;">
+                    <div class="chat-main" style="width:100%;">
+                        <div class="chat-feed" id="user-chat-feed"></div>
+                        <div class="chat-input">
+                            <input type="text" id="user-msg" class="auth-input" style="margin:0;" placeholder="Digite...">
+                            <button class="btn btn-red" onclick="sendUserMsg()">Enviar</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="sec-profile" style="display:none; padding:100px 4%;">
-            <h2>Meu Perfil</h2>
+        <div id="page-profile" class="page-section" style="padding:100px 4%;">
+            <h2>👤 Meu Perfil</h2>
             <div class="auth-box" style="margin-top:20px; text-align:left;">
-                <p>Email: <span id="prof-email"></span></p>
-                <p>Plano: <span id="prof-plan" style="color:var(--gold);"></span></p>
+                <p>Email: <strong id="prof-email"></strong></p>
+                <p>Plano: <strong id="prof-plan" style="color:var(--gold);"></strong></p>
+                <p style="margin-top:20px; color:#aaa;">ID: <span id="prof-id"></span></p>
             </div>
+        </div>
+        
+        <div id="page-config" class="page-section" style="padding:100px 4%;">
+            <h2>⚙️ Configurações</h2>
+            <p>Opções de qualidade e conta (em breve).</p>
         </div>
 
     </div>
 
     <div id="video-modal">
-        <div class="close-btn" onclick="fecharPlayer()">×</div>
+        <div class="close-btn" onclick="closePlayer()">×</div>
         <div style="position:absolute; top:20px; left:20px; z-index:6001; display:flex; gap:10px;">
-            <button class="btn" style="background:rgba(0,0,0,0.5); color:white; border:1px solid #555;" onclick="swapPlayer(1)">🇧🇷 Player 1</button>
-            <button class="btn" style="background:rgba(0,0,0,0.5); color:white; border:1px solid #555;" onclick="swapPlayer(2)">🇺🇸 Player 2</button>
+            <button class="btn" style="background:rgba(0,0,0,0.5); color:white; border:1px solid #555;" onclick="setSource(1)">🇧🇷 Player 1</button>
+            <button class="btn" style="background:rgba(0,0,0,0.5); color:white; border:1px solid #555;" onclick="setSource(2)">🇺🇸 Player 2</button>
         </div>
         <iframe id="video-frame" allowfullscreen></iframe>
     </div>
 
+    <div id="paywall-modal">
+        <div class="auth-box" style="border-color:var(--gold);">
+            <h1 style="font-size:50px;">🔒</h1>
+            <h2>Premium</h2>
+            <p>Peça ao Admin para liberar sua conta.</p>
+            <button class="btn btn-red" onclick="document.getElementById('paywall-modal').style.display='none'">Fechar</button>
+        </div>
+    </div>
+
     <script>
-        // === BANCO DE DADOS (LOCALSTORAGE) ===
-        const DB_USERS = 'cine_v10_users';
-        const DB_CHATS = 'cine_v10_chats'; // [{ email: 'user@x', msgs: [{sender:'user', text:'oi'}] }]
-        const API_KEY = 'c3162eed0616407fa43134e07880c7d5';
-        const BASE_URL = 'https://api.themoviedb.org/3';
+        // === BANCO DE DADOS ===
+        const DB_USERS = 'cine_v11_users';
+        const DB_CHATS = 'cine_v11_chats';
+        const API = 'c3162eed0616407fa43134e07880c7d5';
+        const BASE = 'https://api.themoviedb.org/3';
         
-        let currentUser = null;
-        let activeChatUser = null; // Admin selecionou este user
-        let heroId = 0, currentPlayerId = 0;
+        let currentUser = null, activeChat = null, heroId = 0, currentPlayerId = 0;
+        const getDB = k => JSON.parse(localStorage.getItem(k)) || [];
+        const saveDB = (k,v) => localStorage.setItem(k, JSON.stringify(v));
 
-        // DB Helpers
-        const getDB = (k) => JSON.parse(localStorage.getItem(k)) || [];
-        const saveDB = (k, v) => localStorage.setItem(k, JSON.stringify(v));
-
-        // === INICIALIZAÇÃO ===
         window.onload = () => {
-            // Genres list for Infinite Scroll
-            const genres = [
-                {id: 28, name: "Ação"}, {id: 12, name: "Aventura"}, {id: 16, name: "Animação"}, {id: 35, name: "Comédia"},
-                {id: 80, name: "Crime"}, {id: 99, name: "Documentário"}, {id: 18, name: "Drama"}, {id: 10751, name: "Família"},
-                {id: 14, name: "Fantasia"}, {id: 36, name: "História"}, {id: 27, name: "Terror"}, {id: 10402, name: "Música"},
-                {id: 9648, name: "Mistério"}, {id: 10749, name: "Romance"}, {id: 878, name: "Ficção Científica"},
-                {id: 10770, name: "TV Movie"}, {id: 53, name: "Thriller"}, {id: 10752, name: "Guerra"}, {id: 37, name: "Faroeste"}
-            ];
-            
-            const session = JSON.parse(localStorage.getItem('cineSession'));
-            if(session) {
-                if(session.role === 'admin') {
-                    initAdmin();
-                } else {
-                    const users = getDB(DB_USERS);
-                    const user = users.find(u => u.email === session.email);
-                    if(user) {
-                        currentUser = user;
-                        initApp(genres);
-                    } else logout();
+            const sess = JSON.parse(localStorage.getItem('cineSession'));
+            if(sess) {
+                if(sess.role === 'admin') initAdmin();
+                else {
+                    const u = getDB(DB_USERS).find(x => x.email === sess.email);
+                    if(u) { currentUser = u; initApp(); } 
+                    else logout();
                 }
             } else {
                 document.getElementById('auth-screen').style.display = 'flex';
@@ -260,286 +282,253 @@
         };
 
         // === AUTH ===
-        function login() {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('pass').value;
-            
-            if(email === 'admin' && pass === 'admin') {
-                localStorage.setItem('cineSession', JSON.stringify({role: 'admin'}));
-                location.reload();
-                return;
+        function loginSystem() {
+            const e = document.getElementById('login-email').value;
+            const p = document.getElementById('login-pass').value;
+            if(e === 'admin' && p === 'admin') {
+                localStorage.setItem('cineSession', JSON.stringify({role:'admin'}));
+                location.reload(); return;
             }
-
-            const users = getDB(DB_USERS);
-            const user = users.find(u => u.email === email && u.pass === pass);
-            
-            if(user) {
-                localStorage.setItem('cineSession', JSON.stringify(user));
+            const u = getDB(DB_USERS).find(x => x.email === e && x.pass === p);
+            if(u) {
+                localStorage.setItem('cineSession', JSON.stringify(u));
                 location.reload();
             } else {
+                document.getElementById('msg-error').innerText = "Erro no login.";
                 document.getElementById('msg-error').style.display = 'block';
-                document.getElementById('msg-error').innerText = 'Dados inválidos.';
             }
         }
 
         function criarContaUI() {
-            const email = prompt("Email:"); if(!email) return;
-            const pass = prompt("Senha:"); if(!pass) return;
-            const users = getDB(DB_USERS);
-            if(users.find(u => u.email === email)) return alert("Email já existe!");
-            users.push({ email, pass, plan: 'free' });
-            saveDB(DB_USERS, users);
-            alert("Criado! Faça login.");
+            const e = prompt("Email:"); if(!e) return;
+            const p = prompt("Senha:"); if(!p) return;
+            const db = getDB(DB_USERS);
+            if(db.find(x => x.email === e)) return alert("Email já existe!");
+            db.push({ email: e, pass: p, plan: 'free' });
+            saveDB(DB_USERS, db);
+            alert("Conta criada! Entre agora.");
         }
 
         function logout() { localStorage.removeItem('cineSession'); location.reload(); }
 
-        // === ADMIN LOGIC ===
+        // === ADMIN ===
         function initAdmin() {
             document.getElementById('auth-screen').style.display='none';
             document.getElementById('admin-screen').style.display='flex';
-            loadAdminUsers();
-            
-            // Auto refresh Chat and Users
-            setInterval(() => {
-                if(document.getElementById('adm-tab-users').style.display !== 'none') loadAdminUsers();
-                if(document.getElementById('adm-tab-chat').style.display !== 'none') loadChatList();
-                if(activeChatUser) loadAdminChatFeed(activeChatUser);
-            }, 2000);
+            renderUsers();
+            setInterval(() => { if(activeChat) loadAdminChat(activeChat); }, 2000);
         }
 
-        function showAdminTab(tab) {
-            document.getElementById('adm-tab-users').style.display = tab === 'users' ? 'block' : 'none';
-            document.getElementById('adm-tab-chat').style.display = tab === 'chat' ? 'block' : 'none';
-            if(tab === 'chat') loadChatList();
+        function tabAdmin(t) {
+            document.getElementById('adm-users').style.display = t === 'users'?'block':'none';
+            document.getElementById('adm-chat').style.display = t === 'chat'?'block':'none';
+            if(t === 'users') renderUsers();
+            if(t === 'chat') renderChatList();
         }
 
-        function loadAdminUsers() {
-            const users = getDB(DB_USERS);
-            const tbody = document.getElementById('user-table');
-            // Só redesenha se mudou tamanho (simples otimização)
-            if(tbody.childElementCount !== users.length) {
-                tbody.innerHTML = '';
-                users.forEach((u, i) => {
-                    tbody.innerHTML += `<tr><td style="padding:15px;">${u.email}</td><td>${u.pass}</td><td>${u.plan.toUpperCase()}</td><td><button onclick="delUser(${i})" style="color:red;background:none;border:none;cursor:pointer;">Excluir</button></td></tr>`;
-                });
-            }
+        function renderUsers() {
+            const tbody = document.getElementById('user-table'); tbody.innerHTML='';
+            getDB(DB_USERS).forEach((u, i) => {
+                const btnTxt = u.plan === 'free' ? '👑 VIRAR PREMIUM' : '⬇️ VIRAR FREE';
+                const color = u.plan === 'free' ? 'var(--gold)' : '#ccc';
+                tbody.innerHTML += `<tr><td>${u.email}</td><td>${u.pass}</td><td>${u.plan.toUpperCase()}</td><td><button onclick="togglePlan(${i})" style="padding:5px; background:${color}; border:none; cursor:pointer; font-weight:bold; border-radius:4px;">${btnTxt}</button> <button onclick="delUser(${i})" style="color:red; background:none; border:none; cursor:pointer; margin-left:10px;">X</button></td></tr>`;
+            });
+        }
+
+        function togglePlan(i) {
+            const db = getDB(DB_USERS);
+            db[i].plan = db[i].plan === 'free' ? 'premium' : 'free';
+            saveDB(DB_USERS, db); renderUsers();
         }
 
         function delUser(i) {
             if(confirm("Excluir?")) {
-                const users = getDB(DB_USERS);
-                users.splice(i, 1);
-                saveDB(DB_USERS, users);
-                loadAdminUsers();
+                const db = getDB(DB_USERS); db.splice(i, 1);
+                saveDB(DB_USERS, db); renderUsers();
             }
         }
 
-        // --- CHAT SYSTEM (ADMIN SIDE) ---
-        function loadChatList() {
-            const chats = getDB(DB_CHATS);
-            const list = document.getElementById('chat-list');
-            list.innerHTML = '';
-            chats.forEach(c => {
-                const lastMsg = c.msgs[c.msgs.length-1];
-                list.innerHTML += `<div class="chat-user-item" onclick="openAdminChat('${c.email}')">
-                    <i class="fas fa-user-circle" style="font-size:30px;"></i>
-                    <div>
-                        <div style="font-weight:bold; font-size:14px;">${c.email}</div>
-                        <div style="font-size:12px; color:#777;">${lastMsg ? lastMsg.text.substring(0, 20)+'...' : 'Novo'}</div>
-                    </div>
-                </div>`;
+        // === ADMIN CHAT ===
+        function renderChatList() {
+            const list = document.getElementById('admin-chat-list'); list.innerHTML='';
+            getDB(DB_CHATS).forEach(c => {
+                list.innerHTML += `<div style="padding:15px; border-bottom:1px solid #333; cursor:pointer;" onclick="openChat('${c.email}')"><strong>${c.email}</strong></div>`;
             });
         }
-
-        function openAdminChat(email) {
-            activeChatUser = email;
-            document.getElementById('admin-chat-input').style.display = 'flex';
-            loadAdminChatFeed(email);
+        function openChat(email) {
+            activeChat = email;
+            document.getElementById('admin-chat-input').style.display='flex';
+            loadAdminChat(email);
+        }
+        function loadAdminChat(email) {
+            const chat = getDB(DB_CHATS).find(c => c.email === email);
+            const feed = document.getElementById('admin-chat-feed'); feed.innerHTML='';
+            if(chat) chat.msgs.forEach(m => feed.innerHTML += `<div class="msg ${m.sender==='admin'?'me':'other'}">${m.text}</div>`);
+        }
+        function sendAdminMsg() {
+            const txt = document.getElementById('adm-msg').value; if(!txt) return;
+            const db = getDB(DB_CHATS); const c = db.find(x => x.email === activeChat);
+            c.msgs.push({sender:'admin', text:txt}); saveDB(DB_CHATS, db);
+            document.getElementById('adm-msg').value=''; loadAdminChat(activeChat);
         }
 
-        function loadAdminChatFeed(email) {
-            const chats = getDB(DB_CHATS);
-            const chat = chats.find(c => c.email === email);
-            const feed = document.getElementById('admin-chat-feed');
-            feed.innerHTML = '';
-            if(chat) {
-                chat.msgs.forEach(m => {
-                    const cls = m.sender === 'admin' ? 'me' : 'other';
-                    feed.innerHTML += `<div class="msg ${cls}">${m.text}</div>`;
-                });
-            }
-        }
-
-        function adminSendMsg() {
-            const txt = document.getElementById('adm-msg-input').value;
-            if(!txt) return;
-            const chats = getDB(DB_CHATS);
-            const chat = chats.find(c => c.email === activeChatUser);
-            if(chat) {
-                chat.msgs.push({ sender: 'admin', text: txt, time: Date.now() });
-                saveDB(DB_CHATS, chats);
-                document.getElementById('adm-msg-input').value = '';
-                loadAdminChatFeed(activeChatUser);
-            }
-        }
-
-        // === USER APP LOGIC ===
-        async function initApp(genres) {
+        // === APP USUÁRIO ===
+        async function initApp() {
             document.getElementById('auth-screen').style.display='none';
-            document.getElementById('app-screen').style.display='block'; // App Active
+            document.getElementById('app-screen').style.display='flex';
             
+            // Setup Profile
             document.getElementById('prof-email').innerText = currentUser.email;
             document.getElementById('prof-plan').innerText = currentUser.plan.toUpperCase();
+            document.getElementById('prof-id').innerText = Date.now(); // fake id
             
-            // Hero
-            const res = await fetch(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=pt-BR`);
-            const data = await res.json();
-            const hero = data.results[0];
-            heroId = hero.id;
-            document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, var(--black), transparent), url(https://image.tmdb.org/t/p/original${hero.backdrop_path})`;
-            document.getElementById('hero-title').innerText = hero.title;
-            document.getElementById('hero-desc').innerText = hero.overview;
+            // Badge UI
+            const b = document.getElementById('badge-plan');
+            b.innerText = currentUser.plan === 'premium' ? 'PREMIUM 👑' : 'FREE';
+            b.style.background = currentUser.plan === 'premium' ? 'var(--gold)' : '#333';
+            b.style.color = currentUser.plan === 'premium' ? 'black' : 'white';
+
+            // Load Content
+            const hRes = await fetch(`${BASE}/trending/movie/week?api_key=${API}&language=pt-BR`);
+            const hData = await hRes.json();
+            const h = hData.results[0];
+            heroId = h.id;
+            document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, var(--black), transparent), url(https://image.tmdb.org/t/p/original${h.backdrop_path})`;
+            document.getElementById('hero-title').innerText = h.title;
+            document.getElementById('hero-desc').innerText = h.overview;
 
             // Infinite Rows
-            const container = document.getElementById('infinite-container');
-            // 1. Trending Row
+            const container = document.getElementById('dynamic-rows');
+            container.innerHTML = '';
+            
+            // 1. Trending (Com Trava)
             container.innerHTML += `<div class="row"><h2>🔥 Em Alta</h2><div class="posters" id="row-trend"></div></div>`;
-            fillRow(data.results, 'row-trend');
+            fillPoster(hData.results, 'row-trend', true);
 
-            // 2. Genre Rows (Loop)
-            for (const g of genres) {
-                const rid = `row-${g.id}`;
-                container.innerHTML += `<div class="row"><h2>🎬 ${g.name}</h2><div class="posters" id="${rid}">Loading...</div></div>`;
+            // 2. Generos (Loop Infinito)
+            const genres = [{id:28,n:'Ação'},{id:16,n:'Animação'},{id:35,n:'Comédia'},{id:27,n:'Terror'},{id:878,n:'Sci-Fi'},{id:10749,n:'Romance'}];
+            for(let g of genres) {
+                const rid = `r-${g.id}`;
+                container.innerHTML += `<div class="row"><h2>🎬 ${g.n}</h2><div class="posters" id="${rid}">Loading...</div></div>`;
                 fetchAndFill(g.id, rid);
             }
 
-            // Chat Polling for User
+            // Security Check
             setInterval(() => {
-                if(document.getElementById('sec-chat').style.display !== 'none') loadUserChat();
-            }, 2000);
-            
-            // Security Logout Check
-            setInterval(() => {
-                const users = getDB(DB_USERS);
-                if(!users.find(u => u.email === currentUser.email)) {
-                    alert('Sua conta foi removida.'); logout();
-                }
+                const u = getDB(DB_USERS).find(x => x.email === currentUser.email);
+                if(!u) { alert('Conta removida.'); logout(); }
+                else if(u.plan !== currentUser.plan) { currentUser.plan = u.plan; localStorage.setItem('cineSession', JSON.stringify(currentUser)); location.reload(); }
             }, 3000);
+
+            // Chat Polling
+            setInterval(() => { if(document.getElementById('page-support').style.display === 'block') loadUserChat(); }, 2000);
         }
 
         async function fetchAndFill(gid, elId) {
-            const r = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${gid}&language=pt-BR`);
+            const r = await fetch(`${BASE}/discover/movie?api_key=${API}&with_genres=${gid}&language=pt-BR`);
             const d = await r.json();
-            fillRow(d.results, elId);
+            fillPoster(d.results, elId, false);
         }
 
-        function fillRow(list, elId) {
-            const el = document.getElementById(elId);
-            el.innerHTML = '';
+        function fillPoster(list, elId, isLocked) {
+            const el = document.getElementById(elId); el.innerHTML='';
             list.forEach(f => {
                 if(f.poster_path) {
-                    el.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="openVideo(${f.id})">`;
+                    const lock = isLocked && currentUser.plan !== 'premium';
+                    el.innerHTML += `<div class="poster-wrapper" onclick="tryPlay(${f.id}, ${lock})">
+                        <img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster">
+                        ${lock ? '<div class="lock-overlay"><i class="fas fa-lock"></i></div>' : ''}
+                    </div>`;
                 }
             });
         }
 
-        // --- USER CHAT LOGIC ---
-        function loadUserChat() {
-            const chats = getDB(DB_CHATS);
-            let chat = chats.find(c => c.email === currentUser.email);
-            const feed = document.getElementById('user-chat-feed');
-            feed.innerHTML = '';
-            if(chat) {
-                chat.msgs.forEach(m => {
-                    const cls = m.sender === 'user' ? 'me' : 'other';
-                    feed.innerHTML += `<div class="msg ${cls}">${m.text}</div>`;
-                });
-            } else {
-                feed.innerHTML = '<p style="text-align:center; color:#555;">Inicie uma conversa com o suporte.</p>';
-            }
-        }
-
-        function userSendMsg() {
-            const txt = document.getElementById('user-msg-input').value;
-            if(!txt) return;
-            const chats = getDB(DB_CHATS);
-            let chat = chats.find(c => c.email === currentUser.email);
-            if(!chat) {
-                chat = { email: currentUser.email, msgs: [] };
-                chats.push(chat);
-            }
-            chat.msgs.push({ sender: 'user', text: txt, time: Date.now() });
-            saveDB(DB_CHATS, chats);
-            document.getElementById('user-msg-input').value = '';
-            loadUserChat();
-        }
-
-        // --- SEARCH ---
-        async function searchContent() {
-            const q = document.getElementById('search-input').value;
-            const home = document.getElementById('sec-home');
-            const searchSec = document.getElementById('sec-search');
+        // --- NAVIGATION ---
+        function nav(page) {
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-'+page).style.display = 'none'; // reset all
             
-            if(q.length > 2) {
-                home.style.display = 'none';
-                searchSec.style.display = 'grid';
-                searchSec.innerHTML = '<p>Buscando...</p>';
-                
-                const r = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&language=pt-BR&query=${q}`);
-                const d = await r.json();
-                searchSec.innerHTML = '';
-                d.results.forEach(f => {
-                    if(f.poster_path) {
-                        searchSec.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" style="width:100%" onclick="openVideo(${f.id})">`;
-                    }
-                });
-            } else {
-                home.style.display = 'block';
-                searchSec.style.display = 'none';
-            }
-        }
+            // Hide all first
+            const sections = ['home', 'search', 'grid', 'tv', 'support', 'profile', 'config'];
+            sections.forEach(s => document.getElementById('page-'+s).classList.remove('active'));
 
-        // --- NAVIGATION & PLAYER ---
-        function navTo(page) {
-            document.getElementById('sec-home').style.display = 'none';
-            document.getElementById('sec-chat').style.display = 'none';
-            document.getElementById('sec-profile').style.display = 'none';
-            document.getElementById('sec-search').style.display = 'none';
+            const target = document.getElementById('page-'+page);
+            if(target) target.classList.add('active');
             
-            if(page === 'home') document.getElementById('sec-home').style.display = 'block';
-            if(page === 'chat') { document.getElementById('sec-chat').style.display = 'block'; loadUserChat(); }
-            if(page === 'profile') document.getElementById('sec-profile').style.display = 'block';
-            
-            document.getElementById('sidebar').classList.remove('open');
-            document.querySelector('.overlay').style.display = 'none';
+            if(page === 'trending') loadGrid(`${BASE}/trending/all/week?api_key=${API}&language=pt-BR`);
+            if(page === 'movies') loadGrid(`${BASE}/discover/movie?api_key=${API}&language=pt-BR`);
+            if(page === 'series') loadGrid(`${BASE}/discover/tv?api_key=${API}&language=pt-BR`);
+            if(page === 'support') loadUserChat();
+
+            toggleSidebar();
         }
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
-            document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+            document.querySelector('.overlay').style.display = document.getElementById('sidebar').classList.contains('open')?'block':'none';
         }
 
-        function playHero() { openVideo(heroId); }
-        function openVideo(id) {
-            currentPlayerId = id;
-            document.getElementById('video-modal').style.display = 'flex';
-            swapPlayer(1);
+        async function doSearch() {
+            const q = document.getElementById('search-bar').value;
+            if(q.length < 3) return;
+            nav('search');
+            const r = await fetch(`${BASE}/search/multi?api_key=${API}&language=pt-BR&query=${q}`);
+            const d = await r.json();
+            const el = document.getElementById('page-search'); el.innerHTML='';
+            d.results.forEach(f => {
+                if(f.poster_path) el.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="tryPlay(${f.id}, false)">`;
+            });
         }
-        function swapPlayer(n) {
+
+        async function loadGrid(url) {
+            const el = document.getElementById('page-grid'); el.innerHTML='Carregando...';
+            const r = await fetch(url); const d = await r.json(); el.innerHTML='';
+            d.results.forEach(f => {
+                if(f.poster_path) el.innerHTML += `<img src="https://image.tmdb.org/t/p/w300${f.poster_path}" class="poster" onclick="tryPlay(${f.id}, false)">`;
+            });
+            document.getElementById('page-grid').classList.add('active');
+        }
+
+        // --- PLAYER ---
+        function tryPlay(id, locked) {
+            if(locked) document.getElementById('paywall-modal').style.display='flex';
+            else { currentPlayerId = id; document.getElementById('video-modal').style.display='flex'; setSource(1); }
+        }
+        function playHero() { tryPlay(heroId, false); }
+        function setSource(n) {
             const f = document.getElementById('video-frame');
-            if(n===1) f.src = `https://embed.warezcdn.link/filme/${currentPlayerId}`;
-            if(n===2) f.src = `https://vidsrc.me/embed/movie?tmdb=${currentPlayerId}`;
+            if(n===1) f.src=`https://embed.warezcdn.link/filme/${currentPlayerId}`;
+            if(n===2) f.src=`https://vidsrc.me/embed/movie?tmdb=${currentPlayerId}`;
         }
-        function fecharPlayer() {
-            document.getElementById('video-modal').style.display = 'none';
-            document.getElementById('video-frame').src = '';
+        function closePlayer() { document.getElementById('video-modal').style.display='none'; document.getElementById('video-frame').src=''; }
+
+        // --- TV PLAYER ---
+        function playChannel(url) {
+            const video = document.getElementById('tv-video');
+            if(Hls.isSupported()) {
+                const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play());
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url; video.addEventListener('loadedmetadata',()=>video.play());
+            }
         }
 
-        window.onscroll = () => {
-            const nav = document.getElementById('navbar');
-            if(window.scrollY > 50) nav.classList.add('black'); else nav.classList.remove('black');
-        };
+        // --- USER CHAT ---
+        function loadUserChat() {
+            const db = getDB(DB_CHATS);
+            let c = db.find(x => x.email === currentUser.email);
+            const feed = document.getElementById('user-chat-feed'); feed.innerHTML='';
+            if(c) c.msgs.forEach(m => feed.innerHTML += `<div class="msg ${m.sender==='user'?'me':'other'}">${m.text}</div>`);
+        }
+        function sendUserMsg() {
+            const t = document.getElementById('user-msg').value; if(!t) return;
+            const db = getDB(DB_CHATS);
+            let c = db.find(x => x.email === currentUser.email);
+            if(!c) { c = {email:currentUser.email, msgs:[]}; db.push(c); }
+            c.msgs.push({sender:'user', text:t}); saveDB(DB_CHATS, db);
+            document.getElementById('user-msg').value=''; loadUserChat();
+        }
+
+        window.onscroll = () => { const n = document.getElementById('navbar'); window.scrollY>50?n.classList.add('black'):n.classList.remove('black'); }
     </script>
 </body>
 </html>
