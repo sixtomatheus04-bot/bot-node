@@ -3,239 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Netflix Clone - Filmes Grátis</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>CineStream Ultra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --red: #E50914;
-            --black: #141414;
-            --dark-gray: #181818;
+            --primary: #E50914;
+            --dark: #141414;
+            --gray: #AAA;
+            --gradient: linear-gradient(to top, #141414 10%, transparent 90%);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: var(--black);
+            background-color: var(--dark);
             color: white;
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            overflow-x: hidden; /* Remove rolagem lateral da página */
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
-        /* --- NAVBAR --- */
+        /* --- ANIMAÇÕES (KEYFRAMES) --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes zoomSlow { from { transform: scale(1); } to { transform: scale(1.15); } }
+        @keyframes glow { 0% { box-shadow: 0 0 5px var(--primary); } 50% { box-shadow: 0 0 20px var(--primary); } 100% { box-shadow: 0 0 5px var(--primary); } }
+
+        /* --- NAVBAR BLUR --- */
         .nav {
-            position: fixed; top: 0; width: 100%; height: 60px;
+            position: fixed; top: 0; width: 100%; height: 70px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; box-sizing: border-box; z-index: 10;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
-            transition: background 0.5s;
+            padding: 0 4%; z-index: 50;
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px); /* Efeito de vidro fosco */
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .nav-logo { color: var(--red); font-size: 25px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-        .search-box input {
-            background: rgba(0,0,0,0.5); border: 1px solid white; color: white;
-            padding: 5px 10px; border-radius: 4px; outline: none;
-        }
-
-        /* --- DESTAQUE (HERO) --- */
-        .banner {
-            height: 80vh; 
-            background-size: cover; 
-            background-position: center center; 
-            color: white;
-            object-fit: contain;
-            position: relative;
-        }
-        .banner-contents {
-            margin-left: 40px; padding-top: 25vh; height: 190px;
-        }
-        .banner-title { font-size: 3rem; font-weight: 800; padding-bottom: 0.3rem; text-shadow: 2px 2px 4px #000; }
-        .banner-desc { 
-            width: 45rem; line-height: 1.3; padding-top: 1rem; font-size: 1.1rem; max-width: 360px; height: 80px; 
-            text-shadow: 1px 1px 2px #000; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .banner-buttons { margin-top: 20px; }
-        .btn {
-            cursor: pointer; color: white; outline: none; border: none; font-weight: 700; border-radius: 4px;
-            padding: 10px 2rem; margin-right: 1rem; background-color: rgba(51,51,51,0.5); transition: 0.2s;
-        }
-        .btn:hover { color: #000; background-color: #e6e6e6; }
-        .btn-play { background-color: white; color: black; }
-        .btn-play:hover { background-color: rgba(255,255,255,0.7); }
-
-        .banner-fadeBottom {
-            position: absolute; bottom: 0; width: 100%; height: 7.4rem;
-            background-image: linear-gradient(180deg, transparent, rgba(37,37,37,0.61), #111);
-        }
-
-        /* --- LINHAS DE FILMES --- */
-        .row { margin-left: 20px; margin-top: 20px; }
-        .row h2 { margin-left: 20px; font-size: 1.2rem; margin-bottom: 10px; }
+        .logo { font-family: 'Bebas Neue', cursive; color: var(--primary); font-size: 32px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(229,9,20,0.5); cursor: pointer; }
         
-        .row-posters {
-            display: flex; overflow-y: hidden; overflow-x: scroll; padding: 20px;
-            /* Esconder barra de rolagem mas manter funcionalidade */
-            -ms-overflow-style: none; scrollbar-width: none;
+        .search-bar { position: relative; }
+        .search-bar input {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 15px; border-radius: 20px; color: white; outline: none;
+            transition: 0.3s; width: 200px;
         }
-        .row-posters::-webkit-scrollbar { display: none; }
+        .search-bar input:focus { width: 300px; border-color: var(--primary); background: rgba(0,0,0,0.8); }
 
-        .poster {
-            max-height: 200px; object-fit: contain; margin-right: 10px;
-            transition: transform 450ms; border-radius: 4px; cursor: pointer;
+        /* --- BANNER HERO (CINEMATOGRÁFICO) --- */
+        .hero {
+            position: relative; height: 85vh; width: 100%;
+            overflow: hidden;
         }
-        .poster:hover { transform: scale(1.09); opacity: 1; }
-        .poster-large { max-height: 280px; } /* Para os originais Netflix */
+        .hero-bg {
+            width: 100%; height: 100%; object-fit: cover;
+            animation: zoomSlow 20s infinite alternate; /* Imagem se mexe sozinha */
+        }
+        .hero-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, #141414 0%, rgba(20,20,20,0.6) 50%, transparent 100%),
+                        linear-gradient(0deg, #141414 0%, transparent 50%);
+        }
+        .hero-content {
+            position: absolute; top: 30%; left: 4%; max-width: 600px;
+            animation: fadeIn 1s ease-out;
+        }
+        .hero-title {
+            font-family: 'Bebas Neue', sans-serif; font-size: 5rem; line-height: 0.9;
+            margin-bottom: 20px; text-transform: uppercase;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+        }
+        .hero-desc {
+            font-size: 1.1rem; color: #ddd; margin-bottom: 30px; line-height: 1.5;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .btn {
+            padding: 12px 30px; font-weight: 600; border: none; border-radius: 5px;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+            transition: 0.3s; font-size: 1rem;
+        }
+        .btn-play { background: white; color: black; }
+        .btn-play:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+        .btn-info { background: rgba(109, 109, 109, 0.7); color: white; margin-left: 10px; }
+        .btn-info:hover { background: rgba(109, 109, 109, 0.4); }
 
-        /* --- PLAYER MODAL --- */
-        #modal-player {
+        /* --- LISTAS DE FILMES --- */
+        .category { margin: 20px 0 40px 20px; animation: fadeIn 1.5s ease-out; }
+        .category h2 { 
+            font-size: 1.4rem; margin-bottom: 15px; color: #e5e5e5; 
+            border-left: 4px solid var(--primary); padding-left: 10px;
+        }
+        
+        .row-container {
+            display: flex; overflow-x: auto; padding: 20px 0; gap: 15px;
+            scroll-behavior: smooth;
+        }
+        .row-container::-webkit-scrollbar { display: none; } /* Esconde scroll */
+
+        .card {
+            min-width: 160px; height: 240px; border-radius: 8px;
+            overflow: hidden; position: relative; cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .card:hover { 
+            transform: scale(1.15) translateY(-10px); 
+            z-index: 10; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        /* --- MODAL ELEGANTE --- */
+        .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 100; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.9); z-index: 1000;
+            justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
         }
-        iframe { width: 90%; height: 70vh; border: none; }
-        .close-btn { 
-            position: absolute; top: 20px; right: 30px; color: white; 
-            font-size: 40px; cursor: pointer; z-index: 101; 
+        .modal-box {
+            background: #181818; width: 90%; max-width: 1000px;
+            border-radius: 15px; overflow: hidden; position: relative;
+            box-shadow: 0 0 50px rgba(229,9,20,0.2);
+            transform: translateY(50px); transition: transform 0.3s;
         }
-        .server-btn {
-            margin-top: 10px; background: var(--red); color: white; padding: 10px; 
-            border: none; cursor: pointer; border-radius: 4px;
+        .modal-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: #222; }
+        .server-controls { display: flex; gap: 10px; }
+        .server-tag { 
+            background: #333; padding: 5px 15px; border-radius: 20px; 
+            font-size: 12px; cursor: pointer; border: 1px solid #444; 
         }
+        .server-tag.active { background: var(--primary); border-color: var(--primary); }
+        .close-modal { font-size: 30px; cursor: pointer; color: white; }
+        iframe { width: 100%; height: 500px; border: none; background: black; }
 
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .hero-content { top: 20%; left: 5%; width: 90%; }
+            iframe { height: 35vh; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="nav" id="nav">
-        <div class="nav-logo" onclick="location.reload()">NETFLIX CLONE</div>
-        <div class="search-box">
-            <input type="text" id="busca" placeholder="Filmes, séries..." onkeyup="buscar(this.value)">
+    <nav class="nav">
+        <div class="logo" onclick="location.reload()">NETFLIX <span style="font-size: 15px; color: white;">ULTRA</span></div>
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar título..." onkeyup="buscar(this.value)">
         </div>
-    </div>
+    </nav>
 
-    <header class="banner" id="banner">
-        <div class="banner-contents">
-            <h1 class="banner-title" id="banner-title">Carregando...</h1>
-            <div class="banner-buttons">
-                <button class="btn btn-play" id="btn-banner-play">▶ Assistir</button>
-                <button class="btn">Mais Informações</button>
+    <header class="hero" id="hero">
+        <img id="hero-img" class="hero-bg" src="" alt="">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title" id="hero-title">Carregando...</h1>
+            <p class="hero-desc" id="hero-desc">Buscando os melhores filmes para você...</p>
+            <div style="display: flex; gap: 15px;">
+                <button class="btn btn-play" id="btn-hero-play">▶ Assistir Agora</button>
+                <button class="btn btn-info">ℹ Mais Info</button>
             </div>
-            <h1 class="banner-desc" id="banner-desc">...</h1>
         </div>
-        <div class="banner-fadeBottom"></div>
     </header>
 
-    <div id="main-content">
-        <div class="row">
-            <h2>Em Alta</h2>
-            <div class="row-posters" id="trending-row"></div>
-        </div>
-        <div class="row">
-            <h2>Ação</h2>
-            <div class="row-posters" id="action-row"></div>
-        </div>
-        <div class="row">
-            <h2>Comédia</h2>
-            <div class="row-posters" id="comedy-row"></div>
-        </div>
-        <div class="row">
-            <h2>Terror</h2>
-            <div class="row-posters" id="horror-row"></div>
-        </div>
+    <div id="content-area">
+        <div class="category"><h2>🔥 Em Alta na Semana</h2><div class="row-container" id="trending"></div></div>
+        <div class="category"><h2>🎬 Ação e Aventura</h2><div class="row-container" id="action"></div></div>
+        <div class="category"><h2>😂 Comédias</h2><div class="row-container" id="comedy"></div></div>
+        <div class="category"><h2>👻 Terror e Suspense</h2><div class="row-container" id="horror"></div></div>
+        <div class="category"><h2>👽 Ficção Científica</h2><div class="row-container" id="scifi"></div></div>
     </div>
 
-    <div id="modal-player">
-        <span class="close-btn" onclick="fecharPlayer()">&times;</span>
-        <iframe id="video-frame" allowfullscreen></iframe>
-        <button class="server-btn" onclick="trocarServidor()">Problemas? Trocar Player</button>
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="server-controls">
+                    <div class="server-tag active" onclick="setServer(0, this)">Player 1 (Rápido)</div>
+                    <div class="server-tag" onclick="setServer(1, this)">Player 2 (Backup)</div>
+                    <div class="server-tag" onclick="setServer(2, this)">Player 3 (Alternativo)</div>
+                </div>
+                <span class="close-modal" onclick="fecharModal()">&times;</span>
+            </div>
+            <iframe id="player-frame" allowfullscreen></iframe>
+        </div>
     </div>
 
     <script>
         const API_KEY = 'c3162eed0616407fa43134e07880c7d5';
-        const BASE_URL = "https://api.themoviedb.org/3";
-        const IMG_URL = "https://image.tmdb.org/t/p/original";
+        const BASE_IMG = 'https://image.tmdb.org/t/p/original';
+        const POSTER_IMG = 'https://image.tmdb.org/t/p/w300';
         
-        // URLs das requisições
-        const requests = {
-            trending: `/trending/all/week?api_key=${API_KEY}&language=pt-BR`,
-            action: `/discover/movie?api_key=${API_KEY}&with_genres=28&language=pt-BR`,
-            comedy: `/discover/movie?api_key=${API_KEY}&with_genres=35&language=pt-BR`,
-            horror: `/discover/movie?api_key=${API_KEY}&with_genres=27&language=pt-BR`,
-        };
+        let currentId = '';
+        let currentType = 'movie';
 
-        // --- INICIALIZAÇÃO ---
+        // Inicialização
         window.onload = () => {
-            carregarBanner();
-            carregarLinha(requests.trending, "trending-row", true); // True para posters maiores
-            carregarLinha(requests.action, "action-row");
-            carregarLinha(requests.comedy, "comedy-row");
-            carregarLinha(requests.horror, "horror-row");
+            fetchBanner();
+            fetchCategory('trending/all/week', 'trending', true);
+            fetchCategory('discover/movie?with_genres=28', 'action');
+            fetchCategory('discover/movie?with_genres=35', 'comedy');
+            fetchCategory('discover/movie?with_genres=27', 'horror');
+            fetchCategory('discover/movie?with_genres=878', 'scifi');
         };
 
-        // Efeito Navbar preta ao rolar
-        window.addEventListener("scroll", () => {
-            const nav = document.getElementById("nav");
-            if (window.scrollY > 100) {
-                nav.style.backgroundColor = "#111";
-            } else {
-                nav.style.background = "linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)";
-            }
-        });
-
-        // --- LÓGICA DE DADOS ---
-        async function carregarBanner() {
-            const res = await fetch(`${BASE_URL}${requests.trending}`);
+        // Carregar Banner Principal
+        async function fetchBanner() {
+            const res = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&language=pt-BR`);
             const data = await res.json();
-            // Pega um filme aleatório dos top 20
-            const filme = data.results[Math.floor(Math.random() * data.results.length - 1)];
+            const filme = data.results[Math.floor(Math.random() * 10)]; // Pega um dos top 10
+
+            document.getElementById('hero-img').src = BASE_IMG + filme.backdrop_path;
+            document.getElementById('hero-title').innerText = filme.title || filme.name;
+            document.getElementById('hero-desc').innerText = filme.overview || "Sem descrição disponível.";
             
-            document.getElementById("banner").style.backgroundImage = `url(${IMG_URL}${filme.backdrop_path})`;
-            document.getElementById("banner-title").innerText = filme.title || filme.name;
-            document.getElementById("banner-desc").innerText = filme.overview;
-            
-            // Configura o botão assistir do banner
-            document.getElementById("btn-banner-play").onclick = () => abrirPlayer(filme.id, filme.media_type || 'movie');
+            document.getElementById('btn-hero-play').onclick = () => abrirPlayer(filme.id, filme.media_type || 'movie');
         }
 
-        async function carregarLinha(url, elementId, isLarge = false) {
-            const res = await fetch(`${BASE_URL}${url}`);
+        // Carregar Linhas
+        async function fetchCategory(endpoint, elementId, isTrending = false) {
+            const res = await fetch(`https://api.themoviedb.org/3/${endpoint}${endpoint.includes('?') ? '&' : '?'}api_key=${API_KEY}&language=pt-BR`);
             const data = await res.json();
             const container = document.getElementById(elementId);
 
-            data.results.forEach(filme => {
-                if(!filme.poster_path) return;
-                
-                const img = document.createElement("img");
-                img.className = `poster ${isLarge ? "poster-large" : ""}`;
-                img.src = `https://image.tmdb.org/t/p/w300${filme.poster_path}`;
-                img.alt = filme.name;
-                img.onclick = () => abrirPlayer(filme.id, filme.media_type || 'movie');
-                
-                container.appendChild(img);
+            data.results.forEach(item => {
+                if(!item.poster_path) return;
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.onclick = () => abrirPlayer(item.id, item.media_type || (isTrending ? item.media_type : 'movie'));
+                div.innerHTML = `<img src="${POSTER_IMG}${item.poster_path}" alt="${item.title}" loading="lazy">`;
+                container.appendChild(div);
             });
         }
 
+        // Sistema de Busca Rápida
         async function buscar(query) {
-            if (query.length < 3) return;
-            // Se o usuário buscar, limpamos a tela e mostramos o resultado em grade (opcional, ou podemos manter o layout)
-            const url = `${BASE_URL}/search/multi?api_key=${API_KEY}&query=${query}&language=pt-BR`;
-            const res = await fetch(url);
+            if(query.length < 3) return;
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${query}&language=pt-BR`);
             const data = await res.json();
             
-            const container = document.getElementById("trending-row");
-            container.innerHTML = ""; // Limpa a linha "Em Alta" para mostrar a busca
-            document.querySelector("h2").innerText = "Resultados da Busca";
+            const container = document.getElementById('trending');
+            container.innerHTML = '';
+            document.querySelector('.category h2').innerText = `🔍 Resultados para: ${query}`;
             
-            data.results.forEach(filme => {
-                if(!filme.poster_path) return;
-                const img = document.createElement("img");
-                img.className = "poster poster-large";
-                img.src = `https://image.tmdb.org/t/p/w300${filme.poster_path}`;
-                img.onclick = () => abrirPlayer(filme.id, filme.media_type || 'movie');
-                container.appendChild(img);
+            // Esconde outras categorias durante a busca
+            document.querySelectorAll('.category').forEach((el, index) => {
+                if(index > 0) el.style.display = 'none';
+            });
+
+            data.results.forEach(item => {
+                if(!item.poster_path) return;
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.onclick = () => abrirPlayer(item.id, item.media_type);
+                div.innerHTML = `<img src="${POSTER_IMG}${item.poster_path}">`;
+                container.appendChild(div);
             });
         }
 
-        // --- LÓGICA DO PLAYER (IGUAL AO ANTERIOR) ---
-        let serverIndex = 0;
-        let currentId = '';
-        let currentType = '';
+        // --- LÓGICA DO PLAYER & SERVIDORES ---
         const servers = [
             (id, type) => `https://vidsrc.me/embed/${type === 'movie' ? 'movie' : 'tv'}?tmdb=${id}`,
             (id, type) => `https://vidsrc.to/embed/${type === 'movie' ? 'movie' : 'tv'}/${id}`,
@@ -245,24 +267,49 @@
         function abrirPlayer(id, type) {
             currentId = id;
             currentType = type;
-            serverIndex = 0;
-            atualizarSource();
-            document.getElementById("modal-player").style.display = "flex";
+            const modal = document.getElementById('modal');
+            const box = document.querySelector('.modal-box');
+            
+            // Animação de entrada
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                box.style.transform = 'translateY(0)';
+            }, 10);
+
+            // Carrega o primeiro servidor
+            setServer(0, document.querySelector('.server-tag'));
         }
 
-        function atualizarSource() {
-            document.getElementById("video-frame").src = servers[serverIndex](currentId, currentType);
+        function setServer(index, element) {
+            // Atualiza visual dos botões
+            document.querySelectorAll('.server-tag').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            // Carrega vídeo
+            const iframe = document.getElementById('player-frame');
+            iframe.src = servers[index](currentId, currentType);
         }
 
-        function trocarServidor() {
-            serverIndex = (serverIndex + 1) % servers.length;
-            atualizarSource();
-            alert("Trocando para servidor " + (serverIndex + 1));
+        function fecharModal() {
+            const modal = document.getElementById('modal');
+            const box = document.querySelector('.modal-box');
+            
+            modal.style.opacity = '0';
+            box.style.transform = 'translateY(50px)';
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('player-frame').src = ''; // Para o som
+            }, 300);
         }
 
-        function fecharPlayer() {
-            document.getElementById("modal-player").style.display = "none";
-            document.getElementById("video-frame").src = "";
+        // Se o usuário clicar fora do player, fecha também
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target == modal) {
+                fecharModal();
+            }
         }
     </script>
 </body>
