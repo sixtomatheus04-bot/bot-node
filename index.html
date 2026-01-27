@@ -3,41 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineApp - Filmes Reais</title>
+    <title>CineApp Pro - Filmes e Séries</title>
     <style>
-        /* Estilo Dark e Moderno */
-        body { background: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
-        .header { text-align: center; padding: 40px 20px; background: linear-gradient(to bottom, #1f1f1f, #0a0a0a); }
-        h1 { color: #e50914; font-size: 3rem; margin: 0; }
+        :root {
+            --primary: #e50914;
+            --bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            overflow-x: hidden;
+        }
+
+        /* Header e Busca */
+        .header { 
+            text-align: center; 
+            padding: 40px 20px; 
+            background: linear-gradient(to bottom, #141414, var(--bg)); 
+        }
+        h1 { color: var(--primary); font-size: 3rem; margin: 0; text-transform: uppercase; letter-spacing: 2px; }
         
-        .search-box { margin-top: 20px; }
+        .search-box { margin-top: 25px; position: relative; max-width: 600px; margin-left: auto; margin-right: auto; }
         input { 
-            padding: 15px; width: 80%; max-width: 500px; border-radius: 30px; 
-            border: none; outline: none; font-size: 16px; background: #222; color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            padding: 15px 25px; width: 100%; border-radius: 50px; 
+            border: 2px solid #333; outline: none; font-size: 16px; 
+            background: rgba(255,255,255,0.1); color: white;
+            transition: 0.3s;
         }
+        input:focus { border-color: var(--primary); background: rgba(255,255,255,0.2); }
 
-        /* Grade de Filmes */
-        #lista-filmes { 
+        /* Grade de Conteúdo */
+        #lista-conteudo { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-            gap: 25px; padding: 30px; 
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); 
+            gap: 20px; padding: 40px; 
         }
-        .filme-card { cursor: pointer; transition: 0.4s; position: relative; }
-        .filme-card:hover { transform: scale(1.08); z-index: 2; }
-        .filme-card img { width: 100%; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .filme-card p { text-align: center; font-size: 14px; margin-top: 10px; font-weight: bold; }
+        .card { 
+            cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; 
+            background: var(--card-bg); border-radius: 10px; overflow: hidden;
+            position: relative;
+        }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(229, 9, 20, 0.4); }
+        .card img { width: 100%; display: block; }
+        .card-info { padding: 10px; text-align: center; font-size: 13px; font-weight: bold; }
+        .tipo-tag { 
+            position: absolute; top: 10px; right: 10px; background: var(--primary);
+            padding: 2px 8px; border-radius: 5px; font-size: 10px; text-transform: uppercase;
+        }
 
-        /* Modal do Player (Tela de Cinema) */
+        /* Modal do Player */
         #modal-player {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.98); z-index: 1000; flex-direction: column;
+            justify-content: center; align-items: center;
         }
-        .modal-content { width: 90%; max-width: 1000px; position: relative; }
-        iframe { width: 100%; height: 560px; border-radius: 10px; border: 2px solid #333; }
-        .btn-fechar {
-            position: absolute; top: -40px; right: 0; color: white; font-size: 30px;
-            cursor: pointer; font-weight: bold;
+        .modal-content { width: 95%; max-width: 1100px; }
+        .controls { 
+            width: 100%; max-width: 1100px; display: flex; 
+            justify-content: space-between; margin-bottom: 15px; 
+        }
+        .btn {
+            background: var(--primary); color: white; border: none; 
+            padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;
+        }
+        .btn-gray { background: #444; }
+        iframe { width: 100%; height: 60vh; border-radius: 8px; border: 1px solid #333; background: #000; }
+
+        @media (max-width: 600px) {
+            iframe { height: 40vh; }
+            h1 { font-size: 2rem; }
         }
     </style>
 </head>
@@ -46,75 +84,100 @@
     <div class="header">
         <h1>CineApp</h1>
         <div class="search-box">
-            <input type="text" id="input-busca" placeholder="Pesquise filmes ou séries..." onkeyup="buscarFilme()">
+            <input type="text" id="input-busca" placeholder="O que vamos assistir hoje? (Filmes ou Séries)" onkeyup="buscarConteudo()">
         </div>
     </div>
 
-    <div id="lista-filmes">
+    <div id="lista-conteudo">
         </div>
 
     <div id="modal-player">
+        <div class="controls">
+            <button class="btn btn-gray" onclick="trocarServidor()">🔄 Trocar Servidor</button>
+            <button class="btn" onclick="fecharPlayer()">✕ Fechar</button>
+        </div>
         <div class="modal-content">
-            <span class="btn-fechar" onclick="fecharPlayer()">&times; Fechar</span>
             <iframe id="video-frame" src="" frameborder="0" allowfullscreen></iframe>
         </div>
     </div>
 
     <script>
-        // Sua chave API configurada
-        const API_KEY = 'c3162eed0616407fa43134e07880c7d5'; 
+        const API_KEY = 'c3162eed0616407fa43134e07880c7d5';
+        let currentId = '';
+        let currentType = '';
+        let serverIndex = 0;
 
-        async function buscarFilme() {
+        // Lista de servidores para rodízio caso um caia
+        const servidores = [
+            (id, type) => `https://vidsrc.me/embed/${type === 'movie' ? 'movie' : 'tv'}?tmdb=${id}`,
+            (id, type) => `https://vidsrc.to/embed/${type === 'movie' ? 'movie' : 'tv'}/${id}`,
+            (id, type) => `https://multiembed.mov/?video_id=${id}&tmdb=1`
+        ];
+
+        async function buscarConteudo() {
             const query = document.getElementById('input-busca').value;
             if (query.length < 3) return;
 
-            const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=pt-BR`;
+            // Busca multi (filmes e séries juntos)
+            const url = `https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}&language=pt-BR`;
             
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                exibirFilmes(data.results);
+                exibirResultados(data.results);
             } catch (error) {
-                console.error("Erro na busca");
+                console.error("Erro ao carregar dados");
             }
         }
 
-        function exibirFilmes(filmes) {
-            const container = document.getElementById('lista-filmes');
+        function exibirResultados(itens) {
+            const container = document.getElementById('lista-conteudo');
             container.innerHTML = '';
 
-            filmes.forEach(filme => {
-                if (!filme.poster_path) return;
+            itens.forEach(item => {
+                if (!item.poster_path || (item.media_type !== 'movie' && item.media_type !== 'tv')) return;
 
+                const titulo = item.title || item.name;
                 const card = document.createElement('div');
-                card.className = 'filme-card';
-                // Ao clicar, chama o player com o ID do filme
-                card.onclick = () => abrirPlayer(filme.id); 
+                card.className = 'card';
+                card.onclick = () => abrirPlayer(item.id, item.media_type); 
 
                 card.innerHTML = `
-                    <img src="https://image.tmdb.org/t/p/w500${filme.poster_path}" alt="${filme.title}">
-                    <p>${filme.title}</p>
+                    <span class="tipo-tag">${item.media_type === 'movie' ? 'Filme' : 'Série'}</span>
+                    <img src="https://image.tmdb.org/t/p/w500${item.poster_path}" alt="${titulo}">
+                    <div class="card-info">${titulo}</div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function abrirPlayer(id) {
-            const modal = document.getElementById('modal-player');
+        function abrirPlayer(id, type) {
+            currentId = id;
+            currentType = type;
+            serverIndex = 0; // Reseta para o primeiro servidor
+            
+            carregarVideo();
+            document.getElementById('modal-player').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Trava o scroll do fundo
+        }
+
+        function carregarVideo() {
             const iframe = document.getElementById('video-frame');
-            
-            // Usando um indexador que funciona com IDs do TMDb
-            // Nota: Se um servidor estiver offline, pode-se testar outros
-            iframe.src = `https://embed.su/embed/movie/${id}`;
-            
-            modal.style.display = 'flex';
+            iframe.src = servidores[serverIndex](currentId, currentType);
+        }
+
+        function trocarServidor() {
+            serverIndex = (serverIndex + 1) % servidores.length;
+            carregarVideo();
+            alert("Tentando servidor alternativo " + (serverIndex + 1) + "...");
         }
 
         function fecharPlayer() {
             const modal = document.getElementById('modal-player');
             const iframe = document.getElementById('video-frame');
-            iframe.src = ""; // Para o vídeo parar de tocar ao fechar
+            iframe.src = ""; 
             modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Destrava o scroll
         }
     </script>
 </body>
