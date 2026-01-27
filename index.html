@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream Oficial</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>CineStream - Oficial</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -16,23 +15,21 @@
         /* TELA DE LOGIN */
         #auth-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 2000;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=1470&auto=format&fit=crop');
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=1470&auto=format&fit=crop');
             background-size: cover; display: flex; align-items: center; justify-content: center;
         }
         .login-card {
-            background: rgba(0,0,0,0.85); padding: 60px; border-radius: 8px; width: 100%; max-width: 450px;
+            background: rgba(0,0,0,0.85); padding: 60px; border-radius: 8px; width: 100%; max-width: 450px; text-align: center;
         }
         .login-card h1 { font-family: 'Bebas Neue'; font-size: 50px; margin-bottom: 20px; color: var(--red); }
         .input-field {
             width: 100%; padding: 16px; margin-bottom: 16px; background: #333; border: 1px solid #333; border-radius: 4px; color: white; font-size: 16px;
         }
         .btn-main {
-            width: 100%; padding: 16px; background: var(--red); color: white; border: none; font-weight: bold; font-size: 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;
+            width: 100%; padding: 16px; background: var(--red); color: white; border: none; font-weight: bold; font-size: 16px; border-radius: 4px; cursor: pointer; margin-top: 10px; transition: 0.3s;
         }
         .btn-main:hover { background: #f40612; }
-        .toggle-txt { margin-top: 20px; color: #737373; font-size: 14px; cursor: pointer; text-align: center; }
-        .toggle-txt span { color: white; text-decoration: underline; }
-        .status-msg { color: #ffa00a; margin-bottom: 15px; font-size: 14px; display: none; padding: 10px; border-left: 3px solid #ffa00a; background: rgba(255,160,10,0.1); }
+        .status-msg { color: #ffa00a; margin-bottom: 15px; font-size: 14px; display: none; }
 
         /* APP PRINCIPAL */
         #app-screen { display: none; }
@@ -43,7 +40,7 @@
         }
         .nav.black { background: var(--black); }
         .logo { color: var(--red); font-family: 'Bebas Neue'; font-size: 35px; }
-        .btn-logout { background: transparent; border: 1px solid white; color: white; padding: 5px 15px; cursor: pointer; }
+        .btn-logout { background: transparent; border: 1px solid white; color: white; padding: 5px 15px; cursor: pointer; border-radius: 4px; }
 
         /* HERO */
         .hero { height: 85vh; background-size: cover; background-position: center top; position: relative; }
@@ -70,17 +67,14 @@
 
     <div id="auth-screen">
         <div class="login-card">
-            <h1 id="auth-title">Entrar</h1>
+            <h1>CINESTREAM</h1>
             <p id="status-msg" class="status-msg"></p>
             
-            <input type="email" id="email" class="input-field" placeholder="Email ou Gmail">
-            <input type="password" id="password" class="input-field" placeholder="Senha">
+            <input type="email" id="email" class="input-field" placeholder="Seu E-mail">
+            <input type="password" id="password" class="input-field" placeholder="Crie uma Senha">
             
-            <button class="btn-main" onclick="handleAuth()" id="auth-btn">Entrar</button>
-            
-            <div class="toggle-txt" onclick="toggleMode()">
-                <span id="toggle-link">Novo por aqui? Assine agora.</span>
-            </div>
+            <button class="btn-main" onclick="entrarNoSistema()">ENTRAR / CRIAR CONTA</button>
+            <p style="color: #666; font-size: 12px; margin-top: 15px;">*Salva automaticamente no seu dispositivo.</p>
         </div>
     </div>
 
@@ -88,7 +82,7 @@
         <nav class="nav" id="navbar">
             <div class="logo">CINESTREAM</div>
             <div>
-                <span id="user-display" style="font-size: 12px; margin-right: 10px;">Usuario</span>
+                <span id="user-display" style="font-size: 12px; margin-right: 10px; color: #ccc;">Usuario</span>
                 <button class="btn-logout" onclick="logout()">Sair</button>
             </div>
         </nav>
@@ -114,78 +108,60 @@
     </div>
 
     <script>
-        // --- 1. CONFIGURAÇÃO (Variáveis Únicas) ---
-        const URL_BANCO = 'https://jfzgzkurjnznfnlvdghv.supabase.co';
-        const CHAVE_BANCO = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impmemd6a3Vyam56bmZubHZkZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0NzI1NjUsImV4cCI6MjA4NTA0ODU2NX0.ntJQabnc1pJvlRwdyldLD7h-60WUN3bgtY2isHrwmDs';
-        const TMDB_KEY = 'c3162eed0616407fa43134e07880c7d5';
+        // --- 1. SISTEMA DE BANCO DE DADOS PRÓPRIO (LocalStorage) ---
+        
+        // Verifica se já tem usuário salvo ao abrir
+        window.onload = function() {
+            const usuarioSalvo = localStorage.getItem('cineUser');
+            if (usuarioSalvo) {
+                logarUsuario(usuarioSalvo);
+            } else {
+                // Carrega filmes no fundo para ser rápido
+                carregarFilmes();
+            }
+        };
 
-        // Mudei o nome para 'bancoCine' para evitar o erro de duplicidade
-        const bancoCine = window.supabase.createClient(URL_BANCO, CHAVE_BANCO);
-
-        let isLogin = true;
-
-        // --- 2. SISTEMA DE LOGIN ---
-        async function handleAuth() {
+        function entrarNoSistema() {
             const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const msgBox = document.getElementById('status-msg');
-            const btn = document.getElementById('auth-btn');
+            const senha = document.getElementById('password').value;
+            const msg = document.getElementById('status-msg');
 
-            if(!email || !password) {
-                msgBox.innerText = "Preencha email e senha.";
-                msgBox.style.display = 'block';
+            // Validação simples
+            if (!email.includes('@') || senha.length < 4) {
+                msg.innerText = "Digite um e-mail válido e senha maior que 4 dígitos.";
+                msg.style.display = 'block';
                 return;
             }
 
-            msgBox.style.display = 'none';
-            btn.innerText = "Aguarde...";
+            msg.innerText = "Acessando banco de dados...";
+            msg.style.display = 'block';
+            msg.style.color = '#ffff00';
 
-            let result;
-            if (isLogin) {
-                result = await bancoCine.auth.signInWithPassword({ email, password });
-            } else {
-                result = await bancoCine.auth.signUp({ email, password });
-            }
-
-            if (result.error) {
-                msgBox.innerText = "Erro: " + result.error.message;
-                msgBox.style.display = 'block';
-            } else {
-                // Se for cadastro e pedir confirmação
-                if (!isLogin && result.data.user && !result.data.session) {
-                    msgBox.innerText = "Conta criada! Se não entrar, o banco pediu confirmação.";
-                    msgBox.style.display = 'block';
-                }
-            }
-            btn.innerText = isLogin ? "Entrar" : "Cadastrar";
+            // Simula tempo de processamento
+            setTimeout(() => {
+                // SALVA NO SEU NAVEGADOR (Nosso Banco de Dados)
+                localStorage.setItem('cineUser', email);
+                localStorage.setItem('cinePass', senha); // Opcional, salva senha se quiser
+                
+                logarUsuario(email);
+            }, 800);
         }
 
-        // --- 3. MONITORAMENTO DE ESTADO ---
-        bancoCine.auth.onAuthStateChange((event, session) => {
-            if (session) {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('app-screen').style.display = 'block';
-                document.getElementById('user-display').innerText = session.user.email;
-                carregarFilmes();
-            } else {
-                document.getElementById('auth-screen').style.display = 'flex';
-                document.getElementById('app-screen').style.display = 'none';
-            }
-        });
+        function logarUsuario(email) {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            document.getElementById('user-display').innerText = email;
+            carregarFilmes();
+        }
 
-        async function logout() {
-            await bancoCine.auth.signOut();
+        function logout() {
+            // Apaga do banco local
+            localStorage.removeItem('cineUser');
             location.reload();
         }
 
-        function toggleMode() {
-            isLogin = !isLogin;
-            document.getElementById('auth-title').innerText = isLogin ? "Entrar" : "Criar Conta";
-            document.getElementById('auth-btn').innerText = isLogin ? "Entrar" : "Cadastrar";
-            document.getElementById('toggle-link').innerText = isLogin ? "Novo por aqui? Assine agora." : "Já tem conta? Entre aqui.";
-        }
-
-        // --- 4. FILMES E PLAYER ---
+        // --- 2. SISTEMA DE FILMES (API TMDB) ---
+        const TMDB_KEY = 'c3162eed0616407fa43134e07880c7d5';
         const BASE_URL = "https://api.themoviedb.org/3";
         const IMG_URL = "https://image.tmdb.org/t/p/original";
         const POSTER_URL = "https://image.tmdb.org/t/p/w300";
@@ -198,7 +174,7 @@
 
             document.getElementById('hero').style.backgroundImage = `linear-gradient(to top, #000 10%, transparent 90%), url(${IMG_URL}${hero.backdrop_path})`;
             document.getElementById('hero-title').innerText = hero.title || hero.name;
-            document.getElementById('hero-desc').innerText = hero.overview.substring(0, 150) + "...";
+            document.getElementById('hero-desc').innerText = hero.overview ? hero.overview.substring(0, 150) + "..." : "Assista agora.";
             document.getElementById('hero-play').onclick = () => abrirPlayer(hero.id, hero.media_type);
 
             // Listas
@@ -211,7 +187,7 @@
             const res = await fetch(url);
             const data = await res.json();
             const div = document.getElementById(divId);
-            div.innerHTML = ""; // Limpa antes de adicionar
+            div.innerHTML = ""; 
             
             data.results.forEach(f => {
                 if(f.poster_path) {
@@ -222,6 +198,7 @@
             });
         }
 
+        // --- 3. PLAYER ---
         function abrirPlayer(id, type) {
             const modal = document.getElementById('player-modal');
             const media = type === 'tv' ? 'tv' : 'movie';
@@ -234,7 +211,7 @@
             document.getElementById('video-frame').src = '';
         }
 
-        // Efeito Navbar
+        // Navbar Scroll
         window.onscroll = () => {
             const nav = document.getElementById('navbar');
             if(window.scrollY > 50) nav.classList.add('black');
