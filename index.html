@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream Pro</title>
+    <title>CineStream Oficial</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     
@@ -16,8 +16,7 @@
         /* TELA DE LOGIN */
         #auth-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 2000;
-            /* Imagem de fundo corrigida */
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?q=80&w=1469&auto=format&fit=crop');
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=1470&auto=format&fit=crop');
             background-size: cover; display: flex; align-items: center; justify-content: center;
         }
         .login-card {
@@ -31,7 +30,7 @@
             width: 100%; padding: 16px; background: var(--red); color: white; border: none; font-weight: bold; font-size: 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;
         }
         .btn-main:hover { background: #f40612; }
-        .toggle-txt { margin-top: 20px; color: #737373; font-size: 14px; cursor: pointer; }
+        .toggle-txt { margin-top: 20px; color: #737373; font-size: 14px; cursor: pointer; text-align: center; }
         .toggle-txt span { color: white; text-decoration: underline; }
         .status-msg { color: #ffa00a; margin-bottom: 15px; font-size: 14px; display: none; padding: 10px; border-left: 3px solid #ffa00a; background: rgba(255,160,10,0.1); }
 
@@ -115,17 +114,13 @@
     </div>
 
     <script>
-        // --- 1. CONFIGURAÇÃO SEGURA ---
-        const SUPABASE_URL = 'https://jfzgzkurjnznfnlvdghv.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impmemd6a3Vyam56bmZubHZkZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0NzI1NjUsImV4cCI6MjA4NTA0ODU2NX0.ntJQabnc1pJvlRwdyldLD7h-60WUN3bgtY2isHrwmDs';
+        // --- 1. CONFIGURAÇÃO (Variáveis Únicas) ---
+        const URL_BANCO = 'https://jfzgzkurjnznfnlvdghv.supabase.co';
+        const CHAVE_BANCO = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impmemd6a3Vyam56bmZubHZkZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0NzI1NjUsImV4cCI6MjA4NTA0ODU2NX0.ntJQabnc1pJvlRwdyldLD7h-60WUN3bgtY2isHrwmDs';
         const TMDB_KEY = 'c3162eed0616407fa43134e07880c7d5';
 
-        // Garante que o Supabase só inicie uma vez
-        let supabase;
-        if (!window.supabaseClient) {
-            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        }
-        supabase = window.supabaseClient;
+        // Mudei o nome para 'bancoCine' para evitar o erro de duplicidade
+        const bancoCine = window.supabase.createClient(URL_BANCO, CHAVE_BANCO);
 
         let isLogin = true;
 
@@ -147,15 +142,16 @@
 
             let result;
             if (isLogin) {
-                result = await supabase.auth.signInWithPassword({ email, password });
+                result = await bancoCine.auth.signInWithPassword({ email, password });
             } else {
-                result = await supabase.auth.signUp({ email, password });
+                result = await bancoCine.auth.signUp({ email, password });
             }
 
             if (result.error) {
                 msgBox.innerText = "Erro: " + result.error.message;
                 msgBox.style.display = 'block';
             } else {
+                // Se for cadastro e pedir confirmação
                 if (!isLogin && result.data.user && !result.data.session) {
                     msgBox.innerText = "Conta criada! Se não entrar, o banco pediu confirmação.";
                     msgBox.style.display = 'block';
@@ -165,7 +161,7 @@
         }
 
         // --- 3. MONITORAMENTO DE ESTADO ---
-        supabase.auth.onAuthStateChange((event, session) => {
+        bancoCine.auth.onAuthStateChange((event, session) => {
             if (session) {
                 document.getElementById('auth-screen').style.display = 'none';
                 document.getElementById('app-screen').style.display = 'block';
@@ -178,7 +174,7 @@
         });
 
         async function logout() {
-            await supabase.auth.signOut();
+            await bancoCine.auth.signOut();
             location.reload();
         }
 
@@ -215,6 +211,7 @@
             const res = await fetch(url);
             const data = await res.json();
             const div = document.getElementById(divId);
+            div.innerHTML = ""; // Limpa antes de adicionar
             
             data.results.forEach(f => {
                 if(f.poster_path) {
