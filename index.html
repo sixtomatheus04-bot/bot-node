@@ -3,145 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream - Verificação Real</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>CineStream - Oficial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <style>
-        :root { --primary: #E50914; --bg: #0f0f0f; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-
-        .container {
-            background: rgba(0,0,0,0.85); padding: 40px; border-radius: 12px; width: 100%; max-width: 400px;
-            box-shadow: 0 0 50px rgba(229,9,20,0.2); text-align: center;
-        }
-        h1 { color: var(--primary); margin-bottom: 5px; }
-        p { color: #888; font-size: 14px; margin-bottom: 25px; }
-
-        input {
-            width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 5px;
-            border: 1px solid #333; background: #222; color: white; box-sizing: border-box;
-        }
+        :root { --red: #E50914; --dark: #141414; --gray: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        .btn {
-            width: 100%; padding: 15px; border: none; border-radius: 5px; cursor: pointer;
-            font-weight: bold; font-size: 16px; margin-top: 10px; transition: 0.3s;
+        body { background: #000; color: white; font-family: 'Roboto', sans-serif; overflow-x: hidden; }
+
+        /* --- TELA DE LOGIN --- */
+        #auth-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1000;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+            background-size: cover; display: flex; align-items: center; justify-content: center;
         }
-        .btn-login { background: var(--primary); color: white; }
-        .btn-login:hover { background: #b20710; }
+        .login-box {
+            background: rgba(0,0,0,0.85); padding: 60px; border-radius: 8px; width: 100%; max-width: 450px;
+        }
+        .login-box h1 { font-family: 'Bebas Neue'; font-size: 40px; margin-bottom: 20px; }
+        .input-group input {
+            width: 100%; padding: 16px; margin-bottom: 16px; background: #333; border: none; border-radius: 4px; color: white; font-size: 16px;
+        }
+        .btn-main {
+            width: 100%; padding: 16px; background: var(--red); color: white; border: none; font-weight: bold; font-size: 16px; border-radius: 4px; cursor: pointer; transition: 0.2s;
+        }
+        .btn-main:hover { background: #f40612; }
+        .toggle-text { margin-top: 15px; color: #737373; font-size: 14px; }
+        .toggle-text b { color: white; cursor: pointer; }
+        .error-msg { color: #e87c03; font-size: 13px; margin-bottom: 10px; display: none; }
+
+        /* --- APP PRINCIPAL --- */
+        #app-screen { display: none; }
         
-        .btn-signup { background: transparent; border: 1px solid #555; color: #ccc; }
-        .btn-signup:hover { border-color: white; color: white; }
-
-        #message-box {
-            margin-top: 20px; padding: 15px; border-radius: 5px; font-size: 13px; display: none;
+        /* Navbar */
+        .nav {
+            position: fixed; top: 0; width: 100%; padding: 20px 4%; display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent); z-index: 100; transition: 0.3s;
         }
-        .success { background: rgba(0, 255, 0, 0.1); color: #4caf50; border: 1px solid #4caf50; }
-        .error { background: rgba(255, 0, 0, 0.1); color: #f44336; border: 1px solid #f44336; }
+        .nav.black { background: #111; }
+        .logo { color: var(--red); font-family: 'Bebas Neue'; font-size: 35px; cursor: pointer; }
+        .user-menu { display: flex; align-items: center; gap: 15px; }
+        .btn-logout { background: transparent; border: 1px solid white; color: white; padding: 5px 15px; cursor: pointer; }
 
-        /* Área Logada */
-        #app-area { display: none; text-align: center; }
-        .avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 15px; }
+        /* Banner Hero */
+        .hero {
+            height: 80vh; background-size: cover; background-position: center; position: relative;
+        }
+        .hero-gradient {
+            position: absolute; width: 100%; height: 100%;
+            background: linear-gradient(to top, #000 10%, transparent 90%);
+        }
+        .hero-content {
+            position: absolute; bottom: 150px; left: 4%; max-width: 600px;
+        }
+        .hero-title { font-size: 60px; font-weight: 800; margin-bottom: 20px; text-shadow: 2px 2px 4px #000; font-family: 'Bebas Neue'; }
+        .hero-desc { font-size: 18px; margin-bottom: 20px; line-height: 1.4; text-shadow: 1px 1px 2px #000; }
+        .btn-hero { padding: 10px 25px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 10px; }
+        .btn-play { background: white; color: black; }
+        .btn-play:hover { opacity: 0.8; }
+
+        /* Listas de Filmes */
+        .row { margin-left: 4%; margin-top: 20px; margin-bottom: 40px; }
+        .row h2 { font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #e5e5e5; }
+        .posters {
+            display: flex; overflow-x: scroll; gap: 10px; padding: 10px 0; scrollbar-width: none;
+        }
+        .posters::-webkit-scrollbar { display: none; }
+        .poster {
+            max-height: 180px; border-radius: 4px; transition: 0.3s; cursor: pointer;
+        }
+        .poster:hover { transform: scale(1.1); margin: 0 10px; opacity: 1; }
+        .poster-large { max-height: 280px; }
+
+        /* Player Modal */
+        #player-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 2000;
+        }
+        iframe { width: 100%; height: 100%; border: none; }
+        .close-btn {
+            position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; z-index: 2001; text-shadow: 0 0 10px black;
+        }
+        .loading {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--red);
+        }
     </style>
 </head>
 <body>
 
-    <div class="container" id="auth-area">
-        <h1>CineStream</h1>
-        <p>Acesse ou crie sua conta para assistir</p>
-
-        <input type="email" id="email" placeholder="Seu melhor e-mail">
-        <input type="password" id="password" placeholder="Senha segura">
-
-        <button class="btn btn-login" onclick="fazerLogin()">Entrar</button>
-        <button class="btn btn-signup" onclick="criarConta()">Criar Conta Nova</button>
-
-        <div id="message-box"></div>
+    <div id="auth-screen">
+        <div class="login-box">
+            <h1>Entrar</h1>
+            <p id="error-msg" class="error-msg"></p>
+            
+            <div class="input-group">
+                <input type="email" id="email" placeholder="Email">
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Senha">
+            </div>
+            
+            <button class="btn-main" onclick="handleAuth()">Entrar</button>
+            
+            <div class="toggle-text">
+                Novo por aqui? <b onclick="toggleMode()">Assine agora.</b>
+            </div>
+        </div>
     </div>
 
-    <div class="container" id="app-area" style="background: #1a1a1a;">
-        <img src="https://i.pinimg.com/736x/c5/2e/c5/c52ec530a6c6d264f331610e3034e341.jpg" class="avatar">
-        <h2>Bem-vindo!</h2>
-        <p id="user-email">...</p>
-        <div style="background: #333; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
-            Status: <span style="color: #4caf50; font-weight: bold;">E-mail Verificado ✅</span>
+    <div id="app-screen">
+        <nav class="nav" id="nav">
+            <div class="logo">CINESTREAM</div>
+            <div class="user-menu">
+                <span id="user-email-display" style="font-size: 12px; color: #ccc;"></span>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </nav>
+
+        <header class="hero" id="hero">
+            <div class="hero-gradient"></div>
+            <div class="hero-content">
+                <h1 class="hero-title" id="hero-title">Carregando...</h1>
+                <p class="hero-desc" id="hero-overview">...</p>
+                <button class="btn-hero btn-play" id="hero-play">▶ Assistir</button>
+            </div>
+        </header>
+
+        <div class="row">
+            <h2>Originais CineStream</h2>
+            <div class="posters" id="trending-row"></div>
         </div>
-        <button class="btn btn-signup" onclick="sair()">Sair</button>
+        <div class="row">
+            <h2>Ação</h2>
+            <div class="posters" id="action-row"></div>
+        </div>
+        <div class="row">
+            <h2>Comédia</h2>
+            <div class="posters" id="comedy-row"></div>
+        </div>
+    </div>
+
+    <div id="player-modal">
+        <span class="close-btn" onclick="closePlayer()">×</span>
+        <div class="loading">Carregando player...</div>
+        <iframe id="video-frame" allowfullscreen></iframe>
     </div>
 
     <script>
-        // --- 1. CONFIGURAÇÃO COM SUAS CHAVES ---
+        // --- CONFIGURAÇÕES ---
         const SUPABASE_URL = 'https://jfzgzkurjnznfnlvdghv.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_qAm18bsGOiBpLk9H3lsnQQ_WgkBLUa4';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impmemd6a3Vyam56bmZubHZkZ2h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0NzI1NjUsImV4cCI6MjA4NTA0ODU2NX0.ntJQabnc1pJvlRwdyldLD7h-60WUN3bgtY2isHrwmDs'; // <--- SUA CHAVE NOVA AQUI
+        const TMDB_KEY = 'c3162eed0616407fa43134e07880c7d5';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let isLoginMode = true; // Controla se é Login ou Cadastro
 
-        // --- 2. CRIAR CONTA (Dispara o e-mail via SMTP) ---
-        async function criarConta() {
+        // --- AUTENTICAÇÃO ---
+        
+        // Verifica se já está logado ao abrir
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session) {
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'block';
+                document.getElementById('user-email-display').innerText = session.user.email;
+                loadContent();
+            } else {
+                document.getElementById('auth-screen').style.display = 'flex';
+                document.getElementById('app-screen').style.display = 'none';
+            }
+        });
+
+        async function handleAuth() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const msgBox = document.getElementById('message-box');
+            const errorBox = document.getElementById('error-msg');
+            
+            errorBox.style.display = 'none';
 
-            if(!email || !password) return mostrarMsg("Preencha e-mail e senha.", "error");
+            if (!email || !password) {
+                showError("Preencha todos os campos.");
+                return;
+            }
 
-            mostrarMsg("Enviando e-mail de confirmação...", "success");
-
-            const { data, error } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                mostrarMsg("Erro: " + error.message, "error");
+            let result;
+            if (isLoginMode) {
+                // Tenta Logar
+                result = await supabase.auth.signInWithPassword({ email, password });
             } else {
-                mostrarMsg(`✅ Sucesso! Um link foi enviado para <b>${email}</b>. Confirme lá no seu Gmail para entrar.`, "success");
+                // Tenta Criar Conta
+                result = await supabase.auth.signUp({ email, password });
+            }
+
+            if (result.error) {
+                showError(result.error.message);
+            } else {
+                if(!isLoginMode) {
+                    alert("Conta criada! Se o login não for automático, clique em Entrar.");
+                    toggleMode(); // Volta para tela de login
+                }
             }
         }
 
-        // --- 3. FAZER LOGIN ---
-        async function fazerLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                mostrarMsg("Erro: " + error.message, "error");
-            } else {
-                // O observador de estado (onAuthStateChange) vai cuidar da troca de tela
-                console.log("Login feito:", data);
-            }
-        }
-
-        // --- 4. SAIR ---
-        async function sair() {
+        async function logout() {
             await supabase.auth.signOut();
             window.location.reload();
         }
 
-        // --- 5. FUNÇÕES DE TELA ---
-        function mostrarMsg(texto, tipo) {
-            const box = document.getElementById('message-box');
-            box.style.display = 'block';
-            box.className = tipo;
-            box.innerHTML = texto;
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            document.querySelector('.login-box h1').innerText = isLoginMode ? 'Entrar' : 'Criar Conta';
+            document.querySelector('.btn-main').innerText = isLoginMode ? 'Entrar' : 'Cadastrar';
+            document.querySelector('.toggle-text b').innerText = isLoginMode ? 'Assine agora.' : 'Já tem conta? Entre.';
         }
 
-        // --- 6. MONITORAR SE TÁ LOGADO ---
-        supabase.auth.onAuthStateChange((event, session) => {
-            if (session) {
-                // Usuário logado
-                document.getElementById('auth-area').style.display = 'none';
-                document.getElementById('app-area').style.display = 'block';
-                document.getElementById('user-email').innerText = session.user.email;
-            } else {
-                // Ninguém logado
-                document.getElementById('auth-area').style.display = 'block';
-                document.getElementById('app-area').style.display = 'none';
-            }
+        function showError(msg) {
+            const el = document.getElementById('error-msg');
+            el.innerText = msg;
+            el.style.display = 'block';
+        }
+
+        // --- LÓGICA DE FILMES (TMDb) ---
+
+        async function loadContent() {
+            const BASE_URL = "https://api.themoviedb.org/3";
+            const IMG_URL = "https://image.tmdb.org/t/p/original";
+            const POSTER_URL = "https://image.tmdb.org/t/p/w300";
+
+            // 1. Carregar Banner (Hero)
+            const resHero = await fetch(`${BASE_URL}/trending/all/week?api_key=${TMDB_KEY}&language=pt-BR`);
+            const dataHero = await resHero.json();
+            const heroMovie = dataHero.results[Math.floor(Math.random() * 10)]; // Pega um aleatório
+
+            document.getElementById('hero').style.backgroundImage = `url(${IMG_URL}${heroMovie.backdrop_path})`;
+            document.getElementById('hero-title').innerText = heroMovie.title || heroMovie.name;
+            document.getElementById('hero-overview').innerText = heroMovie.overview;
+            
+            document.getElementById('hero-play').onclick = () => openPlayer(heroMovie.id, heroMovie.media_type);
+
+            // 2. Carregar Listas
+            loadRow(`${BASE_URL}/trending/tv/week?api_key=${TMDB_KEY}&language=pt-BR`, 'trending-row', true);
+            loadRow(`${BASE_URL}/discover/movie?api_key=${TMDB_KEY}&with_genres=28&language=pt-BR`, 'action-row');
+            loadRow(`${BASE_URL}/discover/movie?api_key=${TMDB_KEY}&with_genres=35&language=pt-BR`, 'comedy-row');
+        }
+
+        async function loadRow(url, elementId, isLarge = false) {
+            const res = await fetch(url);
+            const data = await res.json();
+            const container = document.getElementById(elementId);
+            const POSTER_URL = "https://image.tmdb.org/t/p/w300";
+
+            data.results.forEach(item => {
+                if(!item.poster_path) return;
+                const img = document.createElement('img');
+                img.className = `poster ${isLarge ? 'poster-large' : ''}`;
+                img.src = `${POSTER_URL}${item.poster_path}`;
+                img.onclick = () => openPlayer(item.id, item.media_type || 'movie');
+                container.appendChild(img);
+            });
+        }
+
+        // --- PLAYER ---
+        function openPlayer(id, type) {
+            const modal = document.getElementById('player-modal');
+            const iframe = document.getElementById('video-frame');
+            
+            // Define se é filme ou série para o link funcionar
+            const mediaType = type === 'tv' ? 'tv' : 'movie';
+            
+            iframe.src = `https://vidsrc.me/embed/${mediaType}?tmdb=${id}`;
+            modal.style.display = 'block';
+        }
+
+        function closePlayer() {
+            const modal = document.getElementById('player-modal');
+            const iframe = document.getElementById('video-frame');
+            iframe.src = '';
+            modal.style.display = 'none';
+        }
+
+        // Efeito Navbar preta ao rolar
+        window.addEventListener("scroll", () => {
+            const nav = document.getElementById("nav");
+            if (window.scrollY > 100) nav.classList.add("black");
+            else nav.classList.remove("black");
         });
 
     </script>
