@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream - Pro</title>
+    <title>CineStream - Login & Assinatura</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -15,158 +15,133 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--red); }
 
-        /* NAVBAR */
+        /* --- TELA DE LOGIN --- */
+        #auth-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 2000;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
+            background-size: cover; display: flex; align-items: center; justify-content: center;
+        }
+        .login-card {
+            background: rgba(0,0,0,0.85); padding: 50px; border-radius: 8px; width: 100%; max-width: 400px;
+        }
+        .login-title { font-family: 'Bebas Neue'; font-size: 40px; margin-bottom: 20px; color: var(--red); }
+        .input-group { margin-bottom: 15px; }
+        .input-group input {
+            width: 100%; padding: 15px; background: #333; border: 1px solid #444; border-radius: 4px; color: white; font-size: 16px;
+        }
+        .btn-auth {
+            width: 100%; padding: 15px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 16px; transition: 0.3s;
+        }
+        .btn-auth:hover { background: #f40612; }
+        .switch-txt { margin-top: 15px; font-size: 14px; color: #aaa; cursor: pointer; }
+        .switch-txt span { color: white; text-decoration: underline; }
+        .error-msg { color: #ffbaba; background: rgba(255,0,0,0.2); padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none; font-size: 14px; border: 1px solid var(--red); }
+
+        /* --- NAVBAR --- */
         .nav {
             position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between;
             background: linear-gradient(to bottom, rgba(0,0,0,0.95), transparent); z-index: 100; transition: 0.4s;
         }
         .nav.black { background: #000; border-bottom: 1px solid #222; }
         
-        .nav-left { display: flex; align-items: center; gap: 25px; }
-        .hamburger { font-size: 26px; cursor: pointer; color: white; transition: 0.2s; }
-        .logo { color: var(--red); font-family: 'Bebas Neue'; font-size: 35px; cursor: pointer; letter-spacing: 1px; text-shadow: 0 0 10px rgba(229, 9, 20, 0.5); }
-
-        .search-box {
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); 
-            padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; backdrop-filter: blur(5px);
-        }
-        .search-box input { background: transparent; border: none; color: white; padding: 5px; width: 200px; font-family: 'Outfit', sans-serif; }
-        .search-box button { background: transparent; border: none; color: #ccc; cursor: pointer; }
-
-        /* SIDEBAR */
-        .sidebar {
-            position: fixed; top: 0; left: 0; width: 280px; height: 100vh; background: #111; z-index: 200;
-            transform: translateX(-100%); transition: 0.4s; padding-top: 80px; border-right: 1px solid #333;
-        }
-        .sidebar.active { transform: translateX(0); box-shadow: 5px 0 30px rgba(0,0,0,0.8); }
-        .sidebar a {
-            display: flex; align-items: center; gap: 15px; padding: 15px 30px; color: #aaa; text-decoration: none; font-size: 16px; transition: 0.2s;
-        }
-        .sidebar a:hover { color: white; background: #222; border-left: 4px solid var(--red); }
-        .close-sidebar { position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; color: white; }
-        .overlay-menu { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; backdrop-filter: blur(3px); }
-
-        /* HERO */
-        .hero { height: 95vh; background-size: cover; background-position: center top; position: relative; transition: 0.5s; }
-        .hero::after { content: ''; position: absolute; width: 100%; height: 100%; bottom: 0; left: 0; background: linear-gradient(to top, var(--black) 10%, transparent 60%); }
-        .hero-content { position: absolute; bottom: 25%; left: 4%; max-width: 650px; z-index: 2; text-shadow: 2px 2px 10px black; }
-        .hero-title { font-size: 70px; font-family: 'Bebas Neue'; line-height: 0.9; margin-bottom: 20px; }
-        .hero-desc { font-size: 17px; margin-bottom: 25px; line-height: 1.6; color: #ddd; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        .btn { padding: 12px 30px; font-size: 18px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; margin-right: 15px; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; }
-        .btn-white { background: white; color: black; }
-        .btn-white:hover { transform: scale(1.05); background: #eee; }
-        .btn-gray { background: rgba(109, 109, 109, 0.4); color: white; backdrop-filter: blur(5px); }
-
-        /* FILTROS */
-        .brands-container {
-            position: relative; z-index: 10; margin-top: -80px; padding: 0 4% 40px 4%;
-            display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;
-        }
-        .brand-item {
-            width: 60px; height: 60px; border-radius: 12px; cursor: pointer; background: #1f1f1f; border: 2px solid #333; 
-            display: flex; align-items: center; justify-content: center; transition: 0.3s; position: relative; overflow: hidden;
-        }
-        .brand-item:hover, .brand-item.active { transform: scale(1.15); border-color: white; box-shadow: 0 0 20px rgba(255,255,255,0.2); background: #333; }
-        .brand-logo-txt { font-family: 'Bebas Neue'; font-size: 18px; letter-spacing: 1px; }
-
-        /* LISTAS */
-        .container { position: relative; z-index: 10; padding-bottom: 50px; min-height: 100vh; }
-        .row { margin-bottom: 50px; }
-        .row h2 { color: #e5e5e5; font-size: 20px; font-weight: 600; border-left: 4px solid var(--red); padding-left: 10px; }
-        .posters { display: flex; overflow-x: auto; gap: 15px; padding: 10px 4%; scrollbar-width: none; }
-        .poster { min-width: 160px; height: 240px; border-radius: 8px; transition: 0.3s; cursor: pointer; object-fit: cover; border: 1px solid transparent; }
-        .poster:hover { transform: scale(1.1); margin: 0 10px; z-index: 20; border-color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-
-        /* SEARCH & MODAL */
-        #search-results { display: none; padding: 100px 4% 40px 4%; }
-        .grid-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
-        .grid-item img { width: 100%; height: 270px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .nav-left { display: flex; align-items: center; gap: 20px; }
+        .logo { color: var(--red); font-family: 'Bebas Neue'; font-size: 30px; cursor: pointer; }
         
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; overflow-y: auto; justify-content: center; padding-top: 50px; backdrop-filter: blur(5px); }
-        .modal-content { background: #181818; width: 90%; max-width: 900px; border-radius: 12px; position: relative; margin-bottom: 50px; border: 1px solid #333; }
-        .close-modal { position: absolute; top: 15px; right: 20px; background: rgba(0,0,0,0.5); color: white; border-radius: 50%; width: 40px; height: 40px; border: none; cursor: pointer; z-index: 10; font-size: 24px; }
-        .modal-hero { height: 450px; background-size: cover; border-radius: 12px 12px 0 0; position: relative; }
-        .modal-info { padding: 40px; margin-top: -60px; position: relative; }
-        .season-select { background: #333; color: white; padding: 12px; border: 1px solid #555; width: 100%; margin: 20px 0; border-radius: 6px; }
-        .episode-item { display: flex; gap: 20px; padding: 15px; background: #222; border-radius: 8px; cursor: pointer; align-items: center; transition: 0.2s; margin-bottom: 10px; }
-        .episode-item:hover { background: #333; border: 1px solid var(--red); }
-        .episode-item img { width: 140px; border-radius: 4px; }
+        .user-menu { display: flex; align-items: center; gap: 15px; }
+        .vip-tag { background: #E5B80B; color: black; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; display: none; }
+        .btn-logout { background: transparent; border: 1px solid #666; color: white; padding: 5px 10px; cursor: pointer; font-size: 12px; }
 
-        /* PLAYER SIMPLES E EFICIENTE */
-        #video-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 6000; }
-        iframe { width: 100%; height: 100%; border: none; background: #000; }
-        .close-video { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; z-index: 6002; text-shadow: 0 0 10px black; }
+        /* --- HERO & APP --- */
+        #app-screen { display: none; } /* Começa escondido */
+        .hero { height: 95vh; background-size: cover; background-position: center top; position: relative; }
+        .hero-content { position: absolute; bottom: 25%; left: 4%; max-width: 600px; text-shadow: 2px 2px 10px black; }
+        .hero-title { font-size: 60px; font-family: 'Bebas Neue'; line-height: 0.9; margin-bottom: 20px; }
+        .btn { padding: 10px 25px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+        .btn-white { background: white; color: black; }
+        
+        /* LISTAS */
+        .row { margin-left: 4%; margin-bottom: 40px; }
+        .row h2 { color: #e5e5e5; font-size: 18px; font-weight: bold; margin-bottom: 10px; border-left: 4px solid var(--red); padding-left: 10px; }
+        .posters { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; scrollbar-width: none; }
+        .poster { max-height: 160px; border-radius: 4px; transition: 0.3s; cursor: pointer; }
+        .poster:hover { transform: scale(1.1); margin: 0 10px; }
+
+        /* MODAL DE PAGAMENTO (SIMULAÇÃO) */
+        #paywall-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 6000; align-items: center; justify-content: center;
+        }
+        .paywall-box { background: #141414; padding: 40px; text-align: center; border-radius: 10px; border: 1px solid var(--red); max-width: 500px; }
+        .paywall-box h2 { color: var(--red); font-size: 30px; margin-bottom: 10px; }
+        .paywall-box ul { text-align: left; margin: 20px 0; color: #ccc; }
+        .btn-pay { width: 100%; padding: 15px; background: #E5B80B; color: black; font-weight: bold; border: none; cursor: pointer; font-size: 18px; margin-top: 10px; }
+
+        /* PLAYER */
+        #video-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 5000; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .close-video { position: absolute; top: 20px; right: 20px; color: white; font-size: 40px; cursor: pointer; z-index: 5001; }
+
     </style>
 </head>
 <body>
 
-    <nav class="nav" id="navbar">
-        <div class="nav-left">
-            <div class="hamburger" onclick="toggleMenu()">☰</div>
-            <div class="logo" onclick="location.reload()">CINESTREAM</div>
-            <div id="current-filter-label" style="color: #aaa; font-size: 14px; border: 1px solid #333; padding: 5px 10px; border-radius: 20px; display: none;">Todos</div>
+    <div id="auth-screen">
+        <div class="login-card">
+            <h1 class="login-title" id="auth-title">Entrar</h1>
+            <div id="error-box" class="error-msg"></div>
+            
+            <div class="input-group">
+                <input type="email" id="email" placeholder="Email">
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Senha">
+            </div>
+            
+            <button class="btn-auth" onclick="processarAuth()" id="btn-action">Entrar</button>
+            
+            <div class="switch-txt" onclick="alternarModo()">
+                <span id="switch-text">Novo por aqui? Assine agora.</span>
+            </div>
         </div>
-        <div class="search-box">
-            <input type="text" id="search-input" placeholder="Pesquisar...">
-            <button onclick="fazerPesquisa()">🔍</button>
-        </div>
-    </nav>
-
-    <div class="overlay-menu" id="overlay-menu" onclick="toggleMenu()"></div>
-    <div class="sidebar" id="sidebar">
-        <div class="close-sidebar" onclick="toggleMenu()">×</div>
-        <a href="#" onclick="location.reload()">🏠 Início</a>
-        <a href="#" onclick="filtrarGenero(28, 'Ação')">💥 Ação</a>
-        <a href="#" onclick="filtrarGenero(35, 'Comédia')">😂 Comédia</a>
-        <a href="#" onclick="filtrarGenero(27, 'Terror')">👻 Terror</a>
-        <a href="#" onclick="filtrarGenero(10749, 'Romance')">❤️ Romance</a>
-        <a href="#" onclick="filtrarGenero(878, 'Sci-Fi')">🚀 Ficção</a>
     </div>
 
-    <div id="app-home">
+    <div id="app-screen">
+        <nav class="nav" id="navbar">
+            <div class="nav-left">
+                <div class="logo">CINESTREAM</div>
+            </div>
+            <div class="user-menu">
+                <div class="vip-tag" id="vip-badge">PREMIUM</div>
+                <div style="font-size: 13px;" id="user-email-display">usuario@email.com</div>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </nav>
+
         <header class="hero" id="hero">
             <div class="hero-content">
                 <h1 class="hero-title" id="hero-title">Carregando...</h1>
                 <p class="hero-desc" id="hero-desc">...</p>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-white" id="hero-btn">▶ Assistir</button>
-                    <button class="btn btn-gray" id="hero-info">ℹ Detalhes</button>
-                </div>
+                <button class="btn btn-white" id="hero-btn">▶ Assistir</button>
             </div>
         </header>
 
-        <div class="brands-container">
-            <div class="brand-item" onclick="resetarFiltro()" title="Todos"><div class="brand-logo-txt" style="font-size:14px;">TUDO</div></div>
-            <div class="brand-item" onclick="ativarRede(213, 'Netflix', '#E50914')"><div class="brand-logo-txt" style="color:#E50914;">N</div></div>
-            <div class="brand-item" onclick="ativarRede(2739, 'Disney+', '#113CCF')"><div class="brand-logo-txt" style="color:#113CCF;">D+</div></div>
-            <div class="brand-item" onclick="ativarRede(1024, 'Prime Video', '#00A8E1')"><div class="brand-logo-txt" style="color:#00A8E1;">Prime</div></div>
-            <div class="brand-item" onclick="ativarRede(49, 'HBO', '#fff')"><div class="brand-logo-txt" style="color:white;">HBO</div></div>
+        <div style="margin-top: -100px; position: relative; z-index: 10;">
+            <div class="row"><h2>🔥 Em Alta</h2><div class="posters" id="row-trend"></div></div>
+            <div class="row"><h2>🎬 Ação</h2><div class="posters" id="row-action"></div></div>
+            <div class="row"><h2>😂 Comédia</h2><div class="posters" id="row-comedy"></div></div>
         </div>
-
-        <div class="container" id="main-container"></div>
     </div>
 
-    <div id="search-results">
-        <h2 style="font-family:'Bebas Neue'; font-size:30px; margin-bottom:20px;">Resultados</h2>
-        <div class="grid-results" id="search-grid"></div>
-        <button class="btn btn-gray" onclick="location.reload()" style="margin-top:20px;">Voltar</button>
-    </div>
-
-    <div class="modal-overlay" id="detail-modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="fecharModal()">×</button>
-            <div class="modal-hero" id="modal-img"><div class="modal-gradient"></div></div>
-            <div class="modal-info">
-                <h1 id="modal-title" style="font-size: 40px; margin-bottom: 10px;">Titulo</h1>
-                <p id="modal-desc" style="color:#ccc; margin-bottom: 30px;">Sinopse...</p>
-                
-                <div id="area-filme"><button class="btn btn-white" onclick="tocarFilme()">▶ Assistir Filme</button></div>
-                <div id="area-serie" style="display: none;">
-                    <h3>Temporadas</h3>
-                    <select id="season-select" class="season-select" onchange="carregarEpisodios(this.value)"></select>
-                    <div id="episodes-list" class="episodes-list"></div>
-                </div>
-            </div>
+    <div id="paywall-modal">
+        <div class="paywall-box">
+            <h2>Seja Premium 👑</h2>
+            <p>Este conteúdo é exclusivo para assinantes.</p>
+            <ul>
+                <li>✅ Acesso ilimitado a filmes e séries</li>
+                <li>✅ Sem anúncios</li>
+                <li>✅ Qualidade 4K</li>
+            </ul>
+            <button class="btn-pay" onclick="assinarPremium()">ASSINAR AGORA (Simular)</button>
+            <p style="margin-top: 15px; font-size: 12px; cursor: pointer; color: #888;" onclick="fecharPaywall()">Voltar</p>
         </div>
     </div>
 
@@ -176,158 +151,214 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO
         const API_KEY = 'c3162eed0616407fa43134e07880c7d5';
         const BASE_URL = 'https://api.themoviedb.org/3';
         const IMG_URL = 'https://image.tmdb.org/t/p/original';
         const POSTER_URL = 'https://image.tmdb.org/t/p/w300';
 
-        let currentId, currentType, currentSeason = 1, currentEpisode = 1;
-        let activeNetwork = null;
+        // VARIÁVEIS DO SISTEMA
+        let isLoginMode = true;
+        let currentUser = null; // Guarda o usuário logado
 
-        const GENRES = [
-            {id: 28, name: "Ação"}, {id: 16, name: "Animação"}, {id: 35, name: "Comédia"}, 
-            {id: 27, name: "Terror"}, {id: 10749, name: "Romance"}, {id: 878, name: "Ficção Científica"},
-            {id: 80, name: "Crime"}, {id: 18, name: "Drama"}, {id: 14, name: "Fantasia"}
-        ];
-
-        window.onload = () => { resetarFiltro(); };
-
-        // --- NAVEGAÇÃO ---
-        function resetarFiltro() { activeNetwork = null; atualizarLabel("Início"); construirHome(); }
-        function ativarRede(id, nome, cor) { activeNetwork = id; atualizarLabel(`Catálogo: ${nome}`, cor); construirHome(); }
+        // --- SISTEMA DE BANCO DE DADOS (LOCALSTORAGE) ---
         
-        function atualizarLabel(txt, cor = "#aaa") {
-            const lbl = document.getElementById('current-filter-label');
-            lbl.innerText = txt; lbl.style.display = 'block'; lbl.style.borderColor = cor; lbl.style.color = cor;
-            document.getElementById('app-home').style.display = 'block';
-            document.getElementById('search-results').style.display = 'none';
+        function getUsersDB() {
+            // Pega a lista de usuários do navegador
+            const users = localStorage.getItem('cine_users_db');
+            return users ? JSON.parse(users) : [];
         }
 
-        function construirHome() {
-            const container = document.getElementById('main-container');
-            container.innerHTML = '';
-            const params = `&language=pt-BR&include_adult=false&sort_by=popularity.desc`;
-            let urlHero, urlTrend;
+        function saveUserDB(users) {
+            localStorage.setItem('cine_users_db', JSON.stringify(users));
+        }
 
-            if (activeNetwork) {
-                urlHero = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_networks=${activeNetwork}${params}`;
-                urlTrend = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_networks=${activeNetwork}${params}`;
+        function processarAuth() {
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const errorBox = document.getElementById('error-box');
+            
+            errorBox.style.display = 'none';
+
+            if (!email || !pass) {
+                showError("Preencha todos os campos.");
+                return;
+            }
+
+            const users = getUsersDB();
+
+            if (isLoginMode) {
+                // --- LOGIN ---
+                const user = users.find(u => u.email === email && u.pass === pass);
+                if (user) {
+                    loginSuccess(user);
+                } else {
+                    showError("Email ou senha incorretos.");
+                }
             } else {
-                urlHero = `${BASE_URL}/trending/all/day?api_key=${API_KEY}&language=pt-BR`;
-                urlTrend = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=pt-BR`;
+                // --- CADASTRO ---
+                const existing = users.find(u => u.email === email);
+                if (existing) {
+                    showError("Este email já está cadastrado.");
+                } else {
+                    const newUser = { 
+                        email: email, 
+                        pass: pass, 
+                        plan: 'free' // Todo mundo começa Grátis
+                    };
+                    users.push(newUser);
+                    saveUserDB(users);
+                    alert("Conta criada com sucesso! Faça login.");
+                    alternarModo(); // Vai para a tela de login
+                }
             }
-
-            carregarHero(urlHero);
-            container.innerHTML += `<div class="row"><h2>🔥 Destaques</h2><div class="posters" id="row-trend"></div></div>`;
-            carregarLista(urlTrend, 'row-trend', true);
-
-            GENRES.forEach(g => {
-                const rowId = `row-${g.id}`;
-                container.innerHTML += `<div class="row"><h2>${g.name}</h2><div class="posters" id="${rowId}"></div></div>`;
-                let url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${g.id}${params}`;
-                if(activeNetwork) url += `&with_networks=${activeNetwork}`;
-                carregarLista(url, rowId);
-            });
         }
 
-        async function carregarHero(url) {
-            const res = await fetch(url);
+        function loginSuccess(user) {
+            currentUser = user;
+            // Salva sessão
+            localStorage.setItem('cine_current_user', JSON.stringify(user));
+            
+            // Atualiza Interface
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            document.getElementById('user-email-display').innerText = user.email;
+            
+            atualizarBadge();
+            carregarFilmes();
+        }
+
+        function atualizarBadge() {
+            const badge = document.getElementById('vip-badge');
+            if (currentUser.plan === 'premium') {
+                badge.style.display = 'block';
+                badge.innerText = "PREMIUM";
+                badge.style.background = "#E5B80B";
+            } else {
+                badge.style.display = 'block';
+                badge.innerText = "GRÁTIS";
+                badge.style.background = "#666";
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('cine_current_user');
+            location.reload();
+        }
+
+        function showError(msg) {
+            const box = document.getElementById('error-box');
+            box.innerText = msg;
+            box.style.display = 'block';
+        }
+
+        function alternarModo() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? "Entrar" : "Criar Conta";
+            document.getElementById('btn-action').innerText = isLoginMode ? "Entrar" : "Cadastrar";
+            document.getElementById('switch-text').innerText = isLoginMode ? "Novo por aqui? Assine agora." : "Já tem conta? Entre aqui.";
+            document.getElementById('error-box').style.display = 'none';
+        }
+
+        // --- INICIALIZAÇÃO ---
+        window.onload = () => {
+            // Verifica se já estava logado
+            const saved = localStorage.getItem('cine_current_user');
+            if (saved) {
+                // Recarrega dados atualizados do banco (para ver se assinou)
+                const savedUser = JSON.parse(saved);
+                const db = getUsersDB();
+                const freshUser = db.find(u => u.email === savedUser.email);
+                
+                if (freshUser) {
+                    loginSuccess(freshUser);
+                } else {
+                    localStorage.removeItem('cine_current_user'); // Usuário foi deletado
+                }
+            }
+        };
+
+        // --- LÓGICA DE PAGAMENTO / ASSINATURA ---
+        
+        function verificarPermissao(filmeId) {
+            // Se for premium, libera tudo
+            if (currentUser.plan === 'premium') {
+                abrirPlayer(filmeId);
+            } else {
+                // Se for grátis, mostra o Paywall
+                document.getElementById('paywall-modal').style.display = 'flex';
+            }
+        }
+
+        function assinarPremium() {
+            // 1. Atualiza no banco de dados local
+            const users = getUsersDB();
+            const myIndex = users.findIndex(u => u.email === currentUser.email);
+            
+            if (myIndex !== -1) {
+                users[myIndex].plan = 'premium';
+                saveUserDB(users);
+                
+                // 2. Atualiza usuário atual
+                currentUser.plan = 'premium';
+                localStorage.setItem('cine_current_user', JSON.stringify(currentUser));
+                
+                // 3. Feedback
+                alert("Pagamento aprovado! Você agora é Premium.");
+                fecharPaywall();
+                atualizarBadge();
+            }
+        }
+
+        function fecharPaywall() {
+            document.getElementById('paywall-modal').style.display = 'none';
+        }
+
+        // --- SISTEMA DE FILMES (API) ---
+
+        async function carregarFilmes() {
+            // Hero
+            const res = await fetch(`${BASE_URL}/trending/movie/day?api_key=${API_KEY}&language=pt-BR`);
             const data = await res.json();
-            const item = data.results[0];
-            if(item) {
-                document.getElementById('hero').style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
-                document.getElementById('hero-title').innerText = item.title || item.name;
-                document.getElementById('hero-desc').innerText = item.overview;
-                document.getElementById('hero-btn').onclick = () => abrirDetalhes(item.id, item.media_type || 'movie');
-            }
+            const hero = data.results[0];
+            document.getElementById('hero').style.backgroundImage = `url(${IMG_URL}${hero.backdrop_path})`;
+            document.getElementById('hero-title').innerText = hero.title;
+            document.getElementById('hero-desc').innerText = hero.overview;
+            document.getElementById('hero-btn').onclick = () => verificarPermissao(hero.id);
+
+            // Listas
+            loadList(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=pt-BR`, 'row-trend');
+            loadList(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=28&language=pt-BR`, 'row-action');
+            loadList(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=35&language=pt-BR`, 'row-comedy');
         }
 
-        async function carregarLista(url, elId, grande=false) {
+        async function loadList(url, elId) {
             const res = await fetch(url);
             const data = await res.json();
             const el = document.getElementById(elId);
-            data.results.forEach(item => {
-                if(item.poster_path) {
-                    let type = item.media_type || (url.includes('/tv') ? 'tv' : 'movie');
-                    el.innerHTML += `<img src="${POSTER_URL}${item.poster_path}" class="poster ${grande?'poster-large':''}" onclick="abrirDetalhes(${item.id}, '${type}')">`;
+            data.results.forEach(f => {
+                if(f.poster_path) {
+                    el.innerHTML += `<img src="${POSTER_URL}${f.poster_path}" class="poster" onclick="verificarPermissao(${f.id})">`;
                 }
             });
         }
 
-        document.getElementById('search-input').addEventListener('keypress', (e) => { if(e.key==='Enter') fazerPesquisa(); });
-        async function fazerPesquisa() {
-            const q = document.getElementById('search-input').value;
-            if(!q) return;
-            document.getElementById('app-home').style.display='none';
-            document.getElementById('search-results').style.display='block';
-            const grid = document.getElementById('search-grid');
-            grid.innerHTML = 'Buscando...';
-            const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&language=pt-BR&query=${q}`);
-            const data = await res.json();
-            grid.innerHTML = '';
-            data.results.forEach(item => {
-                if(item.poster_path) grid.innerHTML += `<div class="grid-item"><img src="${POSTER_URL}${item.poster_path}" onclick="abrirDetalhes(${item.id}, '${item.media_type}')"></div>`;
-            });
-        }
-
-        function filtrarGenero(id, nome) {
-            toggleMenu(); activeNetwork=null;
-            document.getElementById('app-home').style.display='none';
-            document.getElementById('search-results').style.display='block';
-            const grid = document.getElementById('search-grid'); grid.innerHTML = 'Carregando...';
-            fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${id}&language=pt-BR`).then(r=>r.json()).then(d=>{
-                grid.innerHTML=''; d.results.forEach(i=>{ if(i.poster_path) grid.innerHTML += `<div class="grid-item"><img src="${POSTER_URL}${i.poster_path}" onclick="abrirDetalhes(${i.id}, 'movie')"></div>`; });
-            });
-        }
-        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay-menu').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; }
-
-        // --- DETALHES ---
-        async function abrirDetalhes(id, type) {
-            currentId = id; currentType = type;
-            const res = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}&language=pt-BR`);
-            const data = await res.json();
-            document.getElementById('modal-img').style.backgroundImage = `url(${IMG_URL}${data.backdrop_path})`;
-            document.getElementById('modal-title').innerText = data.title || data.name;
-            document.getElementById('modal-desc').innerText = data.overview;
-
-            if(type === 'tv') {
-                document.getElementById('area-filme').style.display = 'none';
-                document.getElementById('area-serie').style.display = 'block';
-                const s = document.getElementById('season-select'); s.innerHTML='';
-                for(let i=1; i<=data.number_of_seasons; i++) s.innerHTML += `<option value="${i}">Temporada ${i}</option>`;
-                carregarEpisodios(1);
-            } else {
-                document.getElementById('area-filme').style.display = 'block';
-                document.getElementById('area-serie').style.display = 'none';
-            }
-            document.getElementById('detail-modal').style.display = 'flex';
-        }
-
-        async function carregarEpisodios(season) {
-            currentSeason = season;
-            const list = document.getElementById('episodes-list'); list.innerHTML = 'Carregando...';
-            const res = await fetch(`${BASE_URL}/tv/${currentId}/season/${season}?api_key=${API_KEY}&language=pt-BR`);
-            const data = await res.json();
-            list.innerHTML = '';
-            data.episodes.forEach(ep => {
-                const img = ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '';
-                list.innerHTML += `<div class="episode-item" onclick="tocarEpisodio(${season}, ${ep.episode_number})"><img src="${img}"><div><h4>${ep.episode_number}. ${ep.name}</h4></div><div style="margin-left:auto">▶</div></div>`;
-            });
-        }
-
-        // --- PLAYER INTERNACIONAL (VIDSRC) ---
-        function tocarFilme() { 
+        // PLAYER
+        function abrirPlayer(id) {
             document.getElementById('video-overlay').style.display = 'block';
-            document.getElementById('video-frame').src = `https://vidsrc.me/embed/movie?tmdb=${currentId}`;
+            document.getElementById('video-frame').src = `https://vidsrc.me/embed/movie?tmdb=${id}`;
         }
-        function tocarEpisodio(s, e) {
-            document.getElementById('video-overlay').style.display = 'block';
-            document.getElementById('video-frame').src = `https://vidsrc.me/embed/tv?tmdb=${currentId}&season=${s}&episode=${e}`;
+        function fecharVideo() {
+            document.getElementById('video-overlay').style.display = 'none';
+            document.getElementById('video-frame').src = '';
         }
         
-        function fecharVideo() { document.getElementById('video-overlay').style.display = 'none'; document.getElementById('video-frame').src = ''; }
-        function fecharModal() { document.getElementById('detail-modal').style.display = 'none'; }
-        window.onscroll = () => { const n = document.getElementById('navbar'); window.scrollY>50 ? n.classList.add('black') : n.classList.remove('black'); };
+        // Scroll Nav
+        window.onscroll = () => {
+            const n = document.getElementById('navbar');
+            window.scrollY > 50 ? n.classList.add('black') : n.classList.remove('black');
+        };
+
     </script>
 </body>
 </html>
