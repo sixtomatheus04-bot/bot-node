@@ -2,117 +2,97 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>NuClone</title>
+    <title>NuClone Bank</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { background: #820AD1; color: white; font-family: 'Outfit', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .phone { background: #fff; color: black; width: 350px; height: 650px; border-radius: 30px; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
-        
+        .phone { background: #fff; color: black; width: 350px; height: 650px; border-radius: 30px; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .header { background: #820AD1; padding: 30px 20px; color: white; }
         .view { display: none; height: 100%; flex-direction: column; }
         .view.active { display: flex; }
-        
         .inp { width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; font-size: 16px; }
-        .btn-nu { background: #820AD1; color: white; border: none; padding: 15px; border-radius: 30px; font-weight: bold; width: 100%; cursor: pointer; }
-        
-        h2 { color: #820AD1; margin-bottom: 5px; }
-        .bal { font-size: 28px; font-weight: bold; margin: 20px 0; }
+        .btn { background: #820AD1; color: white; border: none; padding: 15px; border-radius: 30px; font-weight: bold; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div class="phone">
-        
-        <div id="v-login" class="view active" style="justify-content:center;">
-            <h2>Olá, NuClone</h2>
-            <p style="color:#666; margin-bottom:20px;">Complete seu cadastro bancário.</p>
-            <input id="reg-name" class="inp" placeholder="Nome Completo">
-            <input id="reg-cpf" class="inp" placeholder="CPF">
-            <input id="reg-pin" class="inp" type="password" placeholder="Senha (4 números)" maxlength="4">
-            <button class="btn-nu" onclick="createBank()">ACESSAR CONTA</button>
+        <div id="v-login" class="view active" style="padding:40px; justify-content:center;">
+            <h2 style="color:#820AD1;">NuClone</h2>
+            <p style="color:#666;">Finalize seu cadastro.</p>
+            <input id="n-name" class="inp" placeholder="Nome">
+            <input id="n-cpf" class="inp" placeholder="CPF">
+            <input id="n-pin" class="inp" type="password" placeholder="Senha (4 dig)" maxlength="4">
+            <button class="btn" onclick="reg()">ENTRAR</button>
         </div>
-
         <div id="v-home" class="view">
-            <div style="background:#820AD1; color:white; padding:20px; margin:-20px -20px 20px -20px;">
-                <span id="user-name">Olá</span>
+            <div class="header"><h3>Olá, <span id="u-name"></span></h3></div>
+            <div style="padding:20px;">
+                <p>Saldo</p><h2 style="margin:0;">R$ <span id="u-bal">0.00</span></h2>
             </div>
-            <p style="color:#666;">Saldo disponível</p>
-            <div class="bal">R$ <span id="balance">0.00</span></div>
-            <div style="display:flex; gap:10px; overflow-x:auto; padding:10px 0;">
-                <div style="background:#f0f0f0; width:80px; height:80px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="goto('pix')">Pix</div>
+            <div style="padding:20px; display:flex; gap:10px;">
+                <div style="background:#f0f0f0; padding:15px; border-radius:10px; text-align:center; cursor:pointer;" onclick="goto('pix')">Pix</div>
             </div>
         </div>
-
-        <div id="v-pix" class="view">
-            <h2>Área Pix</h2>
-            <p>Pagar Código:</p>
-            <input id="pix-key" class="inp" placeholder="Cola aqui...">
-            <button class="btn-nu" onclick="pay()">PAGAR</button>
-            <p style="text-align:center; color:#820AD1; margin-top:20px; cursor:pointer;" onclick="goto('home')">Voltar</p>
+        <div id="v-pix" class="view" style="padding:20px;">
+            <h3 style="color:#820AD1;">Área Pix</h3>
+            <input id="pix-key" class="inp" placeholder="Cola o código aqui...">
+            <button class="btn" onclick="pay()">PAGAR</button>
+            <p style="text-align:center; margin-top:20px; cursor:pointer;" onclick="goto('home')">Voltar</p>
         </div>
-
     </div>
 
     <script>
-        const DB_KEY = 'cine_v19_ecosystem';
+        const DB_KEY = 'cine_v20_system';
         let currentUser = null;
-
         function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
         function saveDB(d) { localStorage.setItem(DB_KEY, JSON.stringify(d)); }
 
         window.onload = () => {
             const s = JSON.parse(localStorage.getItem('cineSession'));
-            if(!s) { alert("Entre no CineStream primeiro!"); return; }
-            
-            const db = getDB();
-            currentUser = db.find(u => u.email === s.email);
-            
-            if(currentUser.name && currentUser.name !== 'Usuário') {
-                updateUI(); goto('home');
+            if(!s) { alert("Entre no Site primeiro!"); return; }
+            const u = getDB().find(x => x.email === s.email);
+            if(u) {
+                currentUser = u;
+                if(u.name !== 'Cliente') { updateUI(); goto('home'); }
             }
         };
-
-        function createBank() {
-            const n = document.getElementById('reg-name').value;
-            const c = document.getElementById('reg-cpf').value;
-            const p = document.getElementById('reg-pin').value;
-            
-            if(n && c && p.length===4) {
-                const db = getDB();
-                const i = db.findIndex(u => u.email === currentUser.email);
-                db[i].name = n; db[i].cpf = c; db[i].pin = p;
-                saveDB(db); currentUser = db[i];
-                updateUI(); goto('home');
-            } else alert("Preencha tudo");
-        }
-
-        function updateUI() {
-            document.getElementById('user-name').innerText = "Olá, " + currentUser.name;
-            document.getElementById('balance').innerText = currentUser.balance.toFixed(2);
-        }
 
         function goto(v) {
             document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
             document.getElementById('v-'+v).classList.add('active');
         }
 
+        function reg() {
+            const n = document.getElementById('n-name').value;
+            const pin = document.getElementById('n-pin').value;
+            if(n && pin.length===4) {
+                const db = getDB();
+                const i = db.findIndex(u => u.email === currentUser.email);
+                db[i].name = n; db[i].pin = pin;
+                saveDB(db); currentUser = db[i]; updateUI(); goto('home');
+            } else alert('Erro');
+        }
+
+        function updateUI() {
+            document.getElementById('u-name').innerText = currentUser.name;
+            document.getElementById('u-bal').innerText = currentUser.balance.toFixed(2);
+        }
+
         function pay() {
             const k = document.getElementById('pix-key').value;
             if(!k.includes('CINESTREAM')) return alert("Código Inválido");
-            
-            // CINESTREAM_PREMIUM_29.90
             const val = parseFloat(k.split('_')[2]);
             const plan = k.split('_')[1].toLowerCase();
 
             if(currentUser.balance >= val) {
                 const db = getDB();
                 const i = db.findIndex(u => u.email === currentUser.email);
-                
                 db[i].balance -= val;
                 db[i].plan = plan; // ATIVA NO SITE
-                
                 saveDB(db); currentUser = db[i];
-                alert("PAGAMENTO REALIZADO! Plano Ativado.");
+                alert("Pagamento Realizado!");
                 updateUI(); goto('home');
             } else alert("Saldo insuficiente. Peça ao Admin.");
         }
