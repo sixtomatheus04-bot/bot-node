@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NuClone Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #820AD1; color: white; font-family: 'Outfit', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .phone { background: #fff; color: black; width: 350px; height: 700px; border-radius: 30px; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        
+        .header { background: #820AD1; padding: 30px 20px; color: white; }
+        .user-name { font-weight: bold; font-size: 18px; margin-top: 10px; }
+        
+        .balance-card { padding: 20px; border-bottom: 1px solid #eee; }
+        .balance-label { font-size: 14px; color: #666; }
+        .balance-value { font-size: 24px; font-weight: bold; margin-top: 5px; }
+        
+        .actions { display: flex; gap: 10px; padding: 20px; overflow-x: auto; }
+        .action-btn { background: #eee; border-radius: 50%; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; }
+        .action-label { font-size: 12px; text-align: center; margin-top: 5px; }
+        
+        .pix-area { background: #f0f0f0; padding: 20px; flex: 1; display: none; flex-direction: column; }
+        .pix-input { width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; }
+        .pay-btn { background: #820AD1; color: white; border: none; padding: 15px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+        
+        .notification { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="phone">
+        <div class="notification" id="notify">Pagamento Realizado!</div>
+        
+        <div class="header">
+            <i class="fas fa-user-circle" style="font-size: 30px;"></i>
+            <div class="user-name" id="user-name">Olá, Cliente</div>
+        </div>
+
+        <div id="home-view">
+            <div class="balance-card">
+                <div class="balance-label">Conta</div>
+                <div class="balance-value">R$ <span id="balance">0.00</span></div>
+            </div>
+
+            <div class="actions">
+                <div style="text-align: center;">
+                    <div class="action-btn" onclick="showPix()"><i class="fas fa-brands fa-pix"></i></div>
+                    <div class="action-label">Pix</div>
+                </div>
+                <div style="text-align: center;">
+                    <div class="action-btn"><i class="fas fa-barcode"></i></div>
+                    <div class="action-label">Pagar</div>
+                </div>
+                <div style="text-align: center;">
+                    <div class="action-btn"><i class="fas fa-hand-holding-usd"></i></div>
+                    <div class="action-label">Transferir</div>
+                </div>
+            </div>
+            
+            <div style="padding: 20px; background: #eee; margin: 20px; border-radius: 10px;">
+                <strong>Cartão de Crédito</strong><br>
+                <span style="color:#666; font-size:14px;">Fatura fechada</span><br>
+                <span style="font-weight:bold;">R$ 0,00</span>
+            </div>
+        </div>
+
+        <div id="pix-view" class="pix-area">
+            <h3 style="margin-bottom: 20px;">Área Pix</h3>
+            <p style="font-size: 14px; color: #666;">Cole o código Pix do CineStream:</p>
+            <input type="text" class="pix-input" id="pix-input" placeholder="Cola aqui o código...">
+            <button class="pay-btn" onclick="pagar()">PAGAR AGORA</button>
+            <p style="text-align: center; margin-top: 20px; color: #820AD1; cursor: pointer;" onclick="hidePix()">Voltar</p>
+        </div>
+
+    </div>
+
+    <script>
+        const DB = 'cine_db_final';
+        let currentUser = null;
+
+        function getDB() { return JSON.parse(localStorage.getItem(DB)) || []; }
+        function saveDB(d) { localStorage.setItem(DB, JSON.stringify(d)); }
+
+        window.onload = () => {
+            const session = JSON.parse(localStorage.getItem('cineSession'));
+            if(!session) {
+                alert("Faça login no CineStream primeiro!");
+                window.close();
+                return;
+            }
+            
+            // Carrega dados atualizados do banco
+            const db = getDB();
+            currentUser = db.find(u => u.email === session.email);
+            
+            if(currentUser) {
+                document.getElementById('user-name').innerText = "Olá, " + currentUser.email.split('@')[0];
+                document.getElementById('balance').innerText = currentUser.balance.toFixed(2);
+            }
+        };
+
+        function showPix() {
+            document.getElementById('home-view').style.display = 'none';
+            document.getElementById('pix-view').style.display = 'flex';
+        }
+
+        function hidePix() {
+            document.getElementById('home-view').style.display = 'block';
+            document.getElementById('pix-view').style.display = 'none';
+        }
+
+        function pagar() {
+            const code = document.getElementById('pix-input').value;
+            if(!code.includes("CINESTREAM")) {
+                alert("Código inválido!");
+                return;
+            }
+
+            const valor = 29.90;
+
+            if(currentUser.balance >= valor) {
+                // Deduzir Saldo
+                const db = getDB();
+                const idx = db.findIndex(u => u.email === currentUser.email);
+                
+                db[idx].balance -= valor;
+                db[idx].plan = 'premium'; // ATIVA O PLANO NA HORA
+                
+                saveDB(db);
+                currentUser = db[idx]; // Atualiza local
+                
+                document.getElementById('balance').innerText = currentUser.balance.toFixed(2);
+                
+                // Notificação
+                const notif = document.getElementById('notify');
+                notif.style.display = 'block';
+                setTimeout(() => notif.style.display = 'none', 3000);
+                
+                alert("PAGAMENTO REALIZADO! CineStream Premium ativado.");
+                hidePix();
+                
+            } else {
+                alert("Saldo insuficiente! Peça ao Admin para adicionar saldo.");
+            }
+        }
+    </script>
+</body>
+</html>
