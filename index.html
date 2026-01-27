@@ -3,32 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineStream - Final Fixed</title>
+    <title>CineStream System + Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
     
     <style>
-        :root { --red: #E50914; --black: #0a0a0a; --gold: #FFD700; }
+        :root { --red: #E50914; --black: #0a0a0a; --dark: #141414; --gold: #FFD700; --green: #2ecc71; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { background: var(--black); color: white; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
         
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 8px; background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        /* --- PORTAL DE ESCOLHA (SIMULA 2 SITES) --- */
+        #portal-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 3000;
+            background: #000; display: flex; align-items: center; justify-content: center; flex-direction: column;
+            background-image: radial-gradient(circle, #222 0%, #000 100%);
+        }
+        .portal-btn {
+            width: 300px; padding: 20px; margin: 10px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; border: none; transition: 0.3s;
+        }
+        .btn-user { background: var(--red); color: white; }
+        .btn-user:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(229, 9, 20, 0.5); }
+        .btn-admin { background: #333; color: var(--green); border: 1px solid var(--green); }
+        .btn-admin:hover { background: var(--green); color: black; }
 
-        /* --- TELA LOGIN --- */
+        /* --- SITE DO ADMIN (A PLANILHA) --- */
+        #admin-screen {
+            display: none; padding: 40px; min-height: 100vh; background: #111;
+        }
+        .admin-table {
+            width: 100%; border-collapse: collapse; margin-top: 20px; background: #1a1a1a; border-radius: 8px; overflow: hidden;
+        }
+        .admin-table th, .admin-table td {
+            padding: 15px; text-align: left; border-bottom: 1px solid #333;
+        }
+        .admin-table th { background: #222; color: var(--green); }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-premium { background: var(--gold); color: black; }
+        .badge-free { background: #444; color: white; }
+        .action-btn { cursor: pointer; color: #ff5555; text-decoration: underline; font-size: 14px; }
+
+        /* --- SITE DO USUÁRIO (LOGIN REFORMULADO) --- */
         #auth-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 2000;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 2000;
             background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/BR-pt-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
-            background-size: cover; display: flex; align-items: center; justify-content: center;
+            background-size: cover; align-items: center; justify-content: center;
         }
         .login-box {
             background: rgba(0,0,0,0.85); padding: 50px; border-radius: 12px; width: 100%; max-width: 400px;
             text-align: center; border: 1px solid #333; backdrop-filter: blur(10px);
         }
-        .logo-img { height: 60px; margin-bottom: 20px; }
         input { width: 100%; padding: 15px; background: #333; border: 1px solid #444; border-radius: 5px; color: white; margin-bottom: 15px; }
         .btn-main { width: 100%; padding: 15px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 16px; }
-        .btn-main:hover { background: #f00; }
+        .error-msg { color: #ff5555; background: rgba(255, 85, 85, 0.1); padding: 10px; border-radius: 4px; display: none; margin-bottom: 15px; border: 1px solid #ff5555; font-size: 14px; }
+        .forgot-pass { color: #aaa; font-size: 13px; margin-top: 10px; cursor: pointer; display: none; }
+        .forgot-pass:hover { text-decoration: underline; color: white; }
 
         /* --- TELA PLANOS --- */
         #plan-screen { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:1900; align-items:center; justify-content:center; flex-direction:column; }
@@ -36,66 +63,89 @@
         .plan-card { background:#111; padding:30px; border:2px solid #333; border-radius:10px; width:280px; text-align:center; cursor:pointer; position:relative; }
         .plan-card:hover { transform:scale(1.05); border-color:var(--red); }
         .plan-card.premium { border-color:var(--gold); box-shadow:0 0 20px rgba(255,215,0,0.2); }
-        
+
         /* --- APP --- */
         #app-screen { display: none; }
         .nav { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 4%; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, black, transparent); z-index: 100; transition: 0.3s; }
         .nav.black { background: #000; }
-        
         .hero { height: 80vh; background-size: cover; background-position: center; position: relative; }
         .hero-content { position: absolute; bottom: 20%; left: 4%; max-width: 600px; text-shadow: 2px 2px 10px black; }
-
         .row { margin-bottom: 40px; padding-left: 4%; }
-        .row h2 { color: #eee; margin-bottom: 10px; border-left: 4px solid var(--red); padding-left: 10px; display: flex; align-items: center; gap: 10px; }
         .posters { display: flex; overflow-x: auto; gap: 15px; padding: 10px 0; scrollbar-width: none; }
-        
         .poster-wrapper { position: relative; min-width: 160px; height: 240px; border-radius: 8px; overflow: hidden; transition: 0.3s; cursor: pointer; }
         .poster-wrapper:hover { transform: scale(1.1); z-index: 10; }
         .poster-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* TAGS (IDIOMA E LOCK) */
-        .lang-tag {
-            position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); 
-            color: white; font-size: 10px; padding: 2px 6px; border-radius: 3px; font-weight: bold; border: 1px solid #555;
-        }
-        .lock-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: var(--gold); font-weight: bold; backdrop-filter: blur(2px);
-        }
+        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-weight: bold; backdrop-filter: blur(2px); }
 
         /* MODAIS */
         #paywall-modal, #video-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; align-items: center; justify-content: center; }
-        
         .player-controls { position: absolute; top: 20px; left: 20px; display: flex; gap: 10px; z-index: 6000; }
         .btn-src { padding: 8px 15px; background: rgba(255,255,255,0.1); border: 1px solid #555; color: white; cursor: pointer; border-radius: 4px; }
         .btn-src.active { background: var(--red); border-color: var(--red); }
-        
         iframe { width: 100%; height: 100%; border: none; }
         .close-btn { position: absolute; top: 20px; right: 20px; font-size: 40px; color: white; cursor: pointer; z-index: 6001; }
-
     </style>
 </head>
 <body>
 
+    <div id="portal-screen">
+        <h1 style="margin-bottom: 40px; font-size: 40px;">SISTEMA CINESTREAM</h1>
+        <button class="portal-btn btn-user" onclick="irParaSite()">🎬 Acessar Site (Usuário)</button>
+        <button class="portal-btn btn-admin" onclick="irParaAdmin()">📊 Acessar Planilha (Admin)</button>
+    </div>
+
+    <div id="admin-screen">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1 style="color:var(--green);">Painel Administrativo</h1>
+            <button onclick="location.reload()" style="background:#333; color:white; border:none; padding:10px 20px; cursor:pointer;">Sair</button>
+        </div>
+        <p style="color:#aaa;">Banco de Dados de Usuários</p>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Senha</th>
+                    <th>Plano</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="admin-tbody">
+                </tbody>
+        </table>
+        <div style="margin-top:20px; color:#666; font-size:12px;">* As alterações aqui afetam o site em tempo real.</div>
+    </div>
+
     <div id="auth-screen">
         <div class="login-box">
-            <img src="logo.png" class="logo-img" alt="CineStream">
-            <h2 style="margin-bottom:20px;">Entrar</h2>
+            <h2 id="login-title" style="margin-bottom:20px; color:var(--red);">ENTRAR</h2>
+            <div id="login-error" class="error-msg"></div>
+            
             <input type="email" id="email" placeholder="Email">
-            <input type="password" id="pass" placeholder="Senha">
-            <button class="btn-main" onclick="fazerLogin()">ACESSAR</button>
-            <p style="margin-top:15px; font-size:13px; color:#ccc; cursor:pointer;" onclick="criarConta()">Não tem conta? <u>Criar agora</u></p>
+            <div id="pass-container">
+                <input type="password" id="pass" placeholder="Senha">
+            </div>
+            
+            <button class="btn-main" onclick="processarLogin()" id="btn-login-action">ACESSAR</button>
+            
+            <div id="forgot-pass-btn" class="forgot-pass" onclick="alert('Um email de recuperação foi enviado (Simulação).')">Esqueceu a senha?</div>
+            
+            <p style="margin-top:20px; font-size:14px; color:#ccc;">
+                <span id="switch-msg">Não tem conta?</span> 
+                <span style="color:white; text-decoration:underline; cursor:pointer; font-weight:bold;" onclick="toggleModoLogin()" id="switch-btn">Criar agora</span>
+            </p>
+            
+            <button onclick="location.reload()" style="background:transparent; border:none; color:#555; margin-top:30px; cursor:pointer; font-size:12px;">← Voltar ao Portal</button>
         </div>
     </div>
 
     <div id="plan-screen">
-        <h2 style="font-size:30px; margin-bottom:30px;">Escolha sua Assinatura</h2>
+        <h2 style="font-size:30px; margin-bottom:30px;">Finalize seu Cadastro</h2>
         <div class="plan-container">
             <div class="plan-card" onclick="setPlan('free')">
                 <h3>GRÁTIS</h3>
                 <h1>R$ 0</h1>
-                <p>Anúncios</p>
+                <p>Com Anúncios</p>
                 <p>Conteúdo Limitado</p>
                 <button class="btn-main" style="background:#333; margin-top:20px;">ESCOLHER</button>
             </div>
@@ -103,7 +153,7 @@
                 <div style="color:var(--gold); font-weight:bold; margin-bottom:5px;">RECOMENDADO</div>
                 <h3 style="color:var(--gold);">PREMIUM</h3>
                 <h1>R$ 29,90</h1>
-                <p>Zero Anúncios</p>
+                <p>Sem Anúncios</p>
                 <p>Tudo Liberado 🔓</p>
                 <button class="btn-main" style="background:var(--gold); color:black; margin-top:20px;">ASSINAR</button>
             </div>
@@ -112,7 +162,7 @@
 
     <div id="app-screen">
         <nav class="nav" id="navbar">
-            <img src="logo.png" style="height:40px;">
+            <div style="color:var(--red); font-weight:bold; font-size:25px;">CINESTREAM</div>
             <div style="display:flex; align-items:center; gap:15px;">
                 <div id="user-badge" style="font-size:12px; padding:5px 10px; background:#333; border-radius:4px;">FREE</div>
                 <button onclick="logout()" style="background:transparent; border:1px solid #666; color:white; padding:5px; cursor:pointer;">Sair</button>
@@ -129,17 +179,11 @@
 
         <div style="margin-top:-80px; position:relative; z-index:10; padding-bottom:50px;">
             <div class="row">
-                <h2>🔥 Destaques Premium <span style="font-size:12px; color:var(--gold); border:1px solid var(--gold); padding:2px 5px; border-radius:4px; margin-left:10px;">SÓ ASSINANTES</span></h2>
+                <h2>🔥 Premium <span style="font-size:12px; color:var(--gold); border:1px solid var(--gold); padding:2px 5px; border-radius:4px; margin-left:10px;">VIP</span></h2>
                 <div class="posters" id="row-premium"></div>
             </div>
-            <div class="row">
-                <h2>🎬 Ação (Liberado)</h2>
-                <div class="posters" id="row-action"></div>
-            </div>
-            <div class="row">
-                <h2>😂 Comédia (Liberado)</h2>
-                <div class="posters" id="row-comedy"></div>
-            </div>
+            <div class="row"><h2>🎬 Ação</h2><div class="posters" id="row-action"></div></div>
+            <div class="row"><h2>😂 Comédia</h2><div class="posters" id="row-comedy"></div></div>
         </div>
     </div>
 
@@ -156,72 +200,144 @@
     <div id="video-modal">
         <div class="close-btn" onclick="fecharPlayer()">×</div>
         <div class="player-controls">
-            <button class="btn-src active" onclick="trocarPlayer(1)">🇧🇷 Player 1</button>
+            <button class="btn-src active" onclick="trocarPlayer(3)">🇺🇸 Player 3 (VidSrc)</button>
+            <button class="btn-src" onclick="trocarPlayer(1)">🇧🇷 Player 1</button>
             <button class="btn-src" onclick="trocarPlayer(2)">🇧🇷 Player 2</button>
-            <button class="btn-src" onclick="trocarPlayer(3)">🇺🇸 Player 3</button>
         </div>
         <iframe id="video-frame" allowfullscreen></iframe>
     </div>
 
     <script>
-        // CONFIG
-        const API_KEY = 'c3162eed0616407fa43134e07880c7d5';
-        const BASE = 'https://api.themoviedb.org/3';
-        const IMG = 'https://image.tmdb.org/t/p/w300';
-        let heroId = 0;
+        // --- SISTEMA DE BANCO DE DADOS (SIMULADO) ---
+        const DB_KEY = 'cine_db_final';
         let currentUser = null;
-        let currentMovieId = 0;
+        let isRegisterMode = false;
 
-        // --- SISTEMA DE BANCO DE DADOS (LOCALSTORAGE) ---
-        function getDB() { return JSON.parse(localStorage.getItem('cineDB_v7')) || []; }
-        function saveDB(data) { localStorage.setItem('cineDB_v7', JSON.stringify(data)); }
+        function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || []; }
+        function saveDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); }
 
-        window.onload = () => {
-            const savedEmail = localStorage.getItem('cineSession');
-            if(savedEmail) {
+        // --- NAVEGAÇÃO DO PORTAL ---
+        function irParaSite() {
+            document.getElementById('portal-screen').style.display = 'none';
+            document.getElementById('auth-screen').style.display = 'flex';
+        }
+        function irParaAdmin() {
+            document.getElementById('portal-screen').style.display = 'none';
+            document.getElementById('admin-screen').style.display = 'block';
+            carregarAdmin();
+        }
+
+        // --- ADMIN LÓGICA ---
+        function carregarAdmin() {
+            const db = getDB();
+            const tbody = document.getElementById('admin-tbody');
+            tbody.innerHTML = '';
+            
+            if(db.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#666;">Nenhum usuário cadastrado.</td></tr>';
+                return;
+            }
+
+            db.forEach((u, index) => {
+                const badgeClass = u.plan === 'premium' ? 'badge-premium' : 'badge-free';
+                const planName = u.plan ? u.plan.toUpperCase() : 'PENDENTE';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${u.email}</td>
+                    <td>${u.pass}</td>
+                    <td><span class="status-badge ${badgeClass}">${planName}</span></td>
+                    <td><span class="action-btn" onclick="deletarUsuario(${index})">Excluir</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deletarUsuario(index) {
+            if(confirm('Tem certeza?')) {
                 const db = getDB();
-                currentUser = db.find(u => u.email === savedEmail);
-                if(currentUser) iniciarApp();
+                db.splice(index, 1);
+                saveDB(db);
+                carregarAdmin();
             }
         }
 
-        // --- LOGIN / CADASTRO ---
-        function criarConta() {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('pass').value;
-            if(!email || !pass) return alert("Preencha tudo!");
-            
-            const db = getDB();
-            if(db.find(u => u.email === email)) return alert("Email já existe!");
+        // --- LOGIN DO USUÁRIO ---
+        function toggleModoLogin() {
+            isRegisterMode = !isRegisterMode;
+            const title = document.getElementById('login-title');
+            const btn = document.getElementById('btn-login-action');
+            const switchMsg = document.getElementById('switch-msg');
+            const switchBtn = document.getElementById('switch-btn');
+            const error = document.getElementById('login-error');
+            const forgot = document.getElementById('forgot-pass-btn');
 
-            // Cria usuário "pendente" (sem plano ainda)
-            currentUser = { email, pass, plan: null };
-            db.push(currentUser);
-            saveDB(db);
-            localStorage.setItem('cineSession', email);
-            
-            // Manda escolher plano
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('plan-screen').style.display = 'flex';
+            error.style.display = 'none';
+
+            if(isRegisterMode) {
+                title.innerText = "CRIAR CONTA";
+                btn.innerText = "CADASTRAR";
+                switchMsg.innerText = "Já tem conta?";
+                switchBtn.innerText = "Entrar";
+                forgot.style.display = 'none';
+            } else {
+                title.innerText = "ENTRAR";
+                btn.innerText = "ACESSAR";
+                switchMsg.innerText = "Não tem conta?";
+                switchBtn.innerText = "Criar agora";
+                forgot.style.display = 'none'; // Escondido por padrão, aparece no erro
+            }
         }
 
-        function fazerLogin() {
+        function processarLogin() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
-            const db = getDB();
-            const user = db.find(u => u.email === email && u.pass === pass);
+            const error = document.getElementById('login-error');
+            const forgot = document.getElementById('forgot-pass-btn');
             
-            if(user) {
-                currentUser = user;
-                localStorage.setItem('cineSession', email);
-                if(!user.plan) {
+            if(!email || !pass) {
+                error.innerText = "Preencha todos os campos.";
+                error.style.display = 'block';
+                return;
+            }
+
+            const db = getDB();
+            const userExists = db.find(u => u.email === email);
+
+            if(isRegisterMode) {
+                // --- CADASTRO ---
+                if(userExists) {
+                    error.innerText = "Este email já existe! Tente entrar.";
+                    error.style.display = 'block';
+                } else {
+                    // SUCESSO NO CADASTRO -> Manda para Planos
+                    currentUser = { email, pass, plan: null };
+                    db.push(currentUser);
+                    saveDB(db);
+                    
+                    // CORREÇÃO: Não entra direto no app. Vai para Planos.
                     document.getElementById('auth-screen').style.display = 'none';
                     document.getElementById('plan-screen').style.display = 'flex';
-                } else {
-                    iniciarApp();
                 }
             } else {
-                alert("Dados incorretos!");
+                // --- LOGIN ---
+                if(!userExists) {
+                    error.innerText = "Conta não encontrada. Crie uma conta.";
+                    error.style.display = 'block';
+                } else if (userExists.pass !== pass) {
+                    error.innerText = "Senha incorreta.";
+                    error.style.display = 'block';
+                    forgot.style.display = 'block'; // Mostra botão "Esqueceu a senha?"
+                } else {
+                    // Login Correto
+                    currentUser = userExists;
+                    if(!currentUser.plan) {
+                        document.getElementById('auth-screen').style.display = 'none';
+                        document.getElementById('plan-screen').style.display = 'flex';
+                    } else {
+                        iniciarApp();
+                    }
+                }
             }
         }
 
@@ -230,34 +346,37 @@
             // Atualiza no DB
             const db = getDB();
             const idx = db.findIndex(u => u.email === currentUser.email);
-            db[idx].plan = plan;
-            saveDB(db);
-
-            alert("Plano Atualizado!");
+            if(idx !== -1) {
+                db[idx].plan = plan;
+                saveDB(db);
+            }
             document.getElementById('plan-screen').style.display = 'none';
             document.getElementById('paywall-modal').style.display = 'none';
             iniciarApp();
         }
 
         function logout() {
-            localStorage.removeItem('cineSession');
+            currentUser = null;
             location.reload();
         }
 
-        // --- APP ---
+        // --- APP LOGIC (API & PLAYER) ---
+        const API_KEY = 'c3162eed0616407fa43134e07880c7d5';
+        const BASE = 'https://api.themoviedb.org/3';
+        const IMG = 'https://image.tmdb.org/t/p/w300';
+        let heroId = 0;
+        let currentMovieId = 0;
+
         async function iniciarApp() {
             document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('plan-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
 
-            // Badge
             const b = document.getElementById('user-badge');
             b.innerText = currentUser.plan === 'premium' ? "PREMIUM 👑" : "GRÁTIS";
             b.style.background = currentUser.plan === 'premium' ? "var(--gold)" : "#333";
             b.style.color = currentUser.plan === 'premium' ? "black" : "white";
 
             // Conteúdo
-            // Hero
             const hRes = await fetch(`${BASE}/trending/movie/day?api_key=${API_KEY}&language=pt-BR`);
             const hData = await hRes.json();
             const h = hData.results[0];
@@ -266,64 +385,49 @@
             document.getElementById('hero-title').innerText = h.title;
             document.getElementById('hero-desc').innerText = h.overview;
 
-            // Listas
-            // IMPORTANTE: A lista 1 é PREMIUM (Locked se for free)
             carregarLista(`${BASE}/trending/movie/week?api_key=${API_KEY}&language=pt-BR`, 'row-premium', true);
             carregarLista(`${BASE}/discover/movie?api_key=${API_KEY}&with_genres=28&language=pt-BR`, 'row-action', false);
             carregarLista(`${BASE}/discover/movie?api_key=${API_KEY}&with_genres=35&language=pt-BR`, 'row-comedy', false);
         }
 
-        async function carregarLista(url, elId, isPremiumRow) {
+        async function carregarLista(url, elId, isPremium) {
             const res = await fetch(url);
             const data = await res.json();
             const el = document.getElementById(elId);
             el.innerHTML = '';
-
             data.results.forEach(f => {
                 if(f.poster_path) {
                     const div = document.createElement('div');
                     div.className = 'poster-wrapper';
-                    
-                    // Verifica Trava
-                    const bloqueado = isPremiumRow && currentUser.plan !== 'premium';
-                    
-                    // Tag de Idioma (Simulado base da API)
-                    const lang = f.original_language === 'pt' ? '🇧🇷 NAC' : '🇧🇷 DUB'; 
-
+                    const locked = isPremium && currentUser.plan !== 'premium';
                     let html = `<img src="${IMG}${f.poster_path}" class="poster-img">`;
-                    html += `<div class="lang-tag">${lang}</div>`;
-                    
-                    if(bloqueado) {
-                        html += `<div class="lock-overlay"><div style="font-size:30px">🔒</div>Premium</div>`;
-                    }
-                    
+                    if(locked) html += `<div class="lock-overlay"><div style="font-size:30px">🔒</div>Premium</div>`;
                     div.innerHTML = html;
-                    div.onclick = () => verificarPermissao(f.id, bloqueado);
+                    div.onclick = () => verificarPermissao(f.id, locked);
                     el.appendChild(div);
                 }
             });
         }
 
-        function verificarPermissao(id, isLocked) {
-            if(isLocked) {
+        function verificarPermissao(id, locked) {
+            if(locked) {
                 document.getElementById('paywall-modal').style.display = 'flex';
             } else {
-                abrirPlayer(id);
+                currentMovieId = id;
+                document.getElementById('video-modal').style.display = 'flex';
+                trocarPlayer(3); // Player 3 (VidSrc) por padrão
             }
-        }
-
-        // --- PLAYER ---
-        function abrirPlayer(id) {
-            currentMovieId = id;
-            document.getElementById('video-modal').style.display = 'flex';
-            trocarPlayer(1); // Começa com Warez
         }
 
         function trocarPlayer(opt) {
             const frame = document.getElementById('video-frame');
-            if(opt === 1) frame.src = `https://embed.warezcdn.link/filme/${currentMovieId}`; // Warez (Top BR)
-            if(opt === 2) frame.src = `https://superflixapi.top/filme/${currentMovieId}`; // SuperFlix (Backup BR)
-            if(opt === 3) frame.src = `https://vidsrc.me/embed/movie?tmdb=${currentMovieId}`; // Gringo (Fallback)
+            if(opt === 1) frame.src = `https://embed.warezcdn.link/filme/${currentMovieId}`;
+            if(opt === 2) frame.src = `https://superflixapi.top/filme/${currentMovieId}`;
+            if(opt === 3) frame.src = `https://vidsrc.me/embed/movie?tmdb=${currentMovieId}`;
+            
+            // UI Update
+            document.querySelectorAll('.btn-src').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
         }
 
         function fecharPlayer() {
