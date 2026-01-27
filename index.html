@@ -2,40 +2,71 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Meu App de Filmes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineApp - Filmes Reais</title>
     <style>
-        body { background: #141414; color: white; font-family: Arial; }
-        .search-box { text-align: center; padding: 20px; }
-        input { padding: 10px; width: 60%; border-radius: 5px; border: none; }
+        /* Estilo Dark e Moderno */
+        body { background: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
+        .header { text-align: center; padding: 40px 20px; background: linear-gradient(to bottom, #1f1f1f, #0a0a0a); }
+        h1 { color: #e50914; font-size: 3rem; margin: 0; }
         
+        .search-box { margin-top: 20px; }
+        input { 
+            padding: 15px; width: 80%; max-width: 500px; border-radius: 30px; 
+            border: none; outline: none; font-size: 16px; background: #222; color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
         /* Grade de Filmes */
         #lista-filmes { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-            gap: 20px; padding: 20px; 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 25px; padding: 30px; 
         }
-        .filme-card { cursor: pointer; transition: 0.3s; }
-        .filme-card:hover { transform: scale(1.1); }
-        .filme-card img { width: 100%; border-radius: 10px; }
-        .filme-card p { text-align: center; font-size: 14px; }
+        .filme-card { cursor: pointer; transition: 0.4s; position: relative; }
+        .filme-card:hover { transform: scale(1.08); z-index: 2; }
+        .filme-card img { width: 100%; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .filme-card p { text-align: center; font-size: 14px; margin-top: 10px; font-weight: bold; }
+
+        /* Modal do Player (Tela de Cinema) */
+        #modal-player {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; align-items: center;
+        }
+        .modal-content { width: 90%; max-width: 1000px; position: relative; }
+        iframe { width: 100%; height: 560px; border-radius: 10px; border: 2px solid #333; }
+        .btn-fechar {
+            position: absolute; top: -40px; right: 0; color: white; font-size: 30px;
+            cursor: pointer; font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <div class="search-box">
-        <h1>CineApp 🎬</h1>
-        <input type="text" id="input-busca" placeholder="Digite o nome do filme..." onkeyup="buscarFilme()">
+    <div class="header">
+        <h1>CineApp</h1>
+        <div class="search-box">
+            <input type="text" id="input-busca" placeholder="Pesquise filmes ou séries..." onkeyup="buscarFilme()">
+        </div>
     </div>
 
     <div id="lista-filmes">
         </div>
 
+    <div id="modal-player">
+        <div class="modal-content">
+            <span class="btn-fechar" onclick="fecharPlayer()">&times; Fechar</span>
+            <iframe id="video-frame" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+
     <script>
-        const API_KEY = 'SUA_CHAVE_API_AQUI'; // <--- COLOQUE SUA CHAVE AQUI
+        // Sua chave API configurada
+        const API_KEY = 'c3162eed0616407fa43134e07880c7d5'; 
 
         async function buscarFilme() {
             const query = document.getElementById('input-busca').value;
-            if (query.length < 3) return; // Só busca se tiver mais de 3 letras
+            if (query.length < 3) return;
 
             const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}&language=pt-BR`;
             
@@ -44,21 +75,21 @@
                 const data = await response.json();
                 exibirFilmes(data.results);
             } catch (error) {
-                console.error("Erro ao buscar filmes", error);
+                console.error("Erro na busca");
             }
         }
 
         function exibirFilmes(filmes) {
             const container = document.getElementById('lista-filmes');
-            container.innerHTML = ''; // Limpa a lista anterior
+            container.innerHTML = '';
 
             filmes.forEach(filme => {
-                if (!filme.poster_path) return; // Pula filmes sem capa
+                if (!filme.poster_path) return;
 
                 const card = document.createElement('div');
                 card.className = 'filme-card';
-                // No clique, vamos apenas mostrar o ID por enquanto
-                card.onclick = () => alert("ID do Filme: " + filme.id); 
+                // Ao clicar, chama o player com o ID do filme
+                card.onclick = () => abrirPlayer(filme.id); 
 
                 card.innerHTML = `
                     <img src="https://image.tmdb.org/t/p/w500${filme.poster_path}" alt="${filme.title}">
@@ -66,6 +97,24 @@
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function abrirPlayer(id) {
+            const modal = document.getElementById('modal-player');
+            const iframe = document.getElementById('video-frame');
+            
+            // Usando um indexador que funciona com IDs do TMDb
+            // Nota: Se um servidor estiver offline, pode-se testar outros
+            iframe.src = `https://embed.su/embed/movie/${id}`;
+            
+            modal.style.display = 'flex';
+        }
+
+        function fecharPlayer() {
+            const modal = document.getElementById('modal-player');
+            const iframe = document.getElementById('video-frame');
+            iframe.src = ""; // Para o vídeo parar de tocar ao fechar
+            modal.style.display = 'none';
         }
     </script>
 </body>
